@@ -282,7 +282,9 @@ class IncomingProductController extends Controller
      * @return SymfonyComponentFormForm The form
      */
     function createModifyScannedForm(Incoming $incoming) {
-        $form = $this->createFormBuilder($incoming)
+        $form = $this->createFormBuilder($incoming,array(
+                'csrf_protection' => false,  // <---- set this to false on a per Form Instance basis
+            ))
             ->setAction($this->generateUrl('scan_stock_ajax', array('id' => $incoming->getId())))
             ->setMethod('POST')
             ->add('incomingScannedProducts',CollectionType::class,array(

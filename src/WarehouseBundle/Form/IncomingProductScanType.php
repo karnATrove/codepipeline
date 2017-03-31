@@ -84,6 +84,7 @@ class IncomingProductScanType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => IncomingProductScan::class,
+            //'csrf_protection' => false,
         ));
     }
 }
