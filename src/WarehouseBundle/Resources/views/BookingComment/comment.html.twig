@@ -1,0 +1,17 @@
+{# <i class="fa fa-user avatar" style="font-size:2em;"></i>
+<div class="message_date">
+  <h3 class="date text-info">{{ comment.created|date('d') }}</h3>
+  <p class="month">{{ comment.created|date('M') }}</p>
+</div>
+<div class="message_wrapper">
+  <h4 class="heading">Brendan Burscough</h4>
+  <blockquote class="message">{{ comment.comment }}</blockquote>
+</div> #}
+
+<div class="block">
+	<div class="block_content">
+	  {# <h2 class="title"><a>Who Needs Sundance When You’ve Got&nbsp;Crowdfunding?</a></h2> #}
+	  <div class="byline title"><span>{{ comment.created|date('Y-m-d h:i A') }}</span>{% if comment.user %} by <a>{{ comment.user.name }}</a>{% else %} by <a>Internal System</a>{% endif %}</div>
+	  <p class="excerpt">{{ comment.comment }}</p>
+	</div>
+</div>

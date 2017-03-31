@@ -1,0 +1,33 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+#    service_name:
+#        class: AppBundle\Directory\ClassName
+#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    # keep service names short
+    app.booking:
+        class: WarehouseBundle\Utils\Booking
+        arguments: ["@service_container","@BookingManager","@request_stack"]
+    app.product:
+        class: WarehouseBundle\Utils\Product
+        arguments: ["@service_container"]
+    app.document_uploader:
+        class: WarehouseBundle\Utils\BookingFile
+        arguments: ['%documents_directory%']
+    app.import_uploader:
+        class: WarehouseBundle\Utils\BookingFile
+        arguments: ['%imports_directory%']
+    app.incoming:
+        class: WarehouseBundle\Utils\Incoming
+        arguments: ["@service_container"]
+    app.return:
+        class: WarehouseBundle\Utils\BookingReturn
+        arguments: ["@service_container"]
+    app.twig_extension:
+        class: WarehouseBundle\Twig\WarehouseExtension
+        public: false
+        tags:
+            - { name: twig.extension }

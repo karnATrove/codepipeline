@@ -1,0 +1,63 @@
+<hr />
+
+<div class="row">
+	<div class="col-xs-12">
+	  	<div class="x_panel">
+	      <div class="x_title">
+	        <h2><i class="fa fa-bars"></i> Start Scanning <small>{{ incoming.name }}</small></h2>
+	        <div class="pull-right">
+            <div class="form-group">
+              {{ form_start(form, { 'attr': {'class':'ajaxForm no-enter-submit','id':'scan-incoming-form'}}) }}
+                {{ form_widget(form.scanIncoming, {'attr':{'id':'scan-incoming'}}) }}
+              {{ form_rest(form) }}
+              {{ form_end(form) }}
+            </div>
+          </div>
+	        <div class="clearfix"></div>
+	      </div>
+	      <div class="x_content">
+          <form name="scan-incoming-product-form" id="scan-incoming-product-form" method="post" class="ajaxForm scan_stock_form" action="{{ path('scan_stock_product_ajax',{'id': incoming.id}) }}">
+            <div class="error_zone"></div>
+	      	  <table id="datatable-keytable" class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Model</th>
+                  <th># Inbound</th>
+                  <th>Total Count</th>
+                  <th>Location</th>
+                  <th>Qty</th>
+                </tr>
+              </thead>
+              <tbody class="incomingScannedProducts">
+              {% include 'WarehouseBundle:Scan:stock/product_scans.html.twig' with {'form': form_scan} %}
+              <tr class="remove">
+                <td colspan="7">Scan items to build this list.</td>
+              </tr>
+              </tbody>
+            </table>
+
+	          <div class="clearfix"></div>
+
+            <div class="actionBar">
+               {{ form_widget(form_scan.complete) }}
+            </div>
+
+            <hr />
+
+            <p>
+              <strong>Note:</strong> These items are later accessible <a href="{{ path('incoming_products_scanned',{'id':incoming.id}) }}">here</a>.
+            </p>
+
+            {{ form_rest(form_scan) }}
+
+          </form>
+
+	      </div>
+	    </div>
+	</div>
+</div>
+
+{% javascripts '@WarehouseBundle/Resources/public/js/scan_incoming.js' %}
+  <script src="{{ asset_url }}"></script>
+{% endjavascripts %}

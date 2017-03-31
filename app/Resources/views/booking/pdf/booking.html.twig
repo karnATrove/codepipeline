@@ -1,0 +1,101 @@
+{% extends 'WarehouseBundle::pdf_layout.html.twig' %}
+
+
+{% block body %}
+		{% block content_header %}
+        	<div class="content_heading">Pick List #{{ booking.orderNumber }} - As of {{ "now"|date('Y-m-d H:i A') }}</div>
+        {% endblock %}
+
+        {% block content %}
+		    <div class="row">
+		        <div class="col-xs-3">
+		            <h1>Order {{ booking.orderNumber }}</h1>
+		        </div>
+
+		        <div class="col-xs-9">
+		        	<div class="booking_carrier">
+		            	Carrier Info
+		            </div>
+		        </div>
+		    </div>
+		    <div class="row">
+		    	<div class="col-xs-8">
+		    		<h2>Items</h2>
+			    	<table class="table table-bordered">
+	                  <thead>
+	                    <tr>
+	                      <th width="30"></th>
+	                      <th>SKU</th>
+	                      <th>Description</th>
+	                      <th>Qty</th>
+	                      <th>Ctn</th>
+	                      <th></th>
+	                    </tr>
+	                  </thead>
+	                  <tbody>
+	                  	{% for product in booking.products %}
+	                    <tr>
+	                      <td><i class="fa fa-square-o" style="font-size:24px;"></i></td>
+	                      <th scope="row">{{ product.product.model }}</th>
+	                      <td>{{ product.product.description }}</td>
+	                      <td>{{ product.qty }}</td>
+	                      <td>{{ (product.qty / product.product.qtyPerCarton) }}</td>
+	                      <td width="100"><img src="{{ productBarCodes[product.id] }}" alt="{{ product.product.model }}" title="{{ product.product.model }}" /></td>
+	                    </tr>
+	                    {% endfor %}
+	                    {% if booking.products|length == 0 %}
+	                    <tr>
+	                    	<td colspan="4">No items on this order are picked.</td>
+	                    </tr>
+	                    {% endif %}
+	                  </tbody>
+	                </table>
+
+	                <h2>Comments</h2>
+	                <ul class="list-unstyled timeline widget booking_comments">
+		              {% if booking.comments|length %}
+		                {% for comment in booking.comments %}
+		                  <li><div class="block">
+							<div class="block_content">
+							  <div class="byline title">{{ comment.comment }}</div>
+							</div>
+						  </div></li>
+		                {% endfor %}
+		              {% else %}
+		                  <li class="remove">There are no comments associated with the booking.</li>
+		              {% endif %}
+		            </ul>
+	            </div>
+
+	            <div class="col-xs-4">
+	            	<h2>Consignee Information</h2>
+	            	<div class="booking_detail row">
+		            	<div class="col-xs-12">
+	                        <p class="title">Company</p>
+	                        <p>{{ booking.contact.company }}</p>
+	                        <p class="title">Consignee Name</p>
+	                        <p>{{ booking.contact.name }}</p>
+	                        <p class="title">Communication methods</p>
+	                        <ul class="list-unstyled">
+	                        {% for com in booking.contact.communications %}
+	                            <li>{% if com.type == 'PHONE' %}<i class="fa fa-phone"></i>{% elseif com.type == 'EMAIL' %}<i class="fa fa-envelope"></i>{% else %}<i class="fa fa-home"></i>{% endif %}
+	                            {{ com.value }}
+	                            {% if com.id == booking.contact.defaultCom %} (default){% endif %}</li>
+	                        {% endfor %}
+	                        </ul>
+	                    </div>
+	                    <div class="col-xs-12">
+	                        <p class="title">Consignee Address</p>
+	                        <pre>{{ bookingUtil.formatContactAddress(booking.contact) }}</pre>
+	                    </div>
+	                </div>
+
+	               	<div class="booking_upc">
+		            	<!-- barcode as image -->
+						<img src="{{ orderBarCode }}" alt="Barcode for {{ booking.orderNumber }}" title="Barcode for {{ booking.orderNumber }}" />
+						<p>{{ orderBarCodeSku }}</p>
+					</div>
+	            </div>
+		    </div>
+		{% endblock %}
+{% endblock %}

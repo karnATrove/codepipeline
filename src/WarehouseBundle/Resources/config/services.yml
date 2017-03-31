@@ -1,0 +1,20 @@
+services:
+#    warehouse.example:
+#        class: WarehouseBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]
+
+     twig.extension.app:
+        class: WarehouseBundle\Twig\DemoExtension
+        public: false
+        arguments: ["@twig.loader"]
+        tags:
+            - { name: twig.extension }
+     app.listener:
+        class: WarehouseBundle\EventListener\ControllerListener
+        arguments: ["@twig.extension.app"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+     BookingManager:
+        class: WarehouseBundle\Doctrine\BookingManager
+        arguments: [ "@doctrine.orm.entity_manager" , "@service_container" ] 

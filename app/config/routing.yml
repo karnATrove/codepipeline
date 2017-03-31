@@ -1,0 +1,27 @@
+warehouse_routing:
+    resource: "@WarehouseBundle/Resources/config/routing.yml"
+    prefix:   /
+
+warehouse:
+    resource: "@WarehouseBundle/Controller/"
+    type:     annotation
+
+#app:
+#    resource: "@AppBundle/Controller/"
+#    type:     annotation
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+fos_group:
+    resource: "@FOSUserBundle/Resources/config/routing/group.xml"
+    prefix: /group
+
+NelmioApiDocBundle:
+  resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+  prefix:   /api/doc
+
+restful_services:
+    resource: "@WarehouseBundle/Resources/config/api_routing.yml"
+    type:     rest
+    prefix:   /api

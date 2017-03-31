@@ -1,0 +1,29 @@
+<div class="lead">Product Results</div>
+
+<div class="table-responsive">
+	<table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Description</th>
+          <th>On Hand</th>
+          <th>Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+      	{% for product in items %}
+        <tr>
+          <th scope="row"><a href="{{ path('product_edit',{'id':product.id}) }}">{{ product.model }}</a></th>
+          <td>{{ product.description }}</td>
+          <td>{{ productUtil.getOnHand(product) }}</td>
+          <td>{{ productUtil.getAllocated(product) }}</td>
+        </tr>
+        {% endfor %}
+        {% if items|length == 0 %}
+        <tr>
+          <td colspan="4">No results for {{ search }} in products.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+</div>

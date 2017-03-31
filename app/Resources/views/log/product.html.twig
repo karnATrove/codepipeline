@@ -1,0 +1,90 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} -  Edit product
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-title">
+      <div class="title_left">
+        <h3>Product log</h3>
+      </div>
+      <div class="title_right"></div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %} 
+            {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                {{ flashMessage|raw }}
+            </div>
+             {% endfor %} 
+             {% endfor %} 
+        </div>
+    </div>
+
+    <div class="col-xs-12 pull-left">
+                        
+        <!-- PAGE SIZE -->
+        <div class="pagination form-inline ">
+            <select class = "form-control"  onchange="window.location = this.value" >
+                <option value='{{ path('log_product', app.request.query.all|merge({'id':product.id,'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
+                <option value='{{ path('log_product', app.request.query.all|merge({'id':product.id,'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
+                <option value='{{ path('log_product', app.request.query.all|merge({'id':product.id,'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
+                <option value='{{ path('log_product', app.request.query.all|merge({'id':product.id,'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
+                <option value='{{ path('log_product', app.request.query.all|merge({'id':product.id,'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
+            </select>
+        </div>
+        <!-- END PAGE SIZE -->
+
+    </div>
+
+
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                  <h2>{{ product.model }} <small>Log Entries</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content log_product">
+                  {% if log_entries|length %}
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Created</th>
+                            <th>By</td>
+                            <th>Note</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for log_entry in log_entries %}
+                            {% include 'WarehouseBundle:ProductLog:log_row.html.twig' with {'log': log_entry} %}
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                      <a href="{{ path('product_edit',{'id':product.id}) }}">Back to Product</a>
+                    </div>
+                  {% else %}
+                    <p>There are no log entries to display.</p>
+                  {% endif %}
+                </div>
+                <div class="col-md-6 col-md-offset-2 text-right">
+                     {{ pagerHtml|raw }} 
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

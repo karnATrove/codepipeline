@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    	<base href=" \path\to\file" \>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="{{ _charset }}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{% endblock %}</title>
+        {% block styles %}
+        <link rel="stylesheet" href="{{ absolute_url(asset('assets/vendor/bootstrap/dist/css/bootstrap.min.css')) }}">
+        <!-- Font Awesome -->
+        <link href="{{ absolute_url(asset('assets/vendor/gentelella/vendors/font-awesome/css/font-awesome.min.css')) }}" rel="stylesheet">
+        <!-- iCheck -->
+        <link href="{{ absolute_url(asset('assets/vendor/gentelella/vendors/iCheck/skins/flat/green.css')) }}" rel="stylesheet">
+        <!-- Custom Theme Style -->
+        <link href="{{ absolute_url(asset('assets/css/pdf.css')) }}" rel="stylesheet">
+        {% endblock %}
+        {% block head %}{% endblock %}
+    </head>
+    <body class="pdf" id="body">
+    	<div class="container">
+	    	{% block body %}
+	            {% block content_header %}{% endblock %}
+
+	            {% block content %}{% endblock %}
+
+	            {% block content_footer %}{% endblock %}
+	        {% endblock %}
+	    </div>
+    </body>
+
+    {% block scripts %}
+    	<script src="{{ absolute_url(asset('assets/vendor/jquery/dist/jquery.min.js')) }}"></script>
+    	<script src="{{ absolute_url(asset('assets/vendor/bootstrap/dist/js/bootstrap.min.js')) }}"></script>
+    {% endblock %}
+</html>

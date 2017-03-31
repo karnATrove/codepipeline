@@ -1,0 +1,330 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block title %}
+{{ parent() }} - booking
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-title">
+      <div class="title_left">
+        <h3>Edit Booking #{{ booking.orderNumber }} <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></h3>
+      </div>
+      <div class="title_right"></div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %} 
+            {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                {{ flashMessage|raw }}
+            </div>
+             {% endfor %} 
+             {% endfor %} 
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Booking Products 
+                <small>
+                  <a class="btn btn-success btn-xs" href="{{ path('pick_list',{'id':booking.id})  }}">Pick List</a>
+                  <a class="btn btn-success btn-xs" href="{{ path('pick_list_pdf',{'id':booking.id})  }}">PDF</a>
+                </small>
+              </h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <table id="datatable-keytable" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Description</th>
+                    <th>Ordered</th>
+                    <th>Available</th>
+                    <th>Qty Picked</th>
+                    <th>Status</th>
+                    <th width="50"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for bookingProduct in booking.products %}
+                  <tr class="bp-product" data-id="{{ bookingProduct.id }}">
+                    <td>{{ bookingProduct.product.model }}</td>
+                    <td>{{ bookingProduct.product.description }}</td>
+                    <td>{{ bookingProduct.qty }}</td>
+                    <td class="bp-available">{{ productUtil.getAvailableInternal(bookingProduct.product) }}</td>
+                    <td class="bp-picked">{{ bookingUtil.bookingProductPickedQty(bookingProduct) }}</td>
+                    <td class="bp-status">{{ bookingUtil.bookingProductStatusName(bookingProduct.status) }}</td>
+                    <td><a class="btn btn-dark btn-xs" id="booking_pick_trigger" data-toggle="modal" data-target=".bs-picking-modal" data-booking-product="{{ bookingProduct.id }}" data-href="{{ path('booking_product_pick_ajax',{'id':bookingProduct.id}) }}">Pick</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <!-- end x_content -->
+          </div>
+          <!-- end x_panel -->
+
+          <!-- Booking comments -->
+          {{ render(controller('WarehouseBundle:BookingComment:create',{'id':booking.id})) }}
+
+          <!-- Booking Files -->
+          {{ render(controller('WarehouseBundle:BookingFile:create',{'id':booking.id})) }}
+          
+          {#
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Order storyline <small>Status changes</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <ul class="list-unstyled timeline">
+                <li>
+                  <div class="block">
+                    <div class="tags">
+                      <a href="" class="tag"><span>Accepted</span></a>
+                    </div>
+                    <div class="block_content">
+                      <h2 class="title"><a>Order created</a></h2>
+                      <div class="byline"><span>13 hours ago</span> by <a>Brendan Burscough</a></div>
+                      <p class="excerpt">Via @roveconcepts.com</p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="tags">
+                      <a href="" class="tag"><span>Forward</span></a>
+                    </div>
+                    <div class="block_content">
+                      <h2 class="title"><a>Awaiting forward</a></h2>
+                      <div class="byline"><span>13 hours ago</span> by <a>Brendan Burscough</a></div>
+                      <p class="excerpt">Order is awaiting a forward for missing items.</p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="tags"><a href="" class="tag"><span>Picked</span></a>
+                    </div>
+                    <div class="block_content">
+                      <h2 class="title"><a>Items were picked</a></h2>
+                      <div class="byline"><span>13 hours ago</span> by <a>Brendan Burscough</a></div>
+                      <p class="excerpt">All 3 items have been picked and are ready for packing.</p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="tags"><a href="" class="tag"><span>Packed</span></a>
+                    </div>
+                    <div class="block_content">
+                      <h2 class="title"><a>Order is packed</a></h2>
+                      <div class="byline"><span>13 hours ago</span> by <a>Brendan Burscough</a></div>
+                      <p class="excerpt">Order is awaiting pickup from Vitran is loading bay with reference (VI68006).</p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="tags"><a href="" class="tag"><span>Shipped</span></a>
+                    </div>
+                    <div class="block_content">
+                      <h2 class="title"><a>Order shipped</a></h2>
+                      <div class="byline"><span>13 hours ago</span> by <a>Brendan Burscough</a></div>
+                      <p class="excerpt">Order was picked up by Vitran (VI68006).</p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              
+            </div>
+          </div>
+          #}
+
+      </div>
+      <!-- end col -->
+
+
+
+
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2><i class="fa fa-eye"></i> Order Information <small>Contact details</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+              <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="x_content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="stats-overview">
+                        <li id="days-since">
+                          <span class="name"> Days since creation </span>
+                          <span class="value text-success">{{ booking.created|days_since() }}</span>
+                        </li>
+                        <li id="date-noted">
+                          {% if booking.shipped %}
+                              <span class="name"> Shipped date </span>
+                              <span class="value text-success"> {{ booking.shipped|date('Y-m-d h:i A') }} </span>
+                          {% elseif booking.futureship %}
+                              <span class="name"> Future ship date </span>
+                              <span class="value text-success"> {{ booking.futureship|date('Y-m-d') }} </span>
+                          {% else %}
+                              <span class="name"> Created date </span>
+                              <span class="value text-success"> {{ booking.created|date('Y-m-d h:i A') }} </span>
+                          {% endif %}
+                        </li>
+                        <li id="date-modified">
+                          <span class="name"> Last updated </span>
+                          <span class="value text-success"> {% if booking.modified %}{{ booking.modified|date('Y-m-d h:i A') }}{% else %}never{% endif %} </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-xs-12">
+                  <section class="panel">
+                    {{ form_start(edit_form) }}
+                      <div class="x_title">
+                        <h2>Booking information <small>Internal ID #{{ booking.id }}</h2>
+                        <div class="clearfix"></div>
+                      </div>
+                      <div class="panel-body">
+                        <div class="project_detail">
+                          
+
+                          <div class="col-xs-12 col-sm-6">
+                              <p class="title">Order Number</p>
+                              <p>{{ form_widget(edit_form.orderNumber) }}</p>
+                              <p class="title">Order Type</p>
+                              <p>{{ form_widget(edit_form.orderType) }}</p>
+                              <p class="title">Order Reference</p>
+                              <p>{{ form_widget(edit_form.orderReference) }}</p>
+                              <p class="title">Future Ship Date</p>
+                              <p>{{ form_widget(edit_form.futureship) }}</p>
+                          </div>
+                          <div class="col-xs-12 col-sm-6">
+                              <p class="title">Assigned Carrier</p>
+                              <p>{{ form_widget(edit_form.carrierId) }}</p>
+                              <p class="title">Number of skids</p>
+                              <p>{{ form_widget(edit_form.skidCount) }}</p>
+                              <p class="title">Booking Status</p>
+                              <p>{{ form_widget(edit_form.status) }}</p>
+                              <p class="title">&nbsp;</p>
+                              <p>
+                                  <button type="submit" class="btn btn-primary">
+                                      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit
+                                  </button>
+                              </p>
+                          </div>
+                          {{ form_rest(edit_form) }}
+                        </div>
+                      </div>
+                      {{ form_end(edit_form) }}
+                  </section>
+                </div>
+
+                <div class="col-xs-12">
+                  <section class="panel">
+                    <div class="x_title">
+                      <h2>Consignee information <small class="btn btn-success btn-xs">{% if booking.contact and booking.contact.isResidential %}Residential{% else %}Commercial{% endif %}</small></h2>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="panel-body">
+                      <div class="project_detail">
+                        {% if booking.contact %}
+                            <div class="col-xs-12 col-sm-6">
+                                <p class="title">Company</p>
+                                <p>{{ booking.contact.company }}</p>
+                                <p class="title">Consignee Name</p>
+                                <p>{{ booking.contact.name }}</p>
+                                <p class="title">Communication methods</p>
+                                <ul class="list-unstyled">
+                                {% for com in booking.contact.communications %}
+                                    <li>{% if com.type == 'PHONE' %}<i class="fa fa-phone"></i>{% elseif com.type == 'EMAIL' %}<i class="fa fa-envelope"></i>{% else %}<i class="fa fa-home"></i>{% endif %}
+                                    {{ com.value }}
+                                    {% if com.id == booking.contact.defaultCom %} (default){% endif %}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <p class="title">Consignee Address</p>
+                                <pre>{{ bookingUtil.formatContactAddress(booking.contact) }}</pre>
+                            </div>
+                        {% else %}
+                            <p>There is no booking consignee.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </section>
+                </div>
+            </div>
+          </div>
+          <!-- end x_content -->
+        </div>
+        <!-- end x_panel -->
+
+        
+
+      </div>
+      <!-- end col -->
+
+
+    </div>
+    <!-- end row -->
+    <hr/>
+
+
+    <div class="form-group">
+        <a class="btn btn-default" href="{{ path('booking') }}">
+            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+            Back to list
+        </a>
+        <a class="btn btn-info" href="{{ path('booking_new') }}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            New
+        </a>
+        <form action="{{ path('booking_delete', { 'id': booking.id }) }}" method="post" style="display: inline-block; vertical-align:middle;">
+            <input type="hidden" name="_method" value="DELETE" />
+            {{ form_widget(delete_form) }}
+            <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                Delete
+            </button>
+        </form>
+    </div>
+
+
+    <!-- Modals -->
+    {% include 'WarehouseBundle:BookingProduct:picking/picking_modal.html.twig' %}
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+  {% javascripts '@WarehouseBundle/Resources/public/js/booking_edit.js' %}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Incoming Inventory Listing
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-title" style="display:none;">
+      <div class="title_left">
+        <h3>Incoming Listing <span class="glyphicon glyphicon-truck" aria-hidden="true"></span></h3>
+      </div>
+      <div class="title_right"></div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %} 
+            {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                {{ flashMessage|raw }}
+            </div>
+             {% endfor %} 
+             {% endfor %} 
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                  <h2><a href="{{ path('product') }}">Incoming</a> <small>Inbound products to warehouse</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <!-- FILTERING -->
+                    <div class="col-md-12">
+                        <div  id="filters" class="collapse">
+
+                            <form class="well" action="{{ path('incoming') }}" method="get" >
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6 col-md-4">
+                                        {{ form_row(filterForm.id) }}
+                                        {{ form_row(filterForm.type) }}
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6 col-md-4">
+                                        {{ form_row(filterForm.name) }}
+                                        {{ form_row(filterForm.eta) }}
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6 col-md-4">
+                                        {{ form_row(filterForm.scheduled) }}
+                                        {{ form_row(filterForm.arrived) }}
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6 col-md-4">
+                                        {{ form_row(filterForm.status) }}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        {{ form_rest(filterForm) }}
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-warning" name="filter_action" value="filter"> <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</button>
+                                            <button type="submit" class="btn btn-default" name="filter_action" value="reset"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- END FILTERING -->
+
+
+                    <div class="col-md-3 pull-left">
+            
+                        <!-- PAGE SIZE -->
+                        <div class="pagination form-inline ">
+                            <select class = "form-control"  onchange="window.location = this.value" >
+                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
+                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
+                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
+                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
+                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
+                            </select>
+                        </div>
+                        <!-- END PAGE SIZE -->
+
+                    </div>
+
+                    <div class="col-md-6">
+                    </div>         
+
+                    <div class="col-md-3">
+                        <a class="btn btn-primary h3 pull-right" href="{{ path('incoming_new') }}" style="margin-bottom:10px">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+                        </a>
+                        <a class="btn dropdown-toggle pull-right h3" data-toggle="collapse" data-target="#filters">
+                            Filter
+                            <span class="caret"></span>
+                        </a>
+                    </div>
+                    <div class="col-md-12">
+                        {%- if form_errors(filterForm) %}
+                        <div class="alert alert-block alert-error fade in form-errors">
+                            {{ form_errors(filterForm) }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="table-responsive col-md-12">
+                            <form method="POST" id="bulk_form" action="{{ path('incoming_bulk_action') }} ">
+                                <table class="table table-striped jambo_table bulk_action" cellspacing="0" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>
+
+                                            {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
+                                            <!--<th>{{macros.th_sortable('id',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>-->
+                                            <th>{{macros.th_sortable('name',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('type',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('status',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('eta',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('scheduled',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('arrived',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{macros.th_sortable('created',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'incoming')}}</th>
+                                            <th>{{ '# Products' }}</td>
+                                       
+                                        <th width = "160px">List</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for inbound in incoming %}
+                                    <tr>
+                                        <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{inbound.id}}"/></td>
+                                        <!--<td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.id }}</a></td>-->
+                                        <td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.name }}</a></td>
+                                        <td>{{ incomingUtil.incomingTypeName(inbound.type) }}</td>
+                                        <td>{{ incomingUtil.incomingStatusName(inbound.status) }}</td>
+                                        <td>{% if inbound.eta %}{{ inbound.eta|date('Y-m-d') }}{% endif %}</td>
+                                        <td>{% if inbound.scheduled %}{{ inbound.scheduled|date('Y-m-d H:i:s') }}{% else %}Unscheduled{% endif %}</td>
+                                        <td>{% if inbound.arrived %}{{ inbound.arrived|date('Y-m-d') }}{% else %}-{% endif %}</td>
+                                        <td>{% if inbound.created %}{{ inbound.created|date('Y-m-d') }}{% endif %}</td>
+                                        <td>{{ inbound.incomingProducts|length }}</td>
+
+                                        <td class="actions">
+                                            <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('incoming_by_id_delete',  app.request.query.all|merge({'id':inbound.id})) }}">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            </a>
+                                            <a  title='Incoming Products' class="btn btn-primary btn-sm" href="{{ path('incoming_products', app.request.query.all|merge({'incoming_id':inbound.id})) }}">
+                                                <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                                            </a>
+                                            <a  title='Import products' class="btn btn-primary btn-sm {% if inbound.incomingProducts|length %}disabled{% endif %}" href="{{ path('incoming_new_import', app.request.query.all|merge({'id':inbound.id})) }}">
+                                                <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                                            </a>
+                                            <a  title='Scanned List' class="btn btn-primary btn-sm" href="{{ path('incoming_products_scanned', app.request.query.all|merge({'id':inbound.id})) }}">
+                                                <span class="glyphicon glyphicon-barcode" aria-hidden="true"></span>
+                                            </a>
+                                            <a  title='Edit' class="btn btn-primary btn-sm" href="{{ path('incoming_edit', app.request.query.all|merge({'id':inbound.id})) }}">
+                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div> <!-- /#list -->
+
+                    <div class="row">
+                        <div class="col-md-4 pull-left">
+                            <div class="pagination form-inline ">
+                                <select class = "form-control" name="bulk_action" >
+                                    <option value="delete">DELETE</option>
+                                </select>
+                                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-md-offset-2 text-right">
+                             {{ pagerHtml|raw }} 
+                        </div>
+                    </div> <!-- /#bottom -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

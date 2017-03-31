@@ -1,0 +1,73 @@
+<!-- Response messages -->
+<div class="row">
+    <div class="col-md-12">
+        {% for type, flashMessages in app.session.flashbag.all() %} 
+        {% for flashMessage in flashMessages %}
+        <div class="alert alert-{{ type }} alert-dismissible fade in">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            {{ flashMessage|raw }}
+        </div>
+         {% endfor %} 
+         {% endfor %} 
+    </div>
+</div>
+
+	<div class="row">
+	    <div class="col-xs-12">
+	        <div class="x_panel">
+	          <div class="x_title">
+	            <h2><i class="fa fa-bars"></i> Scanned Product(s) <small>{{ incoming.name }}</small></h2>
+	            <div class="pull-right">
+	            	{% if not incomingUtil.isComplete(incoming) %}
+		              <form name="new-form" id="scan-incoming-product-new-form" method="post" class="ajaxForm" action="{{ path('incoming_products_scanned_new_ajax',{'id':incoming.id}) }}">
+			              <div class="input-group" style="max-width:200px;">
+			                {{ form_widget(form_new.new) }}
+			                <span class="input-group-btn">
+			                    {{ form_widget(form_new.add) }}
+			                </span>
+			              </div>
+			              {{ form_rest(form_new) }}
+			       	  </form>
+			       	{% endif %}
+	            </div>
+	            <div class="clearfix"></div>
+	          </div>
+	          <div class="x_content">
+	          	{% set iscomplete = incomingUtil.isComplete(incoming) %}
+	          	<form name="modify-form" id="incoming-product-page-form" method="post" class="ajaxForm" action="{{ path('incoming_products_scanned_ajax',{'id':incoming.id}) }}">
+		            <div class="error_zone"></div>
+		              	<table id="datatable-keytable" class="table table-striped table-bordered">
+			              <thead>
+			                <tr>
+			                  <th></td>
+			                  <th>Model</th>
+			                  <th># Inbound</th>
+			                  <th>Total Count</th>
+			                  <th>Location</th>
+			                  <th>Qty</th>
+			                </tr>
+			              </thead>
+			              <tbody class="incomingScannedProductsPage">
+			              {% include 'incoming/products_scanned_rows.html.twig' with {'form': form_scan,'incoming': incoming,'iscomplete':iscomplete} %}
+			              <tr class="remove">
+			                <td colspan="7">Scan items to build this list.</td>
+			              </tr>
+			              </tbody>
+			            </table>
+	            
+	              		<div class="clearfix"></div>
+
+			            <div class="actionBar">
+			               {% if not iscomplete %}{{ form_widget(form_scan.complete) }}{% endif %}
+			            </div>
+
+			            {#{ form_rest(form_scan) }#}
+
+			         </div>
+			   	</form>
+	        </div>
+
+	    </div>
+	</div>
+</form>
+<div class="loading"></div>

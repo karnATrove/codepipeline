@@ -1,0 +1,23 @@
+<div id="location_form_ajax">
+	{{ form_errors(form) }}
+	<div class="col-xs-6 col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.location) }}
+			{{ form_widget(form.location) }}
+		</div>
+	</div>
+	<div class="col-xs-6 col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.onHand,'Qty') }}
+			{{ form_widget(form.onHand) }}
+		</div>
+	</div>
+	<div class="col-xs-6 col-sm-4">
+		<div class="form-group">
+			<label class="control-label required">&nbsp;</label>
+			<div>
+			<button type="submit" class="btn btn-success">Add</button>
+			</div>
+		</div>
+	</div>
+</div>

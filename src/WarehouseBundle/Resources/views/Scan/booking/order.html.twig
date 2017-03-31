@@ -1,0 +1,51 @@
+<hr />
+
+<div class="row">
+	<div class="col-xs-12">
+	  	<div class="x_panel">
+	      <div class="x_title">
+	        <h2><i class="fa fa-bars"></i> Booking Results <small>Scanned: {{ search }} (Max 10 each)</small></h2>
+	        
+	        <div class="clearfix"></div>
+	      </div>
+	      <div class="x_content">
+
+	        <div class="col-xs-12">
+	         
+	         <div class="table-responsive">
+	         	{% if bookings|length %}
+	         	<table class="table table-bordered">
+	         	<thead>
+	         		<tr>
+	         			<th>Order Number</th>
+	         			<th>Pick Flag</th>
+	         			<th>Created</th>
+	         			<th>Future Date</th>
+	         			<th>Order Type</th>
+	         			<th>Qty</th>
+	         			<th>Status</th>
+	         		</tr>
+	         	</thead>
+	         	<tbody>
+	         		{% for booking in bookings %}
+	         		<tr>
+	         			<th scope="row"><a href="{{ path('booking_edit',{'id':booking.id}) }}">{{ booking.orderNumber }}</a></th>
+	         			<td>{% if booking.pickingFlag %}<i class="fa fa-flag aero"></i>{% endif %}</td>
+	         			<td>{{ booking.created|date('Y-m-d') }}</td>
+	         			<td>{% if booking.futureship %}{{ booking.futureship|date('Y-m-d') }}{% endif %}</td>
+	         			<td>{{ bookingUtil.bookingOrderTypeName(booking.orderType) }}</td>
+	         			<td>{{ bookingUtil.bookingProductQuantityTotal(booking) }}</td>
+	         			<td>{{ bookingUtil.bookingStatusName(booking.status) }}</td>
+	         		</tr>
+	         		{% endfor %}
+	         	</tbody>
+	         	</table>
+	         	{% else %}
+	         	<p>No results.</p>
+	         	{% endif %}
+	         </div>
+
+	      </div>
+	    </div>
+	</div>
+</div>

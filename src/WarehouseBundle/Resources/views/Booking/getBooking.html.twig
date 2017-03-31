@@ -1,0 +1,11 @@
+<ul>
+<li>
+    ({{ booking.id }}) {{ booking.orderNumber }} - {{ booking.orderReference }}<br />
+    Products:
+    <ul>
+        {% for product in booking.products %}
+        <li>{{ product.qty }} x {{ product.product.description}} ({{ product.product.model }})</li>
+        {% endfor %}
+    </ul>
+</li>
+</ul>

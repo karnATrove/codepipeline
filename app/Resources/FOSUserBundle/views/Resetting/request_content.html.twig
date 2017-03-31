@@ -1,0 +1,33 @@
+{% trans_default_domain 'FOSUserBundle' %}
+	<div>
+      <div class="login_wrapper">
+        <div class="animate form login_form">
+          <section class="login_content">
+
+              <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+			    <h1>Password Reset</h1>
+			    <div>
+					<input type="text" class="form-control" placeholder="{{ 'resetting.request.username'|trans }}" id="username" name="username" value="" required="required" />
+				</div>
+			    <div>
+			        <input class="btn btn-default submit" type="submit" id="submit" name="submit" value="{{ 'resetting.request.submit'|trans }}" />  '
+			    </div>
+			  
+
+	            <div class="clearfix"></div>
+
+	            <div class="separator">
+	              <div>
+	                <h1><i class="fa fa-check"></i> Rove Concepts</h1>
+	                  <p>©2017 All Rights Reserved.</p> 
+	              </div>
+	            </div>
+	          </form>
+          </section>
+        </div>
+      </div>
+    </div>
+
+
+
+

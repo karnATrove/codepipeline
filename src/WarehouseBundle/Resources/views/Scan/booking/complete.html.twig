@@ -1,0 +1,49 @@
+<hr />
+
+<div class="row">
+	<div class="col-xs-12">
+	  	<div class="x_panel">
+	      <div class="x_title">
+	        <h2><i class="fa fa-bars"></i> Pick Saved <small>Order Number {{ booking.orderNumber }}</small></h2>
+	        
+	        <div class="clearfix"></div>
+	      </div>
+	      <div class="x_content">
+	      	<div class="alert alert-success">
+				Booking {{ booking.orderNumber }} has been saved.
+			</div>
+		    <div>
+		      	<label>Order Status</label>
+		      	<p>{{ bookingUtil.bookingStatusName(booking.status) }}</p>
+		    </div>
+		    <div class="table-responsive">
+		    	<table class="table table-bordered">
+		    	<thead>
+		    		<tr>
+		    			<th>Product</th>
+		    			<th>Qty</th>
+		    			<th>Picked</th>
+		    			<th>Status</th>
+		    		</tr>
+		    	</thead>
+		    	<tbody>
+		    		{% for bookingProduct in booking.products %}
+		    		<tr>
+		    			<td>{{ bookingProduct.product.model }}</td>
+		    			<td>{{ bookingProduct.qty }}</td>
+		    			<td>{{ bookingUtil.bookingProductPickedQty(bookingProduct) }}</td>
+		    			<td>{{ bookingUtil.bookingProductStatusName(bookingProduct.status) }}
+		    		</tr>
+		    		{% endfor %}
+		    	</tbody>
+		    	</table>
+		    </div>
+		    {% if booking.status == 3 or booking.status == 4 %}
+		    	<div class="alert alert-warning">
+					This order is '{{ bookingUtil.bookingStatusName(booking.status)|upper }}'. Please ensure it is in the <u>staging</u> area for packing/shipping.
+				</div>
+		    {% endif %}
+	      </div>
+	    </div>
+	</div>
+</div>

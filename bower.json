@@ -1,0 +1,19 @@
+{
+  "name": "RoveWarehouse",
+  "description": "Rove Concepts Warehousing",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/assets/vendor/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "gentelella": "^1.3.0"
+  }
+}

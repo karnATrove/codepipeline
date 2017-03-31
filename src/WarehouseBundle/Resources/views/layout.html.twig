@@ -1,0 +1,204 @@
+<!-- https://colorlib.com/polygon/gentelella/index.html -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="{{ _charset }}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}rLogistics{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap/dist/css/bootstrap.min.css') }}">
+        <!-- Font Awesome -->
+        <link href="{{ asset('assets/vendor/gentelella/vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+        <!-- iCheck -->
+        <link href="{{ asset('assets/vendor/gentelella/vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
+        <!-- Custom Theme Style -->
+        <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+        {% block head %}{% endblock %}
+    </head>
+    <body class="nav-md" id="body">
+
+
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a class="site_title scan-trigger" data-toggle="modal" data-target=".bs-scan-modal"><i class="fa fa-truck"></i> <span>rLogistics</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile">
+              <div class="profile_info">
+                <span>Welcome,</span>
+                <h2>{{ app.user.name }}</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{{ path('dashboard') }}">Dashboard <span class="label label-success pull-right">Coming Soon</span></a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-edit"></i> Orders <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{{ path('booking') }}">View Orders</a></li>
+                      <li><a href="{{ path('booking_new', {'page': 'form'}) }}">Add Order</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-sitemap"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        <li><a href="{{ path('product', {'page': 'form'}) }}">View Inventory</a></li>
+                        <li><a href="{{ path('product_new') }}">Create SKU</a></li>
+                        <li><a href="{{ path('location') }}">Locations</a></li>
+                    </ul>
+                  </li>              
+                  <li><a><i class="fa fa-ship"></i> Incoming <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{{ path('incoming') }}">View Inbound</a></li>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-retweet"></i> Returns <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{{ path('return') }}">View Returns</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-user"></i> Users <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{{ path('user') }}">View Users</a></li>
+                      <li><a href="{{ path('user_new') }}">Add User</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" id="fsbutton">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-placement="top" title="Quick Scan" data-toggle="modal" data-target=".bs-scan-modal" class="scan-trigger" >
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="{{ path('fos_user_security_logout') }}">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav class="" role="navigation">
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    {{ app.user.name }}
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <!--<li><a href="javascript:;"> Profile</a></li>-->
+                    <li><a href="javascript:;">Help</a></li>
+                    <li><a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                  </ul>
+                </li>
+
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="badge bg-green">1</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    <li>
+                      <a>
+                        <span>
+                          <span>Rove Concepts</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          We are continually updating this app. Please inform us of any issues.
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            {% block body %}
+                {% block content_header %}{% endblock %}
+
+                {% block content %}{% endblock %}
+
+                {% block content_footer %}{% endblock %}
+            {% endblock %}
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Rove Warehouse Management by <a href="https://www.roveconcepts.com">Rove Concepts</a>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    <!-- MODALS -->
+    {{ render(controller('WarehouseBundle:Scan:index')) }}
+    {#% include 'WarehouseBundle:Scan:index.html.twig' %#}
+        
+    </body>
+
+    {% javascripts 
+      'assets/vendor/jquery/dist/jquery.min.js'
+      'assets/vendor/bootstrap/dist/js/bootstrap.min.js'
+      'assets/vendor/gentelella/vendors/fastclick/lib/fastclick.js' 
+      'assets/vendor/gentelella/vendors/nprogress/nprogress.js'
+      'assets/vendor/gentelella/vendors/iCheck/icheck.min.js'
+      'assets/js/moment/moment.min.js'
+      'assets/js/datepicker/daterangepicker.js'
+      'assets/js/custom.js'
+      '@WarehouseBundle/Resources/public/js/scan.js'
+      '@WarehouseBundle/Resources/public/js/warehouse.js' output='js/compiled/main.js' %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <!-- FastClick -->
+    <!-- NProgress -->
+    <!-- iCheck -->
+    <!-- bootstrap-daterangepicker -->
+    <!-- Custom Theme Scripts -->
+    
+    {% block scripts %}{% endblock %}
+</html>

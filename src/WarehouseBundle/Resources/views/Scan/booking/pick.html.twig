@@ -1,0 +1,126 @@
+<hr />
+
+<div class="row">
+	<div class="col-xs-12">
+	  	<div class="x_panel">
+	      <div class="x_title">
+	        <h2><i class="fa fa-bars"></i> Pick List Booking Scanned <small>{{ search }}</small></h2>
+	        {#
+          <div class="pull-right">
+            <div class="form-group">
+              {{ form_start(form_scan, { 'attr': {'class':'ajaxForm no-enter-submit','id':'scan-picking-form'}}) }}
+                {{ form_widget(form_scan.scanPicking, {'attr':{'id':'scan-picking'}}) }}
+              {{ form_rest(form_scan) }}
+              {{ form_end(form_scan) }}
+            </div>
+          </div>
+          #}
+	        <div class="clearfix"></div>
+	      </div>
+	      <div class="x_content" id="pickForProducts">
+
+          {% if notice %}
+          <div class="alert alert-error">
+            {{ notice }}
+          </div>
+          {% endif %}
+
+	      	<h1>{{ booking.orderNumber }}</h1>
+
+          {{ form_start(form, { 'attr': {'class':'ajaxForm scan_pick_form'}}) }}
+            {{ form_widget(form._token) }}
+	      	  <table id="datatable-keytable" class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>&nbsp;</td>
+                  <th>Model</th>
+                  <th>Description</th>
+                  <th>Available</th>
+                  <th>Ordered</th>
+                  <th>Qty Picked</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody class="pickProducts">
+                {% for bookingProduct in form.products %}
+                  {% set picked_qty = bookingUtil.bookingProductPickedQty(booking.products[loop.index0]) %}
+                  {% set readonly = {} %}
+                  {% set qtyAvailable = productUtil.getAvailableInternal(booking.products[loop.index0].product) %}
+                  {% if booking.products[loop.index0].status == 4 or booking.products[loop.index0].status == 0 %}
+                    {% set readonly = {'readonly':''} %}
+                  {% endif %}
+                  <tr class="booking_product_row" data-product-id="{{ booking.products[loop.index0].id }}">
+                    <td><a data-toggle="collapse" data-target=".inventory_for_{{ loop.index }}"><i class="fa fa-chevron-down show_inventory"></i></a></td>
+                    <td>{{ booking.products[loop.index0].product.model }}</td>
+                    <td>{{ booking.products[loop.index0].product.description }}</td>
+                    <td>{{ qtyAvailable }} ({{ (qtyAvailable / booking.products[loop.index0].product.qtyPerCarton)|round(0,'ceil') }})</td>
+                    <td>{{ booking.products[loop.index0].qty }}</td>
+                    <td class="pickedQty">{{ picked_qty }}</td>
+                    <td class="productStatus">{{ form_widget(bookingProduct.status, {'attr': {'data-default':booking.products[loop.index0].status}|merge(readonly)}) }}</td>
+                  </tr>
+                  <tr class="booking_product_row_pick collapse in inventory_for_{{ loop.index }}" data-pick-remaining="{{ booking.products[loop.index0].qty-picked_qty }}" data-picked-qty="{{ picked_qty }}" data-total-qty="{{ booking.products[loop.index0].qty }}">
+                    <td></td>
+                    <td colspan="6">
+                      {% if booking.products[loop.index0].product.locations|length %}
+                        <table class="table table-borderless">
+                        <thead>
+                          <tr>
+                            <th>Location</th>
+                            <th>Qty</th>
+                            <th>Picked</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% set booking_pos = loop.index0 %}
+                          {% for location in bookingProduct.location %}
+                            {% set booking_location = booking.products[booking_pos].product.locations[loop.index0] %}
+                            <tr>
+                              <td>{{ booking_location.location.aisle }} - {{ booking_location.location.row }} - {{ booking_location.location.level }}</td>
+                              <td>{{ booking_location.onHand }} ({{ (booking_location.onHand / booking.products[booking_pos].product.qtyPerCarton)|round(0,'ceil') }})</td>
+                              <td width="100">{{ form_widget(location, {'attr': {'min':0,'max':min(booking_location.onHand,booking.products[booking_pos].qty-picked_qty)}|merge(readonly)}) }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                        </table>
+                      {% else %}
+                        <p>Product is not stocked and/or set in a location.</p>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            
+	          <div class="clearfix"></div>
+
+
+            <div id="wizard" class="form_wizard wizard_horizontal">
+                <ul class="wizard_steps status_steps">
+                    {% for id, status in bookingUtil.bookingStatusList(true) %}
+                    <li>
+                      <a href="#step-1" class="status_step {% if booking.status >= id %}selected default_selected{% else %}disabled{% endif %}" data-status="{{ id }}" data-status-name="{{ status }}">
+                        <span class="step_no">{{ loop.index }}</span>
+                        <span class="step_descr">{{ status }}</span>
+                      </a>
+                    </li>
+                    {% endfor %}
+                 </ul>
+            </div>
+
+            <div class="actionBar">
+               {{ form_widget(form.status,{'attr':{'data-default':booking.status }}) }}
+               <input type="submit" class="btn btn-success btn-large" value="SAVE" />
+            </div>
+            {{ form_rest(form) }}
+
+          {{ form_end(form) }}
+
+	      </div>
+	    </div>
+	</div>
+</div>
+
+{% javascripts '@WarehouseBundle/Resources/public/js/scan_picking.js' %}
+  <script src="{{ asset_url }}"></script>
+{% endjavascripts %}

@@ -1,0 +1,146 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} -  Edit location
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-title">
+      <div class="title_left">
+        <h3>Edit location <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></h3>
+      </div>
+      <div class="title_right"></div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %} 
+                {% for flashMessage in flashMessages %}
+                <div class="alert alert-{{ type }} alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    {{ flashMessage|raw }}
+                </div>
+                 {% endfor %} 
+             {% endfor %} 
+        </div>
+    </div>
+
+    
+    <div class="row">
+        <div class="col-xs-12 col-sm-12">
+            <div class="x_panel">
+                <div class="x_title">
+                  <h2>Location {{ locationProduct.location.aisle }} - {{ locationProduct.location.row }} - {{ locationProduct.location.level }} <small>Changing location information</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    {{ form_start(edit_form) }}
+                    <div class="row">
+
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group {% if form_errors(edit_form.location) %}item bad{% endif %}"">
+                                {{ form_label(edit_form.location) }}
+                                {{ form_widget(edit_form.location) }}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group {% if form_errors(edit_form.onHand) %}item bad{% endif %}"">
+                                {{ form_label(edit_form.onHand) }}
+                                {{ form_widget(edit_form.onHand) }}
+                            </div>
+                        </div>
+
+                        {{ form_rest(edit_form) }}
+
+                    </div>
+                    <hr />
+
+                    <p>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit
+                        </button>
+                    </p>
+                    {{ form_end(edit_form) }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+    
+
+    <hr/>
+
+    <div class="form-group">
+        <a class="btn btn-default" href="{{ path('product_edit',{'id':locationProduct.product.id}) }}">
+            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+            Back to product
+        </a>
+        <form action="{{ path('location_product_delete', { 'id': locationProduct.id }) }}" method="post" style="display: inline-block;vertical-align:middle;">
+            <input type="hidden" name="_method" value="DELETE" />
+            {{ form_widget(delete_form) }}
+            <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                Delete
+            </button>
+        </form>
+    </div>
+    
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    {% javascripts 
+        'assets/vendor/gentelella/vendors/validator/validator.js' %}
+      <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <!-- validator -->
+    <script>
+      // initialize the validator function
+      var validator = new FormValidator({ date:'not a real date' });
+      
+      // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
+      $('form')
+        .on('blur', 'input[required]', function(){
+            validator.checkField.call(validator, this)
+        })
+        .on('change', 'select.required', function(){
+            validator.checkField.call(validator, this)
+        })
+        .on('keypress', 'input[required][pattern]', function(){
+            validator.checkField.call(validator, this)
+        });
+      
+      $('.multi.required').on('keyup blur', 'input', function() {
+        validator.checkField.apply($(this).siblings().last()[0]);
+      });
+      $('form').not('.ajaxForm').submit(function(e) {
+        e.preventDefault();
+        var submit = true;
+
+        // evaluate the form using generic validaing
+        if (!validator.checkAll($(this))) {
+          submit = false;
+        }
+
+        if (submit)
+          this.submit();
+
+        return false;
+      });
+    </script>
+    <!-- /validator -->
+{% endblock %}

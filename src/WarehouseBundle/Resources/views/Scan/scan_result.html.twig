@@ -1,0 +1,41 @@
+<hr />
+
+<div class="row">
+	<div class="col-xs-12">
+	  	<div class="x_panel">
+	      <div class="x_title">
+	        <h2><i class="fa fa-bars"></i> Scan Results <small>Scanned: {{ search }} (Max 10 each)</small></h2>
+	        
+	        <div class="clearfix"></div>
+	      </div>
+	      <div class="x_content">
+
+	        <div class="col-xs-3">
+	          <ul class="nav nav-tabs tabs-left">
+	            <li class="active"><a href="#tab_scan_product" data-toggle="tab">Product <span class="badge bg-{% if product.count %}green{% else %}white{% endif %} pull-right">{{ product.count }}</span></a>
+	            </li>
+	            <li><a href="#tab_scan_booking" data-toggle="tab">Booking <span class="badge bg-{% if booking.count %}green{% else %}white{% endif %} pull-right">{{ booking.count }}</span></a>
+	            </li>
+	            <li><a href="#tab_scan_incoming" data-toggle="tab">Incoming <span class="badge bg-{% if incoming.count %}green{% else %}white{% endif %} pull-right">{{ incoming.count }}</span></a>
+	            </li>
+	            <li><a href="#tab_scan_return" data-toggle="tab">Return <span class="badge bg-{% if return.count %}green{% else %}white{% endif %} pull-right">{{ return.count }}</span></a>
+	            </li>
+	          </ul>
+	        </div>
+
+	        <div class="col-xs-9">
+	          <!-- Tab panes -->
+	          <div class="tab-content">
+	            <div class="tab-pane active" id="tab_scan_product">{% include 'WarehouseBundle:Scan:scan_product.html.twig' with {'items': product.results,'search':search} %}</div>
+	            <div class="tab-pane" id="tab_scan_booking">{% include 'WarehouseBundle:Scan:scan_booking.html.twig' with {'items': booking.results,'search':search} %}</div>
+	            <div class="tab-pane" id="tab_scan_incoming">{% include 'WarehouseBundle:Scan:scan_incoming.html.twig' with {'items': incoming.results,'search':search} %}</div>
+	            <div class="tab-pane" id="tab_scan_return">{% include 'WarehouseBundle:Scan:scan_return.html.twig' with {'items': return.results,'search':search} %}</div>
+	          </div>
+	        </div>
+
+	        <div class="clearfix"></div>
+
+	      </div>
+	    </div>
+	</div>
+</div>

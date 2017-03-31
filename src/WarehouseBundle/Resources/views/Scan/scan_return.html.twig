@@ -1,0 +1,29 @@
+<div class="lead">Return Results</div>
+
+<div class="table-responsive">
+	<table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Return Booking</th>
+          <th>Model</th>
+          <th>Qty Returned</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      	{% for returnProduct in items %}
+        <tr>
+          <th scope="row">{{ returnProduct.bookingReturn.booking.orderNumber }} ({{ returnUtil.returnStatusName(returnProduct.bookingReturn.status) }})</th>
+          <td>{{ returnProduct.product.model }}</td>
+          <td>{{ returnProduct.qty }}</td>
+          <td>{{ returnUtil.returnProductStatusName(returnProduct.status) }}</td>
+        </tr>
+        {% endfor %}
+        {% if items|length == 0 %}
+        <tr>
+        	<td colspan="4">No results for {{ search }} for returns.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+</div>

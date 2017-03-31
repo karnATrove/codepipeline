@@ -1,0 +1,21 @@
+service_token:
+    type: rest
+    prefix: /v1
+    resource: WarehouseBundle\Controller\TokenRestController
+    name_prefix:  api_1_ # naming collision
+
+service_booking:
+    type: rest
+    prefix: /v1
+    resource: WarehouseBundle\Controller\BookingRestController
+    name_prefix:  api_1_ # naming collision
+
+service_booking_product:
+    type: rest
+    parent: service_booking
+    resource: WarehouseBundle\Controller\BookingProductRestController
+
+service_booking_comment:
+    type: rest
+    #parent: service_booking
+    resource: WarehouseBundle\Controller\BookingCommentRestController

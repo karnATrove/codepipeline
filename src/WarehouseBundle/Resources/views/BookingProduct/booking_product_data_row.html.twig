@@ -1,0 +1,12 @@
+<tr>
+    <td><a href="{{ path('booking_edit',{'id':bookingProduct.booking.id}) }}">{{ bookingProduct.booking.orderNumber }}</a><div><small>{{ bookingUtil.bookingStatusName(bookingProduct.booking.status) }}</small></div></td>
+    <td>{{ bookingProduct.qty }} ({{ (bookingProduct.qty / bookingProduct.product.qtyPerCarton)|round(0,'ceil') }})</td>
+    <td>{{ bookingUtil.bookingProductPickedQty(bookingProduct) }}</td>
+    <td>{{ bookingUtil.bookingProductStatusName(bookingProduct.status) }}</td>
+    <td class="hidden-xs">{% if bookingProduct.pickedDate %}{{ bookingProduct.pickedDate|date('Y-m-d H:i:s') }}{% else %}never{% endif %}</td>
+    <td class="actions">
+        <a  title='Edit' class="btn btn-primary btn-sm" href="{{ path('booking_product_edit', { 'id': bookingProduct.id }) }}">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        </a>
+    </td>
+</tr>
