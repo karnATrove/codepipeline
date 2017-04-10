@@ -1,21 +1,24 @@
 <?php
 namespace WarehouseBundle\Utils;
 
+use WarehouseBundle\Entity\IncomingProduct;
+use WarehouseBundle\Entity\IncomingProductScan;
+
 class Incoming
 {
-	/**
-	 * Container aware.
-	 */
-	private $container;
+    /**
+     * Container aware.
+     */
+    private $container;
 
-	/**
-	 * Make this utility container-aware (adding availaiblity of doctrine for example)
-	 *
-	 * @param      <type>  $container  The container
-	 */
-	public function __construct($container) {
-		$this->container = $container;
-	}
+    /**
+     * Make this utility container-aware (adding availaiblity of doctrine for example)
+     *
+     * @param      <type>  $container  The container
+     */
+    public function __construct($container) {
+        $this->container = $container;
+    }
 
     /**
      * Listing of available incoming container statuses.
@@ -80,7 +83,7 @@ class Incoming
      *
      * @param  \WarehouseBundle\Entity\Product $product [description]
      * @param   integer Number of results to return
-     * 
+     *
      * @return     integer  Allocated quantity.
      */
     public function getRecentPickedProducts(\WarehouseBundle\Entity\Product $product, $limit=10) {
@@ -104,6 +107,45 @@ class Incoming
     public function isComplete(\WarehouseBundle\Entity\Incoming $incoming) {
         if ($this->incomingStatusName($incoming->getStatus()) == 'Completed') return TRUE;
         return FALSE;
+    }
+
+    public function preloadScannedProducts(\WarehouseBundle\Entity\Incoming $incoming)
+    {
+        $em = $this->container->get("doctrine")->getManager();
+        /** @var IncomingProduct[] $incomingProducts */
+        $incomingProducts = $incoming->getIncomingProducts();
+        /** @var IncomingProductScan[] $incomingProductScan */
+        $incomeScannedProducts = $incoming->getIncomingScannedProducts();
+        $productIds = $this->getIncomingProductIds($incomeScannedProducts);
+        foreach ($incomingProducts as $incomingProduct) {
+            if (!in_array($incomingProduct->getId(), $productIds)) {
+                $item = (new IncomingProductScan())
+                    ->setIncoming($incoming)
+                    ->setIncomingProduct($incomingProduct)
+                    ->setQtyOnScan(0)
+                    ->setProduct($incomingProduct->getProduct())
+                    ->setCreated(new \DateTime('now'));
+                $item->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+                $em->persist($item);
+            }
+        }
+        $em->flush();
+        $this->container->get('session')->getFlashBag()->add('success', 'Successfully loaded products.');
+
+        return TRUE;
+    }
+
+    /**
+     * @param IncomingProductScan[] $incomingProductScans
+     * @return array
+     */
+    private function getIncomingProductIds($incomeScannedProducts)
+    {
+        $ids = [];
+        foreach ($incomeScannedProducts as $incomeScannedProduct) {
+            $ids[] = $incomeScannedProduct->getProduct()->getId();
+        }
+        return $ids;
     }
 
     /**
