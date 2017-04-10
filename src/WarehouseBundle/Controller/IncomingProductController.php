@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,7 +48,7 @@ class IncomingProductController extends Controller
         $queryBuilder = $em->getRepository('WarehouseBundle:IncomingProduct')->createQueryBuilder('ip')
             ->where('ip.incoming = :incoming')
             ->setParameter('incoming',$incoming);
-        
+
         return $this->render('incoming/products.html.twig', array(
             'incoming' => $incoming,
             'incomingProducts' => $queryBuilder->getQuery()->getResult(),
@@ -72,14 +73,14 @@ class IncomingProductController extends Controller
         $form_scan->handleRequest($request);
 
         # Submissions will be by ajax
-        
+
         if ($form_scan->isSubmitted() && $form_scan->isValid()) {
             if (!$request->isXmlHttpRequest()) {
                 $this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX." );
                 return $this->redirect($this->generateUrl('incoming_products_scanned',array('id'=>$incoming->getId())));
             }
         }
-        
+
         return $this->render('incoming/products_scanned.html.twig', array(
             'incoming' => $incoming,
             'incomingProducts' => $queryBuilder->getQuery()->getResult(),
@@ -106,17 +107,34 @@ class IncomingProductController extends Controller
 
             // Ensure it isnt already completed.
             if (!$this->get('app.incoming')->isComplete($incoming)) {
-                $items = $form_scan->getData();
-                $em->persist($items);
-                $em->flush();
 
-                if ($form_scan->get('complete')->isClicked()) {
-                    if ($this->get('app.incoming')->setComplete($incoming)) {
-                        $this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete." );
+                if ($form_scan->get('load_data')->isClicked()) {
+                    if ($this->get('app.incoming')->preloadScannedProducts($incoming)) {
+                        $repository = $this->getDoctrine()->getRepository('WarehouseBundle:IncomingProductScan');
+                        //reload incoming
+                        $incomingProductScan = $repository->findBy(['incoming' => $incoming]);
+                        $incoming->setIncomingScannedProducts($incomingProductScan);
+                        $form_scan = $this->createModifyScannedForm($incoming);
+                        $this->get('session')->getFlashBag()
+                            ->add('success', "Packing list pre-loaded.");
                     } else {
-                        $this->get('session')->getFlashBag()->add('error', "An error occured while trying to set incoming to complete." );
+                        $this->get('session')->getFlashBag()
+                            ->add('error', "An error occurred while trying to load products.");
+                    }
+                } else {
+                    $items = $form_scan->getData();
+                    $em->persist($items);
+                    $em->flush();
+
+                    if ($form_scan->get('complete')->isClicked()) {
+                        if ($this->get('app.incoming')->setComplete($incoming)) {
+                            $this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete.");
+                        } else {
+                            $this->get('session')->getFlashBag()->add('error', "An error occurred while trying to set incoming to complete.");
+                        }
                     }
                 }
+
 
                 $response['ajaxCommand'][] = array(
                     'selector' => '#scanned_form_wrap',
@@ -136,6 +154,7 @@ class IncomingProductController extends Controller
             $this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX." );
             return $this->redirect($this->generateUrl('incoming_products_scanned',array('id'=>$incoming->getId())));
         }
+        return null;
     }
 
     /**
@@ -158,7 +177,7 @@ class IncomingProductController extends Controller
             $incomingProduct = $em->getRepository('WarehouseBundle:IncomingProduct')->findOneByModel($incoming, $model);
             $item = $em->getRepository('WarehouseBundle:IncomingProductScan')->findOneByModel($incoming,$model,FALSE); # Non assigned only
             $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
-                                                                                                        # 
+            #
             if (!$item) {
                 # make a new scan item
                 if (!$product) { # Product does not exist
@@ -180,8 +199,8 @@ class IncomingProductController extends Controller
                     ->setQtyOnScan(1)
                     ->setProduct($product)
                     ->setCreated(new \DateTime('now'));
-                
-                if (!$incomingProduct) 
+
+                if (!$incomingProduct)
                     $this->get('session')->getFlashBag()->add('success', "<strong>".$model. "</strong> was not identified in the Incoming container however it was added to this list." );
                 else
                     $this->get('session')->getFlashBag()->add('success', "Successfully added <strong>$model</strong>." );
@@ -249,9 +268,9 @@ class IncomingProductController extends Controller
     /**
      * Creates a form to simply add IncomingProductScan to list.
      *
-     * @param WarehouseBundle\Entity\Incoming $incoming The incoming
+     * @param Incoming $incoming The incoming
      *
-     * @return SymfonyComponentFormForm The form
+     * @return Form The form
      */
     function createNewScannedForm(Incoming $incoming) {
         $form = $this->createFormBuilder()
@@ -277,14 +296,14 @@ class IncomingProductController extends Controller
     /**
      * Creates a form to modify a Incoming with IncomingProductScan entity.
      *
-     * @param WarehouseBundle\Entity\Incoming $incoming The incoming
+     * @param Incoming $incoming The incoming
      *
-     * @return SymfonyComponentFormForm The form
+     * @return Form The form
      */
     function createModifyScannedForm(Incoming $incoming) {
         $form = $this->createFormBuilder($incoming,array(
-                'csrf_protection' => false,  // <---- set this to false on a per Form Instance basis
-            ))
+            'csrf_protection' => false,  // <---- set this to false on a per Form Instance basis
+        ))
             ->setAction($this->generateUrl('scan_stock_ajax', array('id' => $incoming->getId())))
             ->setMethod('POST')
             ->add('incomingScannedProducts',CollectionType::class,array(
@@ -304,12 +323,19 @@ class IncomingProductController extends Controller
                     'data-confirm' => 'This will mark the container are closed. It will also assign all items to active inventory. Are you sure you are complete?',
                 )
             ));
+//
+            $form->add('load_data', SubmitType::class, array(
+                'label' => 'LOAD FROM PACKING LIST',
+                'attr' => array(
+                    'class' => 'btn btn-large',
+                    'data-confirm' => 'Do you want to load packing list data to scanned products?',
+                )
+            ));
         }
         $form = $form->getForm();
         return $form;
     }
 
-    
 
     /**
      * Displays a form to create a new Incoming entity.
@@ -319,7 +345,7 @@ class IncomingProductController extends Controller
      */
     public function newAction(Request $request, Incoming $incoming)
     {
-    
+
         $incomingProduct = (new IncomingProduct())->setUser($this->getUser());
         $incomingProduct->setIncoming($incoming);
         $form   = $this->createForm('WarehouseBundle\Form\IncomingProductType', $incomingProduct);
@@ -330,21 +356,21 @@ class IncomingProductController extends Controller
             $incomingProduct->setCreated(new \DateTime('now'));
             $em->persist($incomingProduct);
             $em->flush();
-            
+
             $editLink = $this->generateUrl('incoming_product_edit', array('id' => $incomingProduct->getId()));
             $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New incoming was created successfully.</a>" );
-            
+
             if ($request->get('submit') == 'save')
                 return $this->redirectToRoute('incoming_products',array('incoming_id'=>$incoming->getId()));
             else
-            return $this->redirectToRoute('incoming_product_new',array('incoming'=>$incoming->getId()));
+                return $this->redirectToRoute('incoming_product_new', array('incoming' => $incoming->getId()));
         }
         return $this->render('incoming/product/new.html.twig', array(
             'incoming' => $incoming,
             'form'   => $form->createView(),
         ));
     }
-    
+
 
     /**
      * Displays a form to edit an existing Incoming entity.
@@ -362,7 +388,7 @@ class IncomingProductController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($incomingProduct);
             $em->flush();
-            
+
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('incoming_product_edit', array('id' => $incomingProduct->getId()));
         }
@@ -372,8 +398,7 @@ class IncomingProductController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
+
 
     /**
      * Deletes a Incoming entity.
@@ -383,7 +408,7 @@ class IncomingProductController extends Controller
      */
     public function deleteAction(Request $request, Incoming $incoming, IncomingProduct $incomingProduct)
     {
-    
+
         $form = $this->createDeleteForm($incomingProduct);
         $form->handleRequest($request);
 
@@ -395,10 +420,10 @@ class IncomingProductController extends Controller
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Incoming Product');
         }
-        
+
         return $this->redirectToRoute('incoming_products',array('incoming_id'=>$incoming->getId()));
     }
-    
+
     /**
      * Creates a form to delete a Incoming entity.
      *
@@ -411,10 +436,9 @@ class IncomingProductController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('incoming_product_delete', array('incoming'=>$incomingProduct->getIncoming()->getId(),'id' => $incomingProduct->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
-    
+
     /**
      * Delete Incoming by id
      *
@@ -423,7 +447,7 @@ class IncomingProductController extends Controller
      */
     public function deleteByIdAction(Incoming $incoming, IncomingProduct $incomingProduct){
         $em = $this->getDoctrine()->getManager();
-        
+
         try {
             $em->remove($incomingProduct);
             $em->flush();
@@ -435,13 +459,13 @@ class IncomingProductController extends Controller
         return $this->redirect($this->generateUrl('incoming_products',array('incoming_id'=>$incoming->getId())));
 
     }
-    
+
 
     /**
-    * Bulk Action
-    * @Route("/{incoming}/bulk-action", name="incoming_product_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     * @Route("/{incoming}/bulk-action", name="incoming_product_bulk_action")
+     * @Method("POST")
+     */
     public function bulkAction(Request $request, Incoming $incoming)
     {
         $ids = $request->get("ids", array());

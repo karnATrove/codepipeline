@@ -162,7 +162,7 @@ class Product
      *
      * @param integer $status
      *
-     * @return Booking
+     * @return Product
      */
     public function setStatus($status)
     {

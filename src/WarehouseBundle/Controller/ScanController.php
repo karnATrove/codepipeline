@@ -24,7 +24,7 @@ use WarehouseBundle\Form\BookingProductType;
 use WarehouseBundle\Form\IncomingProductType;
 use WarehouseBundle\Form\IncomingProductScanType;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr; 
+use Doctrine\ORM\Query\Expr;
 
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\Product;
@@ -260,7 +260,7 @@ class ScanController extends Controller
 
     }
 
-    
+
 
     /**
      * Lists all User entities.
@@ -302,7 +302,7 @@ class ScanController extends Controller
         $response = array();
         if ($form->isSubmitted() && $form->isValid()) {
             $booking->setModified(new \DateTime('now'));
-            
+
             # See if any picks were set
             foreach($booking->getProducts() as $key => $bookingProduct) {
                 $locations = $request->request->get('form')['products'][$key]['location'];
@@ -360,7 +360,7 @@ class ScanController extends Controller
             $incomingProduct = $em->getRepository('WarehouseBundle:IncomingProduct')->findOneByModel($incoming, $model);
             $item = $em->getRepository('WarehouseBundle:IncomingProductScan')->findOneByModel($incoming,$model,FALSE); # Non assigned only
             $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
-                                                                                                        # 
+            #
             if (!$item) {
                 # make a new scan item
                 if (!$product) { # Product does not exist
@@ -382,8 +382,8 @@ class ScanController extends Controller
                     ->setQtyOnScan(1)
                     ->setProduct($product)
                     ->setCreated(new \DateTime('now'));
-                
-                if (!$incomingProduct) 
+
+                if (!$incomingProduct)
                     $this->get('session')->getFlashBag()->add('success', "<strong>".$model. "</strong> was not identified in the Incoming container however it was added to this list." );
                 else
                     $this->get('session')->getFlashBag()->add('success', "Successfully added <strong>$model</strong>." );

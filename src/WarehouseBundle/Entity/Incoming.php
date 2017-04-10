@@ -438,6 +438,17 @@ class Incoming
     }
 
     /**
+     * @param IncomingProductScan[] $incomingScannedProducts
+     * @return $this
+     */
+    public function setIncomingScannedProducts($incomingScannedProducts)
+    {
+        $this->incoming_scanned_products = $incomingScannedProducts;
+
+        return $this;
+    }
+
+    /**
      * Remove incomingScannedProduct
      *
      * @param \WarehouseBundle\Entity\IncomingProductScan $incomingScannedProduct

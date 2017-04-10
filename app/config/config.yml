@@ -42,7 +42,7 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
     form_themes:
-    - 'bootstrap_3_layout.html.twig' 
+        - 'bootstrap_3_layout.html.twig'
     globals:
         bookingUtil: "@app.booking"
         productUtil: "@app.product"
@@ -105,6 +105,9 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main
     user_class: WarehouseBundle\Entity\User
+    from_email:
+            address:        noreply@example.com
+            sender_name:    Demo App
 
 assetic:
     debug:          '%kernel.debug%'
