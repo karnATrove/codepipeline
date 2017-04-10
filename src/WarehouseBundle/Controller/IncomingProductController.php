@@ -111,7 +111,7 @@ class IncomingProductController extends Controller
                 if ($form_scan->get('load_data')->isClicked()) {
                     if ($this->get('app.incoming')->preloadScannedProducts($incoming)) {
                         $repository = $this->getDoctrine()->getRepository('WarehouseBundle:IncomingProductScan');
-                        //reload incoming
+                        //reload scanned form
                         $incomingProductScan = $repository->findBy(['incoming' => $incoming]);
                         $incoming->setIncomingScannedProducts($incomingProductScan);
                         $form_scan = $this->createModifyScannedForm($incoming);
