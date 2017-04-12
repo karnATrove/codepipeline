@@ -1183,12 +1183,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSUserBundle.git",
-                "reference": "fda6cbe3db268ab35d569d28a37d9b0f6d0eef60"
+                "reference": "9378cf9e508d235122c9bcabfa6eeae316c4af09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/fda6cbe3db268ab35d569d28a37d9b0f6d0eef60",
-                "reference": "fda6cbe3db268ab35d569d28a37d9b0f6d0eef60",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSUserBundle/zipball/9378cf9e508d235122c9bcabfa6eeae316c4af09",
+                "reference": "9378cf9e508d235122c9bcabfa6eeae316c4af09",
                 "shasum": ""
             },
             "require": {
@@ -1252,7 +1252,7 @@
             "keywords": [
                 "User management"
             ],
-            "time": "2017-04-05 07:28:52"
+            "time": "2017-04-12 08:32:08"
         },
         {
             "name": "gedmo/doctrine-extensions",
@@ -2227,16 +2227,16 @@
         },
         {
             "name": "jms/serializer",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "5e9008cbb0bac2986979d905a87ae48efcf578c4"
+                "reference": "2cf3b1aac0c93e9f5fed759c1a7441c76801e045"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/5e9008cbb0bac2986979d905a87ae48efcf578c4",
-                "reference": "5e9008cbb0bac2986979d905a87ae48efcf578c4",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/2cf3b1aac0c93e9f5fed759c1a7441c76801e045",
+                "reference": "2cf3b1aac0c93e9f5fed759c1a7441c76801e045",
                 "shasum": ""
             },
             "require": {
@@ -2302,7 +2302,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2017-03-24T13:11:23+00:00"
+            "time": "2017-04-12T14:28:35+00:00"
         },
         {
             "name": "jms/serializer-bundle",

@@ -19,7 +19,7 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        
+
         api:
             anonymous: ~
             pattern: ^/

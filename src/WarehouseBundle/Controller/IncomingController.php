@@ -193,9 +193,11 @@ class IncomingController extends Controller
         $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject($this->get('kernel')->getRootDir() . '/../web/uploads/imports/'.$incomingFile->getFilepath());
         $sheetData = $phpExcelObject->getActiveSheet()->toArray(null,true,true,true);
         $imports = 0;
+
+        # First loop for creating non existing products
         foreach($sheetData as $row => $data) {
             if (is_numeric($data['A'])) { # Indicates the entry row number
-                $model = trim($data['B']);
+                $model = strtoupper(trim($data['B']));
                 $name = trim($data['C']);
                 $qty = intval(trim($data['D']));
                 $ctns = intval(trim($data['E']));
@@ -204,12 +206,6 @@ class IncomingController extends Controller
                 if (!$ctns) {
                     $ctns = $qty;
                 }
-
-                $incomingProduct = (new IncomingProduct())->setUser($this->getUser())
-                    ->setIncoming($incoming)
-                    ->setQty($qty)
-                    ->setModel($model)
-                    ->setCreated(new \DateTime('now'));
 
                 # Find the product
                 $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
@@ -227,9 +223,32 @@ class IncomingController extends Controller
 
                     $this->get('session')->getFlashBag()->add('success', "Created new product (".$model.'").' );
                 }
+            }
+        }
+        $em->flush();
+
+        # Second loop to create incomingProduct
+        foreach($sheetData as $row => $data) {
+            if (is_numeric($data['A'])) { # Indicates the entry row number
+                $model = strtoupper(trim($data['B']));
+                $name = trim($data['C']);
+                $qty = intval(trim($data['D']));
+
+                $incomingProduct = (new IncomingProduct())->setUser($this->getUser())
+                    ->setIncoming($incoming)
+                    ->setQty($qty)
+                    ->setModel($model)
+                    ->setCreated(new \DateTime('now'));
+
+                # Find the product
+                $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
+                if (!$product) {
+                   throw new \Exception('Product model failed to import and could not be identified for incomingProduct');
+                }
 
                 $incomingProduct->setProduct($product);
                 $em->persist($incomingProduct);
+
                 $imports++;
             }
         }
