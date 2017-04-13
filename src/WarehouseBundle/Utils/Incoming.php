@@ -1,6 +1,7 @@
 <?php
 namespace WarehouseBundle\Utils;
 
+use Symfony\Component\DependencyInjection\Container;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingProductScan;
 
@@ -12,11 +13,11 @@ class Incoming
     private $container;
 
     /**
-     * Make this utility container-aware (adding availaiblity of doctrine for example)
+     * Make this utility container-aware (adding availability of doctrine for example)
      *
      * @param      <type>  $container  The container
      */
-    public function __construct($container) {
+    public function __construct(Container $container) {
         $this->container = $container;
     }
 

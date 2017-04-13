@@ -14,7 +14,7 @@ class BookingFile
 
     public function upload(UploadedFile $file)
     {
-        $fileName = md5(uniqid()).'.'.$file->guessExtension();
+        $fileName = md5(uniqid()) . '-' . $file->getClientOriginalName();
 
         $file->move($this->targetDir, $fileName);
 

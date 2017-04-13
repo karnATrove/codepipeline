@@ -2,6 +2,8 @@
 
 namespace WarehouseBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -38,10 +40,10 @@ class IncomingController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('WarehouseBundle:Incoming')->createQueryBuilder('i');
-        
+
         list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($incoming, $pagerHtml) = $this->paginator($queryBuilder, $request);
-        
+
         return $this->render('incoming/index.html.twig', array(
             'incoming' => $incoming,
             'pagerHtml' => $pagerHtml,
@@ -50,10 +52,14 @@ class IncomingController extends Controller
         ));
     }
 
+
     /**
-    * Create filter form and process filter request.
-    *
-    */
+     * Create filter form and process filter request.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param Request $request
+     * @return array
+     */
     protected function filter($queryBuilder, Request $request)
     {
         $session = $request->getSession();
@@ -80,13 +86,13 @@ class IncomingController extends Controller
             // Get filter from session
             if ($session->has('IncomingControllerFilter')) {
                 $filterData = $session->get('IncomingControllerFilter');
-                
+
                 foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
                     if (is_object($filter)) {
                         $filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
                     }
                 }
-                
+
                 $filterForm = $this->createForm('WarehouseBundle\Form\IncomingFilterType', $filterData);
                 $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
             }
@@ -97,10 +103,10 @@ class IncomingController extends Controller
 
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request)
+     * Get results from paginator and get paginator view.
+     *
+     */
+    protected function paginator(QueryBuilder $queryBuilder, Request $request)
     {
         //sorting
         $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
@@ -115,13 +121,12 @@ class IncomingController extends Controller
         } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
-        
+
         $entities = $pagerfanta->getCurrentPageResults();
 
         // Paginator - route generator
         $me = $this;
-        $routeGenerator = function($page) use ($me, $request)
-        {
+        $routeGenerator = function ($page) use ($me, $request) {
             $requestParams = $request->query->all();
             $requestParams['pcg_page'] = $page;
             return $me->generateUrl('incoming', $requestParams);
@@ -137,8 +142,7 @@ class IncomingController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
+
 
     /**
      * Displays a form to create a new Incoming entity.
@@ -148,7 +152,7 @@ class IncomingController extends Controller
      */
     public function newAction(Request $request)
     {
-    
+
         $incoming = (new Incoming())->setUser($this->getUser());
         $form   = $this->createForm('WarehouseBundle\Form\IncomingType', $incoming);
         $form->handleRequest($request);
@@ -159,10 +163,12 @@ class IncomingController extends Controller
 
             $em->persist($incoming);
             $em->flush();
-            
+
             $editLink = $this->generateUrl('incoming_edit', array('id' => $incoming->getId()));
-            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New incoming was created successfully.</a>" );
-            
+            $this->get('session')
+                ->getFlashBag()
+                ->add('success', "<a href='$editLink'>New incoming was created successfully.</a>");
+
             if ($request->get('submit') == 'save')
                 return $this->redirectToRoute('incoming');
             return $this->redirectToRoute('incoming_new_import',array('id'=>$incoming->getId()));
@@ -180,7 +186,7 @@ class IncomingController extends Controller
      * @Method({"GET", "POST"})
      */
     public function importFileAction(Request $request, Incoming $incoming, IncomingFile $incomingFile)
-    {   
+    {
         # A little validation
         if (count($incoming->getIncomingProducts())) {
             $this->get('session')->getFlashBag()->add('error', "Please remove all incoming products from ". $incoming->getName(). " before trying to re-import.");
@@ -243,7 +249,7 @@ class IncomingController extends Controller
                 # Find the product
                 $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
                 if (!$product) {
-                   throw new \Exception('Product model failed to import and could not be identified for incomingProduct');
+                    throw new \Exception('Product model failed to import and could not be identified for incomingProduct');
                 }
 
                 $incomingProduct->setProduct($product);
@@ -276,13 +282,15 @@ class IncomingController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            /** @var UploadedFile $file */
             $file = $incomingFile->getFilepath();
             $fileName = $this->get('app.import_uploader')->upload($file);
+
             // Update the 'document' property to store the PDF file name
             // instead of its contents
             $incomingFile->setFilepath($fileName);
             $incomingFile->setCreated(new \DateTime("now"));
+
             # We want to save the modification date
             $incoming->setModified(new \DateTime('now'));
 
@@ -290,18 +298,22 @@ class IncomingController extends Controller
             $em->persist($incomingFile);
             $em->persist($incoming);
             $em->flush();
-            
-            $editLink = $this->generateUrl('incoming_products', array('incoming_id' => $incoming->getId()));
-            $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New incoming file was created successfully.</a>" );
 
-            return $this->redirectToRoute('incoming_products',array('incoming_id'=>$incoming->getId()));
+            $editLink = $this->generateUrl('incoming_products',
+                array('incoming_id' => $incoming->getId()));
+            $this->get('session')
+                ->getFlashBag()
+                ->add('success', "<a href='$editLink'>New incoming file was created successfully.</a>");
+
+            return $this->redirectToRoute('incoming_products',
+                array('incoming_id' => $incoming->getId()));
         }
         return $this->render('incoming/import.html.twig', array(
             'incoming' => $incoming,
             'form'   => $form->createView(),
         ));
     }
-    
+
 
     /**
      * Finds and displays a Booking entity.
@@ -321,8 +333,7 @@ class IncomingController extends Controller
             'file_form' => $fileForm->createView(),
         ));
     }
-    
-    
+
 
     /**
      * Displays a form to edit an existing Incoming entity.
@@ -341,7 +352,7 @@ class IncomingController extends Controller
             $incoming->setModified(new \DateTime('now'));
             $em->persist($incoming);
             $em->flush();
-            
+
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('incoming_edit', array('id' => $incoming->getId()));
         }
@@ -351,8 +362,7 @@ class IncomingController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
+
 
     /**
      * Deletes a Incoming entity.
@@ -362,7 +372,7 @@ class IncomingController extends Controller
      */
     public function deleteAction(Request $request, Incoming $incoming)
     {
-    
+
         $form = $this->createDeleteForm($incoming);
         $form->handleRequest($request);
 
@@ -380,10 +390,10 @@ class IncomingController extends Controller
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Incoming');
         }
-        
+
         return $this->redirectToRoute('incoming');
     }
-    
+
     /**
      * Creates a form to delete a Incoming entity.
      *
@@ -396,10 +406,9 @@ class IncomingController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('incoming_delete', array('id' => $incoming->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
-    
+
     /**
      * Delete Incoming by id
      *
@@ -408,7 +417,7 @@ class IncomingController extends Controller
      */
     public function deleteByIdAction(Incoming $incoming){
         $em = $this->getDoctrine()->getManager();
-        
+
         try {
             # Remove incoming products before being able to delete incoming container
             foreach($incoming->getIncomingProducts() as $incomingProduct) {
@@ -425,13 +434,13 @@ class IncomingController extends Controller
         return $this->redirect($this->generateUrl('incoming'));
 
     }
-    
+
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="incoming_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     * @Route("/bulk-action/", name="incoming_bulk_action")
+     * @Method("POST")
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
@@ -473,7 +482,7 @@ class IncomingController extends Controller
      * @return \Symfony\Component\Form\Form The form
      */
     private function createCommentForm(Incoming $incoming)
-    {   
+    {
 
         $incomingComment = new \WarehouseBundle\Entity\IncomingComment();
         $incomingComment->setBooking($incoming);
@@ -484,7 +493,7 @@ class IncomingController extends Controller
                 'method' => 'POST',
             )
         );
-     
+
         return $form;
     }
 }

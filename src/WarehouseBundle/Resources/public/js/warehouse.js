@@ -298,7 +298,7 @@ function handleAjaxResponse(response) {
     $.fn.scannerListener.destroy = function() {
       that.unbind(options.trigger);
       console.log('scanner destroyed');
-    }
+    };
 
     $('#quick-scan').on('hide.bs.modal', function () {
       $(window).scannerListener.destroy();

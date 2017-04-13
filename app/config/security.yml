@@ -31,7 +31,7 @@ security:
         main:
             anonymous: ~
             pattern: ^/
-            host: warehouse.roveconcepts.com
+            host: "%firewall_host%"
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
