@@ -64,7 +64,7 @@ class ProductLog
      *
      * @param string $note
      *
-     * @return LocationLog
+     * @return string
      */
     public function setNote($note)
     {
@@ -88,7 +88,7 @@ class ProductLog
      *
      * @param \DateTime $created
      *
-     * @return LocationLog
+     * @return ProductLog
      */
     public function setCreated($created)
     {
@@ -136,7 +136,7 @@ class ProductLog
      *
      * @param \WarehouseBundle\Entity\Location $product
      *
-     * @return LocationLog
+     * @return ProductLog
      */
     public function setProduct(\WarehouseBundle\Entity\Product $product = null)
     {

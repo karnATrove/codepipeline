@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -30,7 +31,7 @@ class ProductController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('WarehouseBundle:Product')->createQueryBuilder('e');
-        
+
         // Remove deleted
         if (empty($request->get('status')) && !(is_numeric($request->get('status')) && intval($request->get('status')) == 0)) {
             $queryBuilder->andWhere('e.status <> :pstatus');
@@ -50,10 +51,10 @@ class ProductController extends Controller
 
 
     /**
-    * Create filter form and process filter request.
-    *
-    */
-    protected function filter($queryBuilder, $request)
+     * Create filter form and process filter request.
+     *
+     */
+    protected function filter(QueryBuilder $queryBuilder, Request $request)
     {
         $session = $request->getSession();
         $filterForm = $this->createForm('WarehouseBundle\Form\ProductFilterType');
@@ -85,13 +86,13 @@ class ProductController extends Controller
             // Get filter from session
             if ($session->has('ProductControllerFilter')) {
                 $filterData = $session->get('ProductControllerFilter');
-                
+
                 foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
                     if (is_object($filter)) {
                         $filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
                     }
                 }
-                
+
                 $filterForm = $this->createForm('WarehouseBundle\Form\ProductFilterType', $filterData);
                 $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
             }
@@ -103,10 +104,10 @@ class ProductController extends Controller
     }
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request)
+     * Get results from paginator and get paginator view.
+     *
+     */
+    protected function paginator(QueryBuilder $queryBuilder, Request $request)
     {
         //sorting
         $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
@@ -121,13 +122,12 @@ class ProductController extends Controller
         } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
-        
+
         $entities = $pagerfanta->getCurrentPageResults();
 
         // Paginator - route generator
         $me = $this;
-        $routeGenerator = function($page) use ($me, $request)
-        {
+        $routeGenerator = function($page) use ($me, $request) {
             $requestParams = $request->query->all();
             $requestParams['pcg_page'] = $page;
             return $me->generateUrl('product', $requestParams);
@@ -143,8 +143,7 @@ class ProductController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
+
 
     /**
      * Displays a form to create a new Product entity.
@@ -154,7 +153,7 @@ class ProductController extends Controller
      */
     public function newAction(Request $request)
     {
-    
+
         $product = (new Product())->setUser($this->getUser());
         $product->setStatus(1); # Default to active when creating
         $product->setCreated(new \DateTime('now')); # Default created date
@@ -169,10 +168,10 @@ class ProductController extends Controller
             if (!$existing) {
                 $em->persist($product);
                 $em->flush();
-                
+
                 $editLink = $this->generateUrl('product_edit', array('id' => $product->getId()));
                 $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New product was created successfully.</a>" );
-                
+
                 $nextAction=  $request->get('submit') == 'save' ? 'product' : 'product_new';
                 return $this->redirectToRoute($nextAction);
             } else {
@@ -184,7 +183,7 @@ class ProductController extends Controller
             'form'   => $form->createView(),
         ));
     }
-    
+
 
     /**
      * Displays a form to edit an existing Product entity.
@@ -203,8 +202,8 @@ class ProductController extends Controller
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             # Log the save
-            $log = (new ProductLog())
-                ->setUser($this->getUser())
+            $log = new ProductLog();
+            $log->setUser($this->getUser())
                 ->setProduct($product)
                 ->setCreated(new \DateTime('now'))
                 ->setNote('Changes were saved from the product edit page.');
@@ -212,7 +211,7 @@ class ProductController extends Controller
             $em->persist($product);
             $em->persist($log);
             $em->flush();
-            
+
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('product_edit', array('id' => $product->getId()));
         } elseif ($editForm->isSubmitted()) {
@@ -228,8 +227,7 @@ class ProductController extends Controller
             'log' => $em->getRepository('WarehouseBundle:ProductLog')->getLogByProduct($product,10)
         ));
     }
-    
-    
+
 
     /**
      * Deletes a Product entity.
@@ -260,7 +258,7 @@ class ProductController extends Controller
                     $em->remove($location);
                 }
                 */
-               $error = TRUE;
+                $error = TRUE;
             }
             if (count($product->getIncoming())) {
                 $this->get('session')->getFlashBag()->add('error', $product->getModel().' has incoming inventory. We can not remove product at this time.');
@@ -290,10 +288,10 @@ class ProductController extends Controller
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Product');
         }
-        
+
         return $this->redirectToRoute('product', $request->query->all());
     }
-    
+
     /**
      * Creates a form to delete a Product entity.
      *
@@ -306,10 +304,9 @@ class ProductController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('product_delete', array('id' => $product->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
-    
+
     /**
      * Delete Product by id
      *
@@ -318,7 +315,7 @@ class ProductController extends Controller
      */
     public function deleteByIdAction(Product $product){
         $em = $this->getDoctrine()->getManager();
-        
+
         try {
             $error = FALSE;
             # Remove all locations first
@@ -329,7 +326,7 @@ class ProductController extends Controller
                     $em->remove($location);
                 }
                 */
-               $error = TRUE;
+                $error = TRUE;
             }
             if (count($product->getIncoming())) {
                 $this->get('session')->getFlashBag()->add('error', $product->getModel().' has incoming inventory. We can not remove product at this time.');
@@ -362,13 +359,13 @@ class ProductController extends Controller
         return $this->redirect($this->generateUrl('product'));
 
     }
-    
+
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="product_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     * @Route("/bulk-action/", name="product_bulk_action")
+     * @Method("POST")
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
@@ -391,7 +388,7 @@ class ProductController extends Controller
                             $em->remove($location);
                         }
                         */
-                       $error = TRUE;
+                        $error = TRUE;
                     }
                     if (count($product->getIncoming())) {
                         $this->get('session')->getFlashBag()->add('error', $product->getModel().' has incoming inventory. We can not remove product at this time.');
@@ -428,7 +425,7 @@ class ProductController extends Controller
 
         return $this->redirect($this->generateUrl('product', $request->query->all()));
     }
-    
+
 
     /**
      * Creates a form to add Location to a Product entity.
@@ -448,7 +445,7 @@ class ProductController extends Controller
                 'method' => 'POST',
             )
         );
-     
+
         return $form;
     }
 

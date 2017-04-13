@@ -271,7 +271,7 @@ class BookingController extends Controller
     {
         $ids = $request->get("ids", array());
         $action = $request->get("bulk_action", "delete");
-        
+
         /** @var BookingManager $bookingManager */
         $bookingManager = $this->get('BookingManager');
 

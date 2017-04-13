@@ -220,7 +220,7 @@ class LocationProductController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $product = $this->getDoctrine()->getRepository('WarehouseBundle:Product')->findOneById($product_id);
+        $product = $this->getDoctrine()->getRepository('WarehouseBundle:Product')->find($product_id);
 
         $locationProduct = (new LocationProduct())->setUser($this->getUser());
         $locationProduct->setProduct($product);
@@ -228,7 +228,7 @@ class LocationProductController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $location = $em->getRepository('WarehouseBundle:Location')->findOneById($request->get('location_product')['location']);
+            $location = $em->getRepository('WarehouseBundle:Location')->find($request->get('location_product')['location']);
             $location->setModified(new \DateTime('now'));
             $locationProduct->setLocation($location);
             $locationProductCheck = $em->getRepository('WarehouseBundle:LocationProduct')->findOneByProductAndLocation($product,$locationProduct->getLocation());
@@ -291,7 +291,7 @@ class LocationProductController extends Controller
                 'form' => $this->renderView('WarehouseBundle:LocationProduct:ajax_location_form.html.twig',
                     array(
                         'product' => $product,
-                        'entity' => $location,
+                        'entity' => null,
                         'form' => $form->createView(),
                     )
             )
