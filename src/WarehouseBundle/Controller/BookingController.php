@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -14,6 +15,7 @@ use Pagerfanta\View\TwitterBootstrap3View;
 use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
 use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
 
+use WarehouseBundle\Doctrine\BookingManager;
 use WarehouseBundle\Entity\Booking;
 
 /**
@@ -33,7 +35,7 @@ class BookingController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('WarehouseBundle:Booking')->createQueryBuilder('e');
-        
+
         // Remove deleted
         if (empty($request->get('status')) && !(is_numeric($request->get('status')) && intval($request->get('status')) == 0)) {
             $queryBuilder->andWhere('e.status <> :bstatus');
@@ -42,7 +44,7 @@ class BookingController extends Controller
 
         list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($bookings, $pagerHtml) = $this->paginator($queryBuilder, $request);
-        
+
         return $this->render('booking/index.html.twig', array(
             'bookings' => $bookings,
             'pagerHtml' => $pagerHtml,
@@ -52,10 +54,10 @@ class BookingController extends Controller
     }
 
     /**
-    * Create filter form and process filter request.
-    *
-    */
-    protected function filter($queryBuilder, Request $request)
+     * Create filter form and process filter request.
+     *
+     */
+    protected function filter(QueryBuilder $queryBuilder, Request $request)
     {
         $session = $request->getSession();
         $filterForm = $this->createForm('WarehouseBundle\Form\BookingFilterType');
@@ -65,7 +67,7 @@ class BookingController extends Controller
             $request->request->set('pcg_sort_col','status');
             $request->request->set('pcg_sort_order','asc');
         }
-        
+
         // Reset filter
         if ($request->get('filter_action') == 'reset') {
             $session->remove('BookingControllerFilter');
@@ -87,13 +89,13 @@ class BookingController extends Controller
             // Get filter from session
             if ($session->has('BookingControllerFilter')) {
                 $filterData = $session->get('BookingControllerFilter');
-                
+
                 foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
                     if (is_object($filter)) {
                         $filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
                     }
                 }
-                
+
                 $filterForm = $this->createForm('WarehouseBundle\Form\BookingFilterType', $filterData);
                 $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
             }
@@ -104,10 +106,10 @@ class BookingController extends Controller
 
 
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request)
+     * Get results from paginator and get paginator view.
+     *
+     */
+    protected function paginator(QueryBuilder $queryBuilder, Request $request)
     {
         //sorting
         $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
@@ -122,13 +124,12 @@ class BookingController extends Controller
         } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
-        
+
         $entities = $pagerfanta->getCurrentPageResults();
 
         // Paginator - route generator
         $me = $this;
-        $routeGenerator = function($page) use ($me, $request)
-        {
+        $routeGenerator = function ($page) use ($me, $request) {
             $requestParams = $request->query->all();
             $requestParams['pcg_page'] = $page;
             return $me->generateUrl('booking', $requestParams);
@@ -144,8 +145,7 @@ class BookingController extends Controller
 
         return array($entities, $pagerHtml);
     }
-    
-    
+
 
     /**
      * Displays a form to create a new Booking entity.
@@ -163,10 +163,10 @@ class BookingController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $bookingManager->updateBooking($booking,TRUE); # Persists/flush
-            
+
             $editLink = $this->generateUrl('booking_edit', array('id' => $booking->getId()));
             $this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New booking was created successfully.</a>" );
-            
+
             $nextAction=  $request->get('submit') == 'save' ? 'booking' : 'booking_new';
             return $this->redirectToRoute($nextAction);
         }
@@ -194,7 +194,7 @@ class BookingController extends Controller
             $bookingManager->updateBooking($booking,TRUE); # Persist, flush
 
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
-            return $this->redirectToRoute('booking_edit', array('id' => $booking->getId()));
+//            return $this->redirectToRoute('booking_edit', array('id' => $booking->getId()));
         }
 
         return $this->render('booking/edit.html.twig', array(
@@ -203,8 +203,7 @@ class BookingController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
+
 
     /**
      * Deletes a Booking entity.
@@ -224,10 +223,10 @@ class BookingController extends Controller
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Booking');
         }
-        
+
         return $this->redirectToRoute('booking');
     }
-    
+
     /**
      * Creates a form to delete a Booking entity.
      *
@@ -240,10 +239,9 @@ class BookingController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('booking_delete', array('id' => $booking->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
     }
-    
+
     /**
      * Delete Booking by id
      *
@@ -255,26 +253,26 @@ class BookingController extends Controller
             $bookingManager = $this->get('BookingManager');
             $bookingManager->deleteBooking($booking);
             $this->get('session')->getFlashBag()->add('success', 'The Booking was deleted successfully');
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Booking');
         }
 
         return $this->redirect($this->generateUrl('booking'));
 
     }
-    
+
 
     /**
-    * Bulk Action
-    * @Route("/bulk-action/", name="booking_bulk_action")
-    * @Method("POST")
-    */
+     * Bulk Action
+     * @Route("/bulk-action/", name="booking_bulk_action")
+     * @Method("POST")
+     */
     public function bulkAction(Request $request)
     {
         $ids = $request->get("ids", array());
         $action = $request->get("bulk_action", "delete");
-
-        # Load the booking manager
+        
+        /** @var BookingManager $bookingManager */
         $bookingManager = $this->get('BookingManager');
 
         $cnt_changes = 0;
@@ -286,7 +284,7 @@ class BookingController extends Controller
                     $cnt_changes++;
                 }
                 $this->get('session')->getFlashBag()->add('success', $cnt_changes. ' bookings were deleted successfully!');
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
             }
         }
@@ -296,13 +294,13 @@ class BookingController extends Controller
                 foreach ($ids as $id) {
                     $booking = $bookingManager->findBookingById($id);
                     $booking->setPickingFlag($action == 'pickingon'?1:0);
-                    $booking->updateBooking($booking,true); # persist, flush
+                    $bookingManager->updateBooking($booking, true); # persist, flush
                     $cnt_changes++;
                 }
 
                 $this->get('session')->getFlashBag()->add('success', $cnt_changes. ' bookings were successfully updated!');
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
             }
         }
@@ -316,7 +314,7 @@ class BookingController extends Controller
 
                 $this->get('session')->getFlashBag()->add('success', $cnt_changes. ' bookings were deleted successfully!');
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
             }
         }
@@ -326,11 +324,11 @@ class BookingController extends Controller
 
     /**
      * Export Pick List to PDF
-     * 
+     *
      * SKU IDENTIFICATION
      * BO0000068008 -> Booking 68006 (12 chars)
      * E1-001 -> Booking Product
-     * 
+     *
      * @Route("/{id}/pick_list", name="pick_list")
      */
     public function pickListAction(Request $request, $id)
@@ -363,11 +361,11 @@ class BookingController extends Controller
 
         return new Response($html,200);
     }
-    
+
 
     /**
      * Export Pick List to PDF
-     * 
+     *
      * @Route("/{id}/pick_list/pdf", name="pick_list_pdf")
      */
     public function pickListPDFAction(Request $request, Booking $booking)
@@ -413,9 +411,9 @@ class BookingController extends Controller
      * @return string
      *
      */
-     protected function getBarcodeCachePath($public = false)
-     {
+    protected function getBarcodeCachePath($public = false)
+    {
 
-         return (!$public) ? $this->get('kernel')->getRootDir(). '/../web/uploads/barcode/cache' : '/uploads/barcode/cache';
-     }
+        return (!$public) ? $this->get('kernel')->getRootDir() . '/../web/uploads/barcode/cache' : '/uploads/barcode/cache';
+    }
 }

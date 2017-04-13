@@ -64,5 +64,4 @@ abstract class BookingManager implements BookingManagerInterface
 
         return $this->findBookingByOrderReference($numberOrReference);
     }
-
 }

@@ -145,7 +145,11 @@
                                             <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{booking.id}}"/></td>
                                             {#<td><a href="{{ path('booking_edit', { 'id': booking.id }) }}">{{ booking.id }}</a></td>#}
                                             <td><a href="{{ path('booking_edit', { 'id': booking.id }) }}">{{ booking.orderNumber }}</a></td>
-                                            <td>{% if booking.pickingFlag %}<i class="fa fa-flag aero"></i>{% endif %}</td>
+                                            <td>
+                                                {% if booking.pickingFlag %}
+                                                    <i class="fa fa-flag aero"></i>
+                                                {% endif %}
+                                            </td>
                                             <td>{{ bookingUtil.bookingOrderTypeName(booking.orderType) }}</td>
                                             <td>{{ bookingUtil.bookingStatusName(booking.status) }}</td>
                                             <td>{{ bookingUtil.bookingCarrierName(booking.carrierId) }}</td>

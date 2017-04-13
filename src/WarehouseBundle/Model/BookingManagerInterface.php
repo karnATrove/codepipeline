@@ -1,5 +1,7 @@
 <?php
 namespace WarehouseBundle\Model;
+use WarehouseBundle\Entity\BookingFile;
+use WarehouseBundle\Entity\BookingProduct;
 
 /**
  * Interface to be implemented by booking managers. This adds an additional level
