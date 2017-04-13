@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -10,6 +11,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
+use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\Product;
 
 /**
@@ -28,12 +30,12 @@ class LogController extends Controller
     public function productAction(Request $request, Product $product)
     {
         $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em->getRepository('WarehouseBundle:ProductLog')->findByProduct($product);
-        $queryBuilder = $em->getRepository('WarehouseBundle:ProductLog')->createQueryBuilder('pl')
+        $queryBuilder = $em->getRepository('WarehouseBundle:ProductLog')
+            ->createQueryBuilder('pl')
             ->where('pl.product = :product')
-            ->setParameter('product',$product)
-            ->orderBy('pl.created','DESC');
-        
+            ->setParameter('product', $product)
+            ->orderBy('pl.created', 'DESC');
+
         //list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($log_entries, $pagerHtml) = $this->paginator($queryBuilder, $request, $product);
 
@@ -44,44 +46,31 @@ class LogController extends Controller
         ));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     /**
-    * Get results from paginator and get paginator view.
-    *
-    */
-    protected function paginator($queryBuilder, Request $request, Product $product)
+     * Get results from paginator and get paginator view.
+     *
+     */
+    protected function paginator(QueryBuilder $queryBuilder, Request $request, Product $product)
     {
         //sorting
-        $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
+        $sortCol = $queryBuilder->getRootAlias() . '.' . $request->get('pcg_sort_col', 'id');
         $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
         // Paginator
         $adapter = new DoctrineORMAdapter($queryBuilder);
         $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($request->get('pcg_show' , 10));
+        $pagerfanta->setMaxPerPage($request->get('pcg_show', 10));
 
         try {
             $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
         } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
-        
+
         $entities = $pagerfanta->getCurrentPageResults();
 
         // Paginator - route generator
         $me = $this;
-        $routeGenerator = function($page) use ($me, $request,$product)
-        {
+        $routeGenerator = function ($page) use ($me, $request, $product) {
             $requestParams = $request->query->all();
             $requestParams['pcg_page'] = $page;
             $requestParams['id'] = $product->getId();
@@ -99,4 +88,67 @@ class LogController extends Controller
         return array($entities, $pagerHtml);
     }
 
+    /**
+     * Lists all Product entities.
+     *
+     * @Route("/booking/{id}", name="log_booking")
+     * @Method("GET")
+     */
+    public function bookingAction(Request $request, Booking $booking)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $queryBuilder = $em->getRepository('WarehouseBundle:BookingLog')
+            ->createQueryBuilder('bl')
+            ->where('bl.booking = :booking')
+            ->setParameter('booking', $booking)
+            ->orderBy('bl.created', 'DESC');
+
+        //list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
+        list($log_entries, $pagerHtml) = $this->bookingLogPaginator($queryBuilder, $request, $booking);
+
+        return $this->render('log/booking.html.twig', array(
+            'booking' => $booking,
+            'log_entries' => $log_entries,
+            'pagerHtml' => $pagerHtml,
+        ));
+    }
+
+
+    protected function bookingLogPaginator(QueryBuilder $queryBuilder, Request $request, Booking $booking)
+    {
+        //sorting
+        $sortCol = $queryBuilder->getRootAlias() . '.' . $request->get('pcg_sort_col', 'id');
+        $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
+        // Paginator
+        $adapter = new DoctrineORMAdapter($queryBuilder);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage($request->get('pcg_show', 10));
+
+        try {
+            $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
+        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
+            $pagerfanta->setCurrentPage(1);
+        }
+
+        $entities = $pagerfanta->getCurrentPageResults();
+
+        // Paginator - route generator
+        $me = $this;
+        $routeGenerator = function ($page) use ($me, $request, $booking) {
+            $requestParams = $request->query->all();
+            $requestParams['pcg_page'] = $page;
+            $requestParams['id'] = $booking->getId();
+            return $me->generateUrl('log_booking', $requestParams);
+        };
+
+        // Paginator - view
+        $view = new TwitterBootstrap3View();
+        $pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
+            'proximity' => 3,
+            'prev_message' => 'previous',
+            'next_message' => 'next',
+        ));
+
+        return array($entities, $pagerHtml);
+    }
 }

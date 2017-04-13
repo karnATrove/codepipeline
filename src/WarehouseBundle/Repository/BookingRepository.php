@@ -3,6 +3,7 @@
 namespace WarehouseBundle\Repository;
 
 use Doctrine\ORM\Query\Expr;
+use WarehouseBundle\Entity\Booking;
 
 /**
  * BookingRepository

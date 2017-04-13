@@ -1,6 +1,8 @@
 <?php
 
 namespace WarehouseBundle\Repository;
+use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingLog;
 
 /**
  * BookingLogRepository
@@ -10,4 +12,18 @@ namespace WarehouseBundle\Repository;
  */
 class BookingLogRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * @param Booking $booking
+     * @param null $limit
+     * @return BookingLog[]
+     */
+    public function getLogByBooking(Booking $booking, $limit=NULL) {
+        return $this->createQueryBuilder('bl')
+            ->andWhere('bl.booking = :booking')
+            ->setParameter('booking', $booking)
+            ->orderBy('bl.created','DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

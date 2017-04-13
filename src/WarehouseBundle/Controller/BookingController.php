@@ -211,7 +211,7 @@ class BookingController extends Controller
 
         $bookingLogs = $this->getDoctrine()
             ->getRepository('WarehouseBundle:BookingLog')
-            ->findBy(['booking' => $booking]);
+            ->getLogByBooking($booking, 10);
         return $this->render('booking/edit.html.twig', array(
             'booking' => $booking,
             'bookingLogs' => $bookingLogs,
