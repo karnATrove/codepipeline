@@ -15,6 +15,7 @@ use Pagerfanta\View\TwitterBootstrap3View;
 
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingFile;
+use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Form\BookingFileType;
 
 #http://codemonkeys.be/2013/01/ajaxify-your-symfony2-forms-with-jquery/
@@ -40,8 +41,8 @@ class BookingFileController extends Controller
 	    $bookingManager = $this->get('BookingManager');
     	$bookingFile = $bookingManager->createFile($booking);
 
-        $form = $this->createForm('WarehouseBundle\Form\BookingFileType',$bookingFile,
-            array('action' => $this->generateUrl('file_new',array('id'=>$booking->getId())),'method' => 'POST'));
+        $form = $this->createForm('WarehouseBundle\Form\BookingFileType', $bookingFile,
+            array('action' => $this->generateUrl('file_new', array('id' => $booking->getId())), 'method' => 'POST'));
         $form->handleRequest($request);
 
         if (!$request->isXmlHttpRequest()) {
@@ -52,7 +53,7 @@ class BookingFileController extends Controller
 	        ));
 	    } elseif ($form->isSubmitted() && $form->isValid()) {
 			// $file stores the uploaded PDF file
-            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            /** @var UploadedFile $file */
             $file = $bookingFile->getFilepath();
 
             $fileName = $this->get('app.document_uploader')->upload($file);
@@ -68,6 +69,17 @@ class BookingFileController extends Controller
 			# Save the file and persist,flush
 			$bookingManager->updateBooking($booking,true);
 			$bookingManager->updateFile($bookingFile,true);
+
+            //add booking log
+            $em = $this->getDoctrine()->getManager();
+            $bookingLog = new BookingLog();
+            $bookingLog->setBooking($booking)
+                ->setUser($this->getUser())
+                ->setCreated(new \DateTime('now'))
+                ->setNote('Booking file uploaded.');
+            $em->persist($bookingLog);
+
+            $em->flush();
 
 			//$data = $form->getData();
 			$response['success'] = true;
@@ -87,6 +99,12 @@ class BookingFileController extends Controller
 				'op' => 'remove',
 				'value' => '',
 			);
+            $response['ajaxCommand'][] = array(
+                'selector' => '.log_booking tbody',
+                'op' => 'prepend',
+                'value' => $this->renderView('WarehouseBundle:BookingLog:booking_log_row.html.twig',
+                    array('log' => $bookingLog)),
+            );
 			return new JsonResponse($response, 200);
 		}
 

@@ -352,7 +352,7 @@ class ProductController extends Controller
                 $em->flush();
                 $this->get('session')->getFlashBag()->add('success', 'The Product was deleted successfully');
             }
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Product');
         }
 

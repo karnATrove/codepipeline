@@ -35,6 +35,7 @@ class BookingController extends Controller
     public function indexAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $em->getRepository('WarehouseBundle:Booking')->createQueryBuilder('e');
 
         // Remove deleted
@@ -186,9 +187,6 @@ class BookingController extends Controller
     public function editAction(Request $request, Booking $booking)
     {
         $bookingManager = $this->get('BookingManager');
-        $bookingLogs = $this->getDoctrine()
-            ->getRepository('WarehouseBundle:BookingLog')
-            ->findBy(['booking' => $booking]);
         $deleteForm = $this->createDeleteForm($booking);
         $editForm = $this->createForm('WarehouseBundle\Form\BookingType', $booking);
         $editForm->handleRequest($request);
@@ -211,6 +209,9 @@ class BookingController extends Controller
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
         }
 
+        $bookingLogs = $this->getDoctrine()
+            ->getRepository('WarehouseBundle:BookingLog')
+            ->findBy(['booking' => $booking]);
         return $this->render('booking/edit.html.twig', array(
             'booking' => $booking,
             'bookingLogs' => $bookingLogs,
