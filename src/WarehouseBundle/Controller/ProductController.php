@@ -418,7 +418,7 @@ class ProductController extends Controller
                 if ($count)
                     $this->get('session')->getFlashBag()->add('success', $count. ' product(s) were deleted successfully!');
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the products ');
             }
         }

@@ -154,4 +154,28 @@ class BookingReturnComment
     {
         return $this->user;
     }
+
+    /**
+     * Set return
+     *
+     * @param \WarehouseBundle\Entity\BookingReturn $return
+     *
+     * @return BookingReturnComment
+     */
+    public function setReturn(\WarehouseBundle\Entity\BookingReturn $return = null)
+    {
+        $this->return = $return;
+
+        return $this;
+    }
+
+    /**
+     * Get return
+     *
+     * @return \WarehouseBundle\Entity\BookingReturn
+     */
+    public function getReturn()
+    {
+        return $this->return;
+    }
 }

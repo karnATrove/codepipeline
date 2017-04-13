@@ -17,6 +17,7 @@ use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
 
 use WarehouseBundle\Doctrine\BookingManager;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingLog;
 
 /**
  * Booking controller.
@@ -185,20 +186,34 @@ class BookingController extends Controller
     public function editAction(Request $request, Booking $booking)
     {
         $bookingManager = $this->get('BookingManager');
-
+        $bookingLogs = $this->getDoctrine()
+            ->getRepository('WarehouseBundle:BookingLog')
+            ->findBy(['booking' => $booking]);
         $deleteForm = $this->createDeleteForm($booking);
         $editForm = $this->createForm('WarehouseBundle\Form\BookingType', $booking);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $bookingManager->updateBooking($booking,TRUE); # Persist, flush
+            $em = $this->getDoctrine()->getManager();
+
+            $bookingManager->updateBooking($booking, false);//persist not flush
+            $em->persist($booking);
+
+            $bookingLog = new BookingLog();
+            $bookingLog->setBooking($booking)
+                ->setUser($this->getUser())
+                ->setCreated(new \DateTime('now'))
+                ->setNote('Changes were saved from the booking edit page.');
+            $em->persist($bookingLog);
+
+            $em->flush();
 
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
-//            return $this->redirectToRoute('booking_edit', array('id' => $booking->getId()));
         }
 
         return $this->render('booking/edit.html.twig', array(
             'booking' => $booking,
+            'bookingLogs' => $bookingLogs,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ));

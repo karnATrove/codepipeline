@@ -2,13 +2,14 @@
 
 namespace WarehouseBundle\Entity;
 
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * BookingProductLocation
  *
  * Represents booking product pick history.
- *
+ * @Gedmo\Loggable
  * @ORM\Table(name="warehouse_booking_product_location")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\BookingProductLocationRepository")
  */
@@ -24,6 +25,12 @@ class BookingProductLocation
     private $id;
 
     /**
+     * One BookingProductLocation has One User
+     * @ORM\ManyToOne(targetEntity="User")
+     */
+    private $user;
+
+    /**
      * Many BookingProductLocation have One BookingProduct.
      * @ORM\ManyToOne(targetEntity="BookingProduct")
      * @ORM\JoinColumn(onDelete="CASCADE")
@@ -32,6 +39,7 @@ class BookingProductLocation
 
     /**
      * Many BookingProductLocation have One Location.
+     * @Gedmo\Versioned
      * @ORM\ManyToOne(targetEntity="Location")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
@@ -39,7 +47,7 @@ class BookingProductLocation
 
     /**
      * @var int
-     *
+     * @Gedmo\Versioned
      * @ORM\Column(name="qty", type="integer")
      */
     private $qty;
@@ -51,6 +59,12 @@ class BookingProductLocation
      */
     private $created;
 
+    /**
+     * Construct and setup defaults.
+     */
+    public function __construct() {
+        $this->created = new \DateTime('now');
+    }
 
     /**
      * Get id
@@ -109,5 +123,76 @@ class BookingProductLocation
     {
         return $this->created;
     }
-}
 
+    /**
+     * Set bookingProduct
+     *
+     * @param \WarehouseBundle\Entity\BookingProduct $bookingProduct
+     *
+     * @return BookingProductLocation
+     */
+    public function setBookingProduct(\WarehouseBundle\Entity\BookingProduct $bookingProduct = null)
+    {
+        $this->bookingProduct = $bookingProduct;
+
+        return $this;
+    }
+
+    /**
+     * Get bookingProduct
+     *
+     * @return \WarehouseBundle\Entity\BookingProduct
+     */
+    public function getBookingProduct()
+    {
+        return $this->bookingProduct;
+    }
+
+    /**
+     * Set location
+     *
+     * @param \WarehouseBundle\Entity\Location $location
+     *
+     * @return BookingProductLocation
+     */
+    public function setLocation(\WarehouseBundle\Entity\Location $location = null)
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * Get location
+     *
+     * @return \WarehouseBundle\Entity\Location
+     */
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    /**
+     * Set user
+     *
+     * @param \WarehouseBundle\Entity\User $user
+     *
+     * @return BookingLog
+     */
+    public function setUser(\WarehouseBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \WarehouseBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+}
