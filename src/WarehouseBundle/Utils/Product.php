@@ -1,6 +1,8 @@
 <?php
 namespace WarehouseBundle\Utils;
 
+use Symfony\Component\DependencyInjection\Container;
+
 class Product
 {
 	/**
@@ -13,7 +15,7 @@ class Product
 	 *
 	 * @param      <type>  $container  The container
 	 */
-	public function __construct($container) {
+	public function __construct(Container $container) {
 		$this->container = $container;
 	}
 
@@ -60,13 +62,13 @@ class Product
      */
     public function getAvailable(\WarehouseBundle\Entity\Product $product) {
     	return $this->getAvailableByProduct($product);
-        return $this->container->get("doctrine")->getRepository('WarehouseBundle:Product')->getAvailableByProduct($product);
-
-        $onHand = 0;
-        foreach($product->getLocations() as $location) {
-            $onHand += $location->getOnHand();
-        }
-        return $onHand;
+//        return $this->container->get("doctrine")->getRepository('WarehouseBundle:Product')->getAvailableByProduct($product);
+//
+//        $onHand = 0;
+//        foreach($product->getLocations() as $location) {
+//            $onHand += $location->getOnHand();
+//        }
+//        return $onHand;
     }
 
     /**
@@ -190,7 +192,7 @@ class Product
      *
      * @param  \WarehouseBundle\Entity\Product $product [description]
      * @param   integer Number of results to return
-     * 
+     *
      * @return     integer  Allocated quantity.
      */
     public function getRecentPickedProducts(\WarehouseBundle\Entity\Product $product, $limit=10) {

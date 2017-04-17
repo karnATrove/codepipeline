@@ -11,6 +11,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
+use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Entity\ProductLog;
 
@@ -21,6 +22,7 @@ use WarehouseBundle\Entity\ProductLog;
  */
 class ProductController extends Controller
 {
+    const SORTING_KEY_QTY_OH = "qtyOnHand";
     /**
      * Lists all Product entities.
      *
@@ -33,7 +35,10 @@ class ProductController extends Controller
         $queryBuilder = $em->getRepository('WarehouseBundle:Product')->createQueryBuilder('e');
 
         // Remove deleted
-        if (empty($request->get('status')) && !(is_numeric($request->get('status')) && intval($request->get('status')) == 0)) {
+        if (empty($request->get('status'))
+            && !(is_numeric($request->get('status'))
+                && intval($request->get('status')) == 0)
+        ) {
             $queryBuilder->andWhere('e.status <> :pstatus');
             $queryBuilder->setParameter('pstatus',0);
         }
@@ -110,8 +115,20 @@ class ProductController extends Controller
     protected function paginator(QueryBuilder $queryBuilder, Request $request)
     {
         //sorting
-        $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
-        $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
+        $sortingKey = $request->get('pcg_sort_col', 'id');
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+        if ($sortingKey == self::SORTING_KEY_QTY_OH) {
+            $queryBuilder->addSelect('sum(lp.onHand) as HIDDEN total');
+            $queryBuilder->leftJoin('WarehouseBundle:LocationProduct',
+                'lp',
+                'with',
+                "{$rootAlias}=lp.product");
+            $queryBuilder->groupBy("{$rootAlias}.id");
+            $queryBuilder->orderBy('total','desc');
+        } else {
+            $sortCol = $rootAlias . '.' . $sortingKey;
+            $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
+        }
         // Paginator
         $adapter = new DoctrineORMAdapter($queryBuilder);
         $pagerfanta = new Pagerfanta($adapter);

@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Expr;
 //use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use WarehouseBundle\Entity\Product;
 
 /**
  * ProductRepository
