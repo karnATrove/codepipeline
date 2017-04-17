@@ -45,3 +45,4 @@ gen
 *.DS_Store
 /node_modules
 /app/config/security.yml.bak
+/.jshintrc
