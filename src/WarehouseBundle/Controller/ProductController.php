@@ -124,11 +124,11 @@ class ProductController extends Controller
                 'with',
                 "{$rootAlias}=lp.product");
             $queryBuilder->groupBy("{$rootAlias}.id");
-            $queryBuilder->orderBy('total','desc');
+            $sortCol = 'total';
         } else {
             $sortCol = $rootAlias . '.' . $sortingKey;
-            $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
         }
+        $queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
         // Paginator
         $adapter = new DoctrineORMAdapter($queryBuilder);
         $pagerfanta = new Pagerfanta($adapter);
