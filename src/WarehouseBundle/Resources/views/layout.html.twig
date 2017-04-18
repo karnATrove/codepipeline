@@ -15,6 +15,10 @@
         <link href="{{ asset('assets/vendor/gentelella/vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
         <!-- Custom Theme Style -->
         <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+
+        <link href="{{ asset('assets/vendor/noty/lib/noty.css') }}" rel="stylesheet">
+
+
         {% block head %}{% endblock %}
     </head>
     <body class="nav-md" id="body">
@@ -188,9 +192,11 @@
       'assets/vendor/gentelella/vendors/iCheck/icheck.min.js'
       'assets/js/moment/moment.min.js'
       'assets/js/datepicker/daterangepicker.js'
+    'assets/vendor/noty/lib/noty.js'
       'assets/js/custom.js'
       '@WarehouseBundle/Resources/public/js/scan.js'
-      '@WarehouseBundle/Resources/public/js/warehouse.js' output='js/compiled/main.js' %}
+    '@WarehouseBundle/Resources/public/js/warehouse.js'
+    '@WarehouseBundle/Resources/public/js/scanned_products_page.js' output='js/compiled/main.js' %}
       <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 

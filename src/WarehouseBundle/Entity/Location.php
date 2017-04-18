@@ -262,4 +262,8 @@ class Location
     {
         return $this->user;
     }
+
+    public function printLocation(){
+	    return $this->getAisle(). ' - '. $this->getRow(). ' - '. $this->getLevel();
+    }
 }

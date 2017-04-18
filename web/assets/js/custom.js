@@ -33,14 +33,14 @@ Assumes Mozilla naming conventions instead of W3C for now
         browserPrefixes = 'webkit moz o ms khtml'.split(' ');
     
     // check for native support
-    if (typeof document.cancelFullScreen != 'undefined') {
+    if (typeof document.cancelFullScreen !== 'undefined') {
         fullScreenApi.supportsFullScreen = true;
     } else {     
         // check for fullscreen support by vendor prefix
         for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
             fullScreenApi.prefix = browserPrefixes[i];
             
-            if (typeof document[fullScreenApi.prefix + 'CancelFullScreen' ] != 'undefined' ) {
+            if (typeof document[fullScreenApi.prefix + 'CancelFullScreen' ] !== 'undefined' ) {
                 fullScreenApi.supportsFullScreen = true;
                 
                 break;
@@ -61,17 +61,17 @@ Assumes Mozilla naming conventions instead of W3C for now
                 default:
                     return document[this.prefix + 'FullScreen'];
             }
-        }
+        };
         fullScreenApi.requestFullScreen = function(el) {
             return (this.prefix === '') ? el.requestFullScreen() : el[this.prefix + 'RequestFullScreen']();
-        }
+        };
         fullScreenApi.cancelFullScreen = function(el) {
             return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + 'CancelFullScreen']();
-        }       
+        };
     }
 
     // jQuery plugin
-    if (typeof jQuery != 'undefined') {
+    if (typeof jQuery !== 'undefined') {
         jQuery.fn.requestFullScreen = function() {
     
             return this.each(function() {
@@ -98,16 +98,11 @@ if (window.fullScreenApi.supportsFullScreen) {
 function toggleAll(source) {
     var aInputs = document.getElementsByTagName('input');
     for (var i = 0; i < aInputs.length; i++) {
-        if (aInputs[i] != source && aInputs[i].className == source.className) {
+        if (aInputs[i] !== source && aInputs[i].className === source.className) {
             aInputs[i].checked = source.checked;
         }
     }
-    if (source.checked) {
-        document.getElementById('bulkSubmitBtn').disabled = false;
-    } else {
-        document.getElementById('bulkSubmitBtn').disabled = true;
-
-    }
+    document.getElementById('bulkSubmitBtn').disabled = !source.checked;
 }
 
 //Checks if at least one checkbox is selected.
@@ -124,12 +119,7 @@ function bulkSubmitBtnManage()
         }
     }
     
-    if (selected) {
-        document.getElementById('bulkSubmitBtn').disabled = false;
-    } else {
-        document.getElementById('bulkSubmitBtn').disabled = true;
-
-    }
+    document.getElementById('bulkSubmitBtn').disabled = !selected;
 }
 
 
@@ -194,7 +184,7 @@ $(document).ready(function() {
     $SIDEBAR_MENU.find('a[href="' + CURRENT_URL + '"]').parent('li').addClass('current-page');
 
     $SIDEBAR_MENU.find('a').filter(function () {
-        return this.href == CURRENT_URL;
+        return this.href === CURRENT_URL;
     }).parent('li').addClass('current-page').parents('ul').slideDown(function() {
         setContentHeight();
     }).parent().addClass('active');
@@ -340,7 +330,7 @@ $(document).ready(function() {
         $(this).next().slideToggle(200);
         $expand = $(this).find(">:first-child");
 
-        if ($expand.text() == "+") {
+        if ($expand.text() === "+") {
             $expand.text("-");
         } else {
             $expand.text("+");
@@ -349,7 +339,7 @@ $(document).ready(function() {
 });
 
 // NProgress
-if (typeof NProgress != 'undefined') {
+if (typeof NProgress !== 'undefined') {
     NProgress.start();
 
     $(window).on('load',function() {

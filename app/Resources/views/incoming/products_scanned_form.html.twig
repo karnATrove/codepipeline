@@ -25,7 +25,7 @@
                         <form name="new-form" id="scan-incoming-product-new-form" method="post" class="ajaxForm"
                               action="{{ path('incoming_products_scanned_new_ajax',{'id':incoming.id}) }}">
                             <div class="input-group" style="max-width:200px;">
-                                {{ form_widget(form_new.new) }}
+                                {{ form_widget(form_new.new, {'attr': {'autofocus':true}}) }}
                                 <span class="input-group-btn">
 			                    {{ form_widget(form_new.add) }}
 			                </span>

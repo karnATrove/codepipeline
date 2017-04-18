@@ -46,3 +46,4 @@ gen
 /node_modules
 /app/config/security.yml.bak
 /.jshintrc
+/bower_components/
