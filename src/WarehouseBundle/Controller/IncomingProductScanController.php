@@ -43,7 +43,6 @@ class IncomingProductScanController extends Controller
 	 */
 	public function incomingProductScanEditAjaxAction(Request $request, IncomingProductScan $incomingProductScan)
 	{
-		$time_start = microtime_float();
 		if (!$request->isXmlHttpRequest()) {
 			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
 			return $this->redirect($this->generateUrl('incoming_products_scanned', array('id' => $incomingProductScan->getIncoming())));
@@ -64,18 +63,14 @@ class IncomingProductScanController extends Controller
 		}
 
 		//persist data
-
 		$em->persist($incomingProductScan);
 		$em->flush();
-		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: {$incomingProductScan->getLocation()->printLocation()} Quantity: {$incomingProductScan->getQtyOnScan()}";
+
+		$locationTitle = $incomingProductScan->getLocation() ? $incomingProductScan->getLocation()->printLocation() : "NULL";
+		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: " .
+			$locationTitle . " Quantity: {$incomingProductScan->getQtyOnScan()}";
 		$response = ['status' => 'success', 'error' => "", 'message' => $message];
-		$time = microtime_float() - $time_start;
 		return new JsonResponse($response, 200);
 	}
 
-}
-function microtime_float()
-{
-	list($usec, $sec) = explode(" ", microtime());
-	return ((float)$usec + (float)$sec);
 }

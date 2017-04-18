@@ -18,7 +18,7 @@
         <td>{{ incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) }}</td>
         <td width="170">
             {% if not iscomplete %}
-                {{ form_widget(incomingScannedProduct.location,
+                {{ form_widget(incomingScannedProduct.locationId,
                 {'attr':
                     {
                         'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),

@@ -1,27 +1,18 @@
 $(function () {
-
 	$('.incoming-location-update').change(function () {
 		var value = $(this).val();
 		var data = {'location': value};
-		incomingUpdate($(this), data, 'location');
-	});
-
-	$('.incoming-qty-update').keypress(function (e) {
-		e.preventDefault();
-		if (e.which === 13) {
-			//todo move to next
-
-		}
+		incomingUpdate($(this), data);
 	});
 
 	$('.incoming-qty-update').change(function () {
 		var value = $(this).val();
 		var data = {'quantity': value};
-		incomingUpdate($(this), data, 'quantity');
+		incomingUpdate($(this), data);
 	});
 });
 
-function incomingUpdate(currentElement, data, type) {
+function incomingUpdate(currentElement, data) {
 	// var loading = $('.loading');
 	// loading.show();
 	$.ajax({
@@ -61,4 +52,3 @@ function incomingUpdate(currentElement, data, type) {
 
 	});
 }
-

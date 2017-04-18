@@ -22,6 +22,13 @@ class IncomingProductScan
      */
     private $id;
 
+	/**
+	 * @var int
+	 *
+	 * @ORM\Column(name="location_id", type="integer")
+	 */
+	private $locationId;
+
     /**
      * One IncomingProductScan has One User
      * @ORM\ManyToOne(targetEntity="User")
@@ -280,4 +287,20 @@ class IncomingProductScan
     {
         return $this->user;
     }
+
+	/**
+	 * @return int
+	 */
+	public function getLocationId()
+	{
+		return $this->locationId;
+	}
+
+	/**
+	 * @param int $locationId
+	 */
+	public function setLocationId($locationId)
+	{
+		$this->locationId = $locationId;
+	}
 }

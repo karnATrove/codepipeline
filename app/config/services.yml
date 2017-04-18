@@ -31,3 +31,8 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+    app.form.type.task:
+        class: WarehouseBundle\Form\IncomingProductScanType
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: form.type }

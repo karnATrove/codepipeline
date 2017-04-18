@@ -100,7 +100,6 @@ class IncomingProductController extends Controller
 	 */
 	public function incomingProductsScannedAjaxAction(Request $request, Incoming $incoming)
 	{
-		$time_start = microtime_float();
 		$em = $this->getDoctrine()->getManager();
 
 		$form_scan = $this->createModifyScannedForm($incoming);
@@ -153,7 +152,6 @@ class IncomingProductController extends Controller
 			} else {
 				$this->get('session')->getFlashBag()->add('error', "Incoming is already set to complete.");
 			}
-			$time = microtime_float() - $time_start;
 			return new JsonResponse($response, 200);
 		} elseif ($form_scan->isSubmitted() && $form_scan->isValid()) {
 			# Normal submission
@@ -170,14 +168,19 @@ class IncomingProductController extends Controller
 	 */
 	public function incomingProductsScannedNewAjaxAction(Request $request, Incoming $incoming)
 	{
-		$time_pre = microtime(true);
+		if (!$request->isXmlHttpRequest()){
+			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
+			return $this->redirect($this->generateUrl('incoming_products_scanned', array('id' => $incoming->getId())));
+		}
+
+
 		$em = $this->getDoctrine()->getManager();
 
 		$form_new = $this->createNewScannedForm($incoming);
 		$form_new->handleRequest($request);
 
 		# Submissions will be by ajax
-		if ($form_new->isSubmitted() && $form_new->isValid() && $request->isXmlHttpRequest()) {
+		if ($form_new->isSubmitted() && $form_new->isValid()) {
 			$model = trim($request->request->get('form')['new']);
 
 			# Check if it exists?
@@ -221,25 +224,26 @@ class IncomingProductController extends Controller
 			$em->persist($item);
 			$em->flush();
 
+			$rustart = getrusage();
+			$formView = $this->createModifyScannedForm($incoming)->createView();
+			$ru = getrusage();
+			$t1 = "This process used " . rutime($ru, $rustart, "utime") / 1000 .
+				" ms for its computations\n";
+			$t2 = "It spent " . rutime($ru, $rustart, "stime") / 1000 .
+				" ms in system calls\n";
+
 			$response['ajaxCommand'][] = array(
 				'selector' => '#scanned_form_wrap',
 				'op' => 'html',
 				'value' => $this->renderView('incoming/products_scanned_form.html.twig', array(
-					'form_scan' => $this->createModifyScannedForm($incoming)->createView(),
+					'form_scan' => $formView,
 					'form_new' => $form_new->createView(),
 					'incoming' => $incoming,
 				)),
 			);
-			$time_post = microtime(true);
-			$exec_time = ($time_post - $time_pre)/60;
-			return new JsonResponse($response, 200);
 
-		} elseif ($form_new->isSubmitted() && $form_new->isValid()) {
-			# Normal submission
-			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
-			return $this->redirect($this->generateUrl('incoming_products_scanned', array('id' => $incoming->getId())));
+			return new JsonResponse($response, 200);
 		}
-		return null;
 	}
 
 	/**
@@ -510,4 +514,10 @@ class IncomingProductController extends Controller
 		return $this->redirect($this->generateUrl('incoming_products', array('incoming_id' => $incoming->getId())));
 	}
 
+}
+
+function rutime($ru, $rus, $index)
+{
+	return ($ru["ru_$index.tv_sec"] * 1000 + intval($ru["ru_$index.tv_usec"] / 1000))
+		- ($rus["ru_$index.tv_sec"] * 1000 + intval($rus["ru_$index.tv_usec"] / 1000));
 }

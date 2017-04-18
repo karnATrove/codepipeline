@@ -26,7 +26,7 @@ class Incoming
      *
      * @return     array  Available incoming statuses.
      */
-    public function incomingStatusList() {
+    public static function incomingStatusList() {
         return array(
             0 => 'Deleted',
             1 => 'Inbound',
@@ -51,7 +51,7 @@ class Incoming
      *
      * @return     array  Available incoming statuses.
      */
-    public function incomingTypeList() {
+    public static function incomingTypeList() {
         return array(
             1 => 'Ocean Freight',
             2 => 'Forward',
