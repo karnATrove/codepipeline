@@ -47,4 +47,4 @@ gen
 /app/config/security.yml.bak
 /.jshintrc
 /bower_components/
-/web/js/compiled/
+/web/js/
