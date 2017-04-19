@@ -50,23 +50,26 @@ class IncomingProductScanController extends Controller
 
 		$qty = $request->get('quantity');
 		$locationId = $request->get('location');
-		if ($qty) {
+		if ($qty !== null) {
 			$incomingProductScan->setQtyOnScan($qty);
 		}
+		$locationTitle = $incomingProductScan->getLocation() ? $incomingProductScan->getLocation()->printLocation() : "NULL";
+
 		$em = $this->getDoctrine()->getManager();
-		if ($locationId) {
+		if ($locationId !== null) {
 			$location = $em->getRepository('WarehouseBundle:Location')->find($locationId);
 			if (!$location) {
 				throw new Exception('Location not found');
 			}
 			$incomingProductScan->setLocation($location);
+			$locationTitle = $location->printLocation();
 		}
 
 		//persist data
 		$em->persist($incomingProductScan);
 		$em->flush();
 
-		$locationTitle = $incomingProductScan->getLocation() ? $incomingProductScan->getLocation()->printLocation() : "NULL";
+
 		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: " .
 			$locationTitle . " Quantity: {$incomingProductScan->getQtyOnScan()}";
 		$response = ['status' => 'success', 'error' => "", 'message' => $message];
