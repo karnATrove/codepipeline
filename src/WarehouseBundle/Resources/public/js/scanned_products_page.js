@@ -6,14 +6,6 @@ $(function () {
 		incomingUpdate($(this), data, 'location');
 	});
 
-	$('.incoming-qty-update').keypress(function (e) {
-		e.preventDefault();
-		if (e.which === 13) {
-			//todo move to next
-
-		}
-	});
-
 	$('.incoming-qty-update').change(function () {
 		var value = $(this).val();
 		var data = {'quantity': value};
