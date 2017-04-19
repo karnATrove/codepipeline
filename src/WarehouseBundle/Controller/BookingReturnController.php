@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -45,7 +46,7 @@ class BookingReturnController extends Controller
     * Create filter form and process filter request.
     *
     */
-    protected function filter($queryBuilder, Request $request)
+    protected function filter(QueryBuilder $queryBuilder, Request $request)
     {
         $session = $request->getSession();
         $filterForm = $this->createForm('WarehouseBundle\Form\BookingReturnFilterType');
@@ -91,7 +92,7 @@ class BookingReturnController extends Controller
     * Get results from paginator and get paginator view.
     *
     */
-    protected function paginator($queryBuilder, Request $request)
+    protected function paginator(QueryBuilder $queryBuilder, Request $request)
     {
         //sorting
         $sortCol = $queryBuilder->getRootAlias().'.'.$request->get('pcg_sort_col', 'id');
@@ -293,7 +294,7 @@ class BookingReturnController extends Controller
 
                 $this->get('session')->getFlashBag()->add('success', 'bookingReturns was deleted successfully!');
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookingReturns ');
             }
         }

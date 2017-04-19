@@ -25,7 +25,7 @@ class IncomingProductScan
 	/**
 	 * @var int
 	 *
-	 * @ORM\Column(name="location_id", type="integer")
+	 * @ORM\Column(name="location_id", type="integer", nullable=true)
 	 */
 	private $locationId;
 

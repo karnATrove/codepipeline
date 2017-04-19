@@ -285,7 +285,7 @@ class Booking
      *
      * @return     array  Available order types.
      */
-    public function bookingProductStatusList() {
+    public static function bookingProductStatusList() {
         return array(
             0 => 'Cancelled/Deleted/Invisible',
             1 => 'Pending',

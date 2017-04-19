@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -18,9 +19,6 @@ use Pagerfanta\View\TwitterBootstrap3View;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Form\BookingProductType;
 
-
-#http://codemonkeys.be/2013/01/ajaxify-your-symfony2-forms-with-jquery/
-
 /**
  * Booking controller.
  *
@@ -30,32 +28,32 @@ class BookingProductController extends Controller
 {
 
 
-	/**
-     * Displays a form to edit an existing BookingProduct entity.
-     *
-     * @Route("/{id}/edit", name="booking_product_edit")
-     * @Method({"GET", "POST"})
-     */
-    public function editAction(Request $request, BookingProduct $bookingProduct)
-    {
-        $deleteForm = $this->createDeleteForm($bookingProduct);
-        $editForm = $this->createForm('WarehouseBundle\Form\BookingProductType', $bookingProduct);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $bookingManager = $this->get('BookingManager');
-            # Persist and flush
-            $bookingManager->updateBookingProduct($bookingProduct,true);
-            
-            $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
-            return $this->redirectToRoute('location_edit', array('id' => $bookingProduct->getId()));
-        }
-        return $this->render('bookingProduct/edit.html.twig', array(
-            'bookingProduct' => $bookingProduct,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
+//	/**
+//     * Displays a form to edit an existing BookingProduct entity.
+//     *
+//     * @Route("/{id}/edit", name="booking_product_edit")
+//     * @Method({"GET", "POST"})
+//     */
+//    public function editAction(Request $request, BookingProduct $bookingProduct)
+//    {
+//        $deleteForm = $this->createDeleteForm($bookingProduct);
+//        $editForm = $this->createForm('WarehouseBundle\Form\BookingProductType', $bookingProduct);
+//        $editForm->handleRequest($request);
+//
+//        if ($editForm->isSubmitted() && $editForm->isValid()) {
+//            $bookingManager = $this->get('BookingManager');
+//            # Persist and flush
+//            $bookingManager->updateBookingProduct($bookingProduct,true);
+//
+//            $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
+//            return $this->redirectToRoute('location_edit', array('id' => $bookingProduct->getId()));
+//        }
+//        return $this->render('bookingProduct/edit.html.twig', array(
+//            'bookingProduct' => $bookingProduct,
+//            'edit_form' => $editForm->createView(),
+//            'delete_form' => $deleteForm->createView(),
+//        ));
+//    }
     
     
 
@@ -77,7 +75,7 @@ class BookingProductController extends Controller
         } else {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the BookingProduct');
         }
-        
+
         # See if destination was passed (redirect)
         if ($request->get('destination') && !empty($request->get('destination')))
             return $this->redirect($request->get('destination'));
@@ -90,14 +88,14 @@ class BookingProductController extends Controller
     /**
      * Creates a form to delete a BookingProduct entity.
      *
-     * @param Booking $bookingProduct The BookingProduct entity
+     * @param BookingProduct $bookingProduct The BookingProduct entity
      *
      * @return \Symfony\Component\Form\Form The form
      */
     private function createDeleteForm(BookingProduct $bookingProduct)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('bookingProduct_delete', array('id' => $bookingProduct->getId())))
+            ->setAction($this->generateUrl('booking_product_delete', array('id' => $bookingProduct->getId())))
             ->setMethod('DELETE')
             ->getForm()
         ;
@@ -117,7 +115,7 @@ class BookingProductController extends Controller
             $bookingManager = $this->get('BookingManager');
             $bookingManager->deleteBookingProduct($bookingProduct);
             $this->get('session')->getFlashBag()->add('success', 'The BookingProduct was deleted successfully');
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the BookingProduct');
         }
 
@@ -152,7 +150,7 @@ class BookingProductController extends Controller
                     $bookingManager->deleteBookingProduct($bookingProduct);
                 }
                 $this->get('session')->getFlashBag()->add('success', 'Booking Products was deleted successfully!');
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Booking Products ');
             }
         }
@@ -241,9 +239,10 @@ class BookingProductController extends Controller
      * @Template()
      */
     public function formAjaxBookingProductPickForm(Request $request, BookingProduct $bookingProduct) {
-        $bookingManager = $this->get('BookingManager');
+	    $bookingManager = $this->get('BookingManager');
 
-        $form = $this->createFormBuilder($bookingProduct)
+	    /** @var Form $form */
+	    $form = $this->createFormBuilder($bookingProduct)
             ->setAction($this->generateUrl('booking_product_pick_ajax', array('id' => $bookingProduct->getId())))
             ->setMethod('POST')
             ->add('status', ChoiceType::class, array(
@@ -251,8 +250,7 @@ class BookingProductController extends Controller
                 'choices_as_values' => true,
             ))
             ->add('location',CollectionType::class, array('mapped' => FALSE))
-        ;
-        $form = $form->getForm();
+		    ->getForm();
 
         // Find locations
         $locations = $bookingProduct->getProduct()->getLocations();
@@ -281,7 +279,7 @@ class BookingProductController extends Controller
             $locations = isset($request->request->get('form')['location']) ? $request->request->get('form')['location'] : array();
             foreach($locations as $location_product_id => $qty_picked) {
                 if (intval($qty_picked) > 0) {
-                    $locationProduct = $this->getDoctrine()->getRepository('WarehouseBundle:LocationProduct')->findOneById(intval($location_product_id));
+                    $locationProduct = $this->getDoctrine()->getRepository('WarehouseBundle:LocationProduct')->find(intval($location_product_id));
                     # Create BookingProductLocation()
                     $bookingManager->createPick($bookingProduct,$locationProduct,$qty_picked);
                 }
@@ -315,7 +313,6 @@ class BookingProductController extends Controller
                 'value' => $this->renderView('WarehouseBundle::BookingProduct/picking/picking_form.html.twig', array('bookingProduct' => $bookingProduct,'form'=>$form->createView())),
             );
         }
-
         return new JsonResponse($response, 200);
     }
 

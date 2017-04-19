@@ -102,7 +102,6 @@ class BookingController extends Controller
                 $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
             }
         }
-
         return array($filterForm, $queryBuilder);
     }
 
@@ -202,6 +201,7 @@ class BookingController extends Controller
                 ->setUser($this->getUser())
                 ->setCreated(new \DateTime('now'))
                 ->setNote('Changes were saved from the booking edit page.');
+
             $em->persist($bookingLog);
 
             $em->flush();

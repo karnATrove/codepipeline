@@ -1,3 +1,8 @@
+report:
+    resource: "@ReportBundle/Controller/"
+    type:     annotation
+    prefix:   /report
+
 warehouse_routing:
     resource: "@WarehouseBundle/Resources/config/routing.yml"
     prefix:   /
