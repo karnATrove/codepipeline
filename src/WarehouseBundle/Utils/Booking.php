@@ -147,7 +147,7 @@ class Booking
      *
      * @return     integer  (active, inactive, complete)
      */
-    public function bookingStatusState($statusId) {
+    public static function bookingStatusState($statusId) {
         switch($statusId) {
             case 0:
                 return BOOKING_STATE_INACTIVE;
@@ -167,7 +167,7 @@ class Booking
      *
      * @return     array  Available order types.
      */
-    public function bookingOrderTypeList() {
+    public static function bookingOrderTypeList() {
         return array(
             1 => 'Carrier Order',
             2 => 'Pickup Order',
@@ -192,7 +192,7 @@ class Booking
      *
      * @return     array  Available carriers.
      */
-    public function bookingCarrierList() {
+    public static function bookingCarrierList() {
         return array(
             1 => 'XPO Logistics',
             2 => 'Non Stop Delivery',

@@ -193,7 +193,7 @@ class BookingController extends Controller
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
-
+	        $booking->setModified(new \DateTime('now'));
             $bookingManager->updateBooking($booking, false);//persist not flush
             $em->persist($booking);
 
