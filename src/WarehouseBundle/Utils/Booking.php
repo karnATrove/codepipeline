@@ -103,7 +103,7 @@ class Booking
     - Cancelling in 'Picked' or 'Packed' - Email change request to BD then they can go in and cancel an item or order
      * @return     array  Available booking statuses.
      */
-    public function bookingStatusList($active_only=FALSE,$not_closed=FALSE) {
+    public static function bookingStatusList($active_only=FALSE,$not_closed=FALSE) {
         if ($active_only && !$not_closed)
             return array(
                 1 => 'Awaiting Forward',

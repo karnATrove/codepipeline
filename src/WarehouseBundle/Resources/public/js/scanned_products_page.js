@@ -1,21 +1,14 @@
 $(function () {
-
-	$('.incoming-location-update').change(function () {
-		var value = $(this).val();
-		var data = {'location': value};
-		incomingUpdate($(this), data, 'location');
-	});
-
-	$('.incoming-qty-update').change(function () {
-		var value = $(this).val();
-		var data = {'quantity': value};
-		incomingUpdate($(this), data, 'quantity');
-	});
 });
 
-function incomingUpdate(currentElement, data, type) {
-	// var loading = $('.loading');
-	// loading.show();
+function ajaxUpdateIncomingScan(currentElement, type) {
+	var value = currentElement.val();
+	var data = null;
+	if (type === 'location') {
+		data = {'location': value};
+	} else {
+		data = {'quantity': value};
+	}
 	$.ajax({
 		url: currentElement.data('url'),
 		data: data,
@@ -50,7 +43,8 @@ function incomingUpdate(currentElement, data, type) {
 		complete: function () {
 			// loading.hide();
 		}
-
 	});
 }
+
+
 

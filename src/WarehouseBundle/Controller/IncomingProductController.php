@@ -173,9 +173,7 @@ class IncomingProductController extends Controller
 			return $this->redirect($this->generateUrl('incoming_products_scanned', array('id' => $incoming->getId())));
 		}
 
-
 		$em = $this->getDoctrine()->getManager();
-
 		$form_new = $this->createNewScannedForm($incoming);
 		$form_new->handleRequest($request);
 
@@ -223,14 +221,7 @@ class IncomingProductController extends Controller
 			$item->setUser($this->getUser());
 			$em->persist($item);
 			$em->flush();
-
-			$rustart = getrusage();
 			$formView = $this->createModifyScannedForm($incoming)->createView();
-			$ru = getrusage();
-			$t1 = "This process used " . rutime($ru, $rustart, "utime") / 1000 .
-				" ms for its computations\n";
-			$t2 = "It spent " . rutime($ru, $rustart, "stime") / 1000 .
-				" ms in system calls\n";
 
 			$response['ajaxCommand'][] = array(
 				'selector' => '#scanned_form_wrap',
@@ -254,15 +245,15 @@ class IncomingProductController extends Controller
 	public function incomingProductsScannedDeleteAjaxAction(Request $request, IncomingProductScan $incomingProductScan)
 	{
 		$em = $this->getDoctrine()->getManager();
-
 		$response = array();
 		$incoming = $incomingProductScan->getIncoming();
 		if ($incoming->getStatus(1, 2)) { # Inbound or Arrived
 			$em->remove($incomingProductScan);
 			$em->flush();
 		} else {
-			$this->get('session')->getFlashBag()->add('error', "incoming container is no longer in active/arrived status.");
+			$this->get('session')->getFlashBag()->add('error', "Incoming container is no longer in active/arrived status.");
 		}
+
 		$response['ajaxCommand'][] = array(
 			'selector' => '.loading',
 			'op' => 'hide',
