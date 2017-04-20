@@ -175,9 +175,9 @@ class Booking
 	public static function bookingOrderTypeList()
 	{
 		return array(
-			1 => 'Carrier Order',
-			2 => 'Pickup Order',
-			3 => 'Transfer (Forward)',
+			BookingEntity::TYPE_CARRIER_ORDER => 'Carrier Order',
+			BookingEntity::TYPE_PICKUP_ORDER => 'Pickup Order',
+			BookingEntity::TYPE_TRANSFER => 'Transfer (Forward)',
 		);
 	}
 

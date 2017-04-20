@@ -27,6 +27,10 @@ class Booking implements BookingInterface
 	const STATUS_PACKED = 4;
 	const STATUS_SHIPPED = 5;
 
+	const TYPE_CARRIER_ORDER=1;
+	const TYPE_PICKUP_ORDER=2;
+	const TYPE_TRANSFER=3;
+
 	/**
 	 * @var int
 	 *

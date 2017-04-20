@@ -1,4 +1,26 @@
 {% extends 'WarehouseBundle::layout.html.twig' %}
 {% block body %}
 
+    <div class="row">
+
+        <form id="search_form" class="form-inline" method="post" action="{{ path('report_ajax_bd_report_content') }}">
+            <div class="form-group">
+                <label>Date
+                    <input type="text" class="form-control" name="daterange" value=""/>
+                </label>
+            </div>
+        </form>
+    </div>
+    <div id="report_content" class="row">
+
+    </div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+    {% javascripts '@ReportBundle/Resources/public/js/bd_report.js' %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
 {% endblock %}

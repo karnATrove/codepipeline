@@ -40,3 +40,6 @@ services:
         class: WarehouseBundle\EventListener\BookingSubscriber
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+    report.build_direct_report:
+            class: ReportBundle\Utils\BuildDirectReport
+            arguments: ["@service_container"]

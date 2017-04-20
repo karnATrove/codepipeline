@@ -14,6 +14,14 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Incoming
 {
+	const STATUS_DELETED=0;
+	const STATUS_INBOUND=1;
+	const STATUS_ARRIVED=2;
+	const STATUS_COMPLETED=3;
+
+	const TYPE_OCEAN_FREIGHT=1;
+	const TYPE_FORWARD=2;
+
     /**
      * @var int
      *
@@ -92,6 +100,8 @@ class Incoming
     private $files;
 
     /**
+     * @var ArrayCollection
+     *
      * One Incoming has Many IncomingComment.
      * @ORM\OneToMany(targetEntity="IncomingComment", mappedBy="incoming")
      */
@@ -104,6 +114,8 @@ class Incoming
     private $incoming_products;
 
     /**
+     * @var IncomingProductScan[]
+     *
      * One Incoming has Many IncomingProductScan.
      * @ORM\OneToMany(targetEntity="IncomingProductScan", mappedBy="incoming", cascade={"persist","remove"})
      */
@@ -320,11 +332,11 @@ class Incoming
     /**
      * Add file
      *
-     * @param \WarehouseBundle\Entity\IncomingFile $file
+     * @param IncomingFile $file
      *
      * @return Incoming
      */
-    public function addFile(\WarehouseBundle\Entity\IncomingFile $file)
+    public function addFile(IncomingFile $file)
     {
         $file->setIncoming($this);
         $this->files[] = $file;
@@ -335,9 +347,9 @@ class Incoming
     /**
      * Remove file
      *
-     * @param \WarehouseBundle\Entity\IncomingFile $file
+     * @param IncomingFile $file
      */
-    public function removeFile(\WarehouseBundle\Entity\IncomingFile $file)
+    public function removeFile(IncomingFile $file)
     {
         $this->files->removeElement($file);
     }
@@ -355,24 +367,23 @@ class Incoming
     /**
      * Add comment
      *
-     * @param \WarehouseBundle\Entity\IncomingComment $comment
+     * @param IncomingComment $comment
      *
-     * @return Booking
+     * @return Incoming
      */
-    public function addComment(\WarehouseBundle\Entity\IncomingComment $comment)
+    public function addComment(IncomingComment $comment)
     {
         $comment->setIncoming($this);
         $this->comments[] = $comment;
-
         return $this;
     }
 
     /**
      * Remove comment
      *
-     * @param \WarehouseBundle\Entity\IncomingComment $comment
+     * @param IncomingComment $comment
      */
-    public function removeComment(\WarehouseBundle\Entity\IncomingComment $comment)
+    public function removeComment(IncomingComment $comment)
     {
         $this->comments->removeElement($comment);
     }
@@ -390,11 +401,11 @@ class Incoming
     /**
      * Add incomingProduct
      *
-     * @param \WarehouseBundle\Entity\IncomingProduct $incomingProduct
+     * @param IncomingProduct $incomingProduct
      *
      * @return Incoming
      */
-    public function addIncomingProduct(\WarehouseBundle\Entity\IncomingProduct $incomingProduct)
+    public function addIncomingProduct(IncomingProduct $incomingProduct)
     {
         $incomingProduct->setIncoming($this);
         $this->incoming_products[] = $incomingProduct;
@@ -405,9 +416,9 @@ class Incoming
     /**
      * Remove incomingProduct
      *
-     * @param \WarehouseBundle\Entity\IncomingProduct $incomingProduct
+     * @param IncomingProduct $incomingProduct
      */
-    public function removeIncomingProduct(\WarehouseBundle\Entity\IncomingProduct $incomingProduct)
+    public function removeIncomingProduct(IncomingProduct $incomingProduct)
     {
         $this->incoming_products->removeElement($incomingProduct);
     }
@@ -425,14 +436,14 @@ class Incoming
     /**
      * Add incomingProduct
      *
-     * @param \WarehouseBundle\Entity\IncomingProductScan $incomingScannedProduct
+     * @param IncomingProductScan $incomingScannedProduct
      *
      * @return Incoming
      */
-    public function addIncomingScannedProduct(\WarehouseBundle\Entity\IncomingProductScan $incomingScannedProduct)
+    public function addIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
     {
         $incomingScannedProduct->setIncoming($this);
-        $this->incoming_scanned_products[] = $incomingProduct;
+        $this->incoming_scanned_products[] = $incomingScannedProduct;
 
         return $this;
     }
@@ -451,19 +462,17 @@ class Incoming
     /**
      * Remove incomingScannedProduct
      *
-     * @param \WarehouseBundle\Entity\IncomingProductScan $incomingScannedProduct
+     * @param IncomingProductScan $incomingScannedProduct
      */
-    public function removeIncomingScannedProduct(\WarehouseBundle\Entity\IncomingProductScan $incomingScannedProduct)
+    public function removeIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
     {
-        $this->incoming_scanned_products->removeElement($incomingProduct);
+        $this->incoming_scanned_products->removeElement($incomingScannedProduct);
     }
 
-    /**
-     * Get incomingScannedProducts
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getIncomingScannedProducts()
+	/**
+	 * @return ArrayCollection
+	 */
+	public function getIncomingScannedProducts()
     {
         return $this->incoming_scanned_products;
     }
@@ -471,11 +480,11 @@ class Incoming
     /**
      * Set user
      *
-     * @param \WarehouseBundle\Entity\User $user
+     * @param User $user
      *
      * @return Incoming
      */
-    public function setUser(\WarehouseBundle\Entity\User $user = null)
+    public function setUser(User $user = null)
     {
         $this->user = $user;
 
@@ -485,7 +494,7 @@ class Incoming
     /**
      * Get user
      *
-     * @return \WarehouseBundle\Entity\User
+     * @return User
      */
     public function getUser()
     {
