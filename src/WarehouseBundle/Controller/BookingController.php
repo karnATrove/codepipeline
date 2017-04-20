@@ -3,6 +3,7 @@
 namespace WarehouseBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,6 +21,7 @@ use Timestampable\Fixture\Document\Book;
 use WarehouseBundle\Doctrine\BookingManager;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
+use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Utils\StringHelper;
 
 /**
@@ -199,9 +201,13 @@ class BookingController extends Controller
 			$bookingManager->updateBooking($booking, false);//persist not flush
 			$em->persist($booking);
 
+			/**
+			 * find booking changes
+			 * @var UnitOfWork $uow */
 			$uow = $em->getUnitOfWork();
-			$uow->computeChangeSets(); // do not compute changes if inside a listener
+			$uow->computeChangeSets();
 			$changes = $uow->getEntityChangeSet($booking);
+
 			$note = null;
 			foreach ($changes as $name => $change) {
 				switch ($name) {
@@ -218,6 +224,14 @@ class BookingController extends Controller
 						$changedFrom = \WarehouseBundle\Utils\Booking::bookingStatusName($change[0]);
 						$changedTo = \WarehouseBundle\Utils\Booking::bookingStatusName($change[1]);
 						$note .= "Booking status changed from {$changedFrom} to {$changedTo}. ";
+						//save shipment
+						if ($change[1] == Booking::STATUS_SHIPPED) {
+							$shipment = new Shipment();
+							$shipment->setUser($this->getUser());
+							$shipment->setBooking($booking);
+							$shipment->setCreated(new \DateTime('now'));
+							$em->persist($shipment);
+						}
 						continue;
 						break;
 					case "carrierId":
@@ -262,10 +276,6 @@ class BookingController extends Controller
 			'edit_form' => $editForm->createView(),
 			'delete_form' => $deleteForm->createView(),
 		));
-	}
-
-	private function saveShipment(Booking $booking){
-
 	}
 
 	/**
