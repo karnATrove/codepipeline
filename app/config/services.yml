@@ -36,3 +36,7 @@ services:
         arguments: ['@doctrine.orm.entity_manager']
         tags:
             - { name: form.type }
+    app.subscriber:
+        class: WarehouseBundle\EventListener\BookingSubscriber
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
