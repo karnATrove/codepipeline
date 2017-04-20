@@ -28,32 +28,32 @@ class BookingProductController extends Controller
 {
 
 
-//	/**
-//     * Displays a form to edit an existing BookingProduct entity.
-//     *
-//     * @Route("/{id}/edit", name="booking_product_edit")
-//     * @Method({"GET", "POST"})
-//     */
-//    public function editAction(Request $request, BookingProduct $bookingProduct)
-//    {
-//        $deleteForm = $this->createDeleteForm($bookingProduct);
-//        $editForm = $this->createForm('WarehouseBundle\Form\BookingProductType', $bookingProduct);
-//        $editForm->handleRequest($request);
-//
-//        if ($editForm->isSubmitted() && $editForm->isValid()) {
-//            $bookingManager = $this->get('BookingManager');
-//            # Persist and flush
-//            $bookingManager->updateBookingProduct($bookingProduct,true);
-//
-//            $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
-//            return $this->redirectToRoute('location_edit', array('id' => $bookingProduct->getId()));
-//        }
-//        return $this->render('bookingProduct/edit.html.twig', array(
-//            'bookingProduct' => $bookingProduct,
-//            'edit_form' => $editForm->createView(),
-//            'delete_form' => $deleteForm->createView(),
-//        ));
-//    }
+	/**
+     * Displays a form to edit an existing BookingProduct entity.
+     *
+     * @Route("/{id}/edit", name="booking_product_edit")
+     * @Method({"GET", "POST"})
+     */
+    public function editAction(Request $request, BookingProduct $bookingProduct)
+    {
+        $deleteForm = $this->createDeleteForm($bookingProduct);
+        $editForm = $this->createForm('WarehouseBundle\Form\BookingProductType', $bookingProduct);
+        $editForm->handleRequest($request);
+
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $bookingManager = $this->get('BookingManager');
+            # Persist and flush
+            $bookingManager->updateBookingProduct($bookingProduct,true);
+
+            $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
+            return $this->redirectToRoute('location_edit', array('id' => $bookingProduct->getId()));
+        }
+        return $this->render('bookingProduct/edit.html.twig', array(
+            'bookingProduct' => $bookingProduct,
+            'edit_form' => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        ));
+    }
     
     
 

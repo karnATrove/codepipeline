@@ -22,7 +22,7 @@
                 {'attr':
                     {
                         'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                        'onchange':"ajaxUpdateIncomingScan($(this),'location')"
+                        'data-type': 'location'
                     }
                 }) }}
             {% else %}-{% endif %}</td>
@@ -31,7 +31,7 @@
                 {{ form_widget(incomingScannedProduct.qtyOnScan, {'attr':
                     {
                         'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                        'onchange':"ajaxUpdateIncomingScan($(this),'quantity')"
+                        'data-type': 'quantity'
                     }
                 }) }}
             {% else %}-{% endif %}

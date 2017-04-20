@@ -1,7 +1,15 @@
 $(function () {
+	$('#scanned_form_wrap').on('change', 'select', function () {
+		ajaxUpdateIncomingScan($(this));
+	});
+
+	$('#scanned_form_wrap').on('change', 'input[type="number"]', function () {
+		ajaxUpdateIncomingScan($(this));
+	});
 });
 
-function ajaxUpdateIncomingScan(currentElement, type) {
+function ajaxUpdateIncomingScan(currentElement) {
+	var type = currentElement.data('type');
 	var value = currentElement.val();
 	var data = null;
 	if (type === 'location') {
@@ -16,13 +24,13 @@ function ajaxUpdateIncomingScan(currentElement, type) {
 		dataType: 'json',
 		success: function (data) {
 			if (data.error) {
-				if(data.error!==null){
+				if (data.error !== null) {
 					alert(data.error);
-				}else{
+				} else {
 					alert("Unknown error");
 				}
 				location.reload();
-			}else{
+			} else {
 				new Noty({
 					theme: 'relax',
 					type: 'success',
