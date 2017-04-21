@@ -9,6 +9,7 @@ $(function () {
 			'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
 		}
 	}, function (start, end, label) {
+		$('.loading').show();
 		$('<input />').attr('type', 'hidden')
 			.attr('name', 'start')
 			.attr('value', start.format('YYYY-MM-DD'))
@@ -21,6 +22,7 @@ $(function () {
 		postForm(form, function (response, $form) {
 			if (typeof(response.ajaxCommand) !== 'undefined') {
 				handleAjaxResponse(response);
+				$('.loading').hide();
 			}
 		});
 	});
