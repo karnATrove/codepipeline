@@ -13,6 +13,17 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class BookingProduct
 {
+	//region Constants
+
+	//status
+	const STATUS_DELETED=0;
+	const STATUS_PENDING=1;
+	const STATUS_IN_PROGRESS=2;
+	const STATUS_PICKED=3;
+
+	//endregion
+
+
     /**
      * @var int
      *

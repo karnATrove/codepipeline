@@ -20,6 +20,9 @@ use WarehouseBundle\Model\BookingInterface;
  */
 class Booking implements BookingInterface
 {
+	//region Constants
+
+	//status
 	const STATUS_DELETED = 0;
 	const STATUS_AWAITING_FORWARD = 1;
 	const STATUS_ACCEPTED = 2;
@@ -27,10 +30,36 @@ class Booking implements BookingInterface
 	const STATUS_PACKED = 4;
 	const STATUS_SHIPPED = 5;
 
-	const TYPE_CARRIER_ORDER=1;
-	const TYPE_PICKUP_ORDER=2;
-	const TYPE_TRANSFER=3;
+	//type
+	const TYPE_CARRIER_ORDER = 1;
+	const TYPE_PICKUP_ORDER = 2;
+	const TYPE_TRANSFER = 3;
 
+	//carrier
+	const CARRIER_XPO_LOGISTICS = 1;
+	const CARRIER_NON_STOP_DELIVERY = 2;
+	const CARRIER_UPS = 3;
+	const CARRIER_FEDEX = 4;
+	const CARRIER_HOME_DIRECT = 5;
+	const CARRIER_VITRAN = 6;
+	const CARRIER_MACTRAN = 7;
+	const CARRIER_CEVA_LOGISTICS = 8;
+	const CARRIER_AGS_LOGISTICS = 9;
+	const CARRIER_SEKO_LOGISTICS = 10;
+	const CARRIER_MANNA_LOGISTICS = 11;
+	const CARRIER_PILOT_LOGISTICS = 12;
+	const CARRIER_TEST_LOGISTICS = 13;
+	const CARRIER_PROPACK_SHIPPING = 14;
+	const CARRIER_DWS_PICKUP = 16;
+	const CARRIER_SUNSHINE = 17;
+	const CARRIER_CUSTOMER_PICKUP = 18;
+	const CARRIER_ATS = 19;
+	const CARRIER_WAYFAIR_CARRIER = 20;
+	const CARRIER_AMAZON_CARRIER = 21;
+
+	//endregion
+
+	//region Parameters
 	/**
 	 * @var int
 	 *
@@ -172,9 +201,10 @@ class Booking implements BookingInterface
 	 * @ORM\OneToMany(targetEntity="BookingReturn", mappedBy="booking")
 	 */
 	private $returns;
+	//endregion
 
 	/**
-	 * Contruct and set some defaults.
+	 * Construct and set some defaults.
 	 */
 	public function __construct()
 	{
@@ -476,7 +506,7 @@ class Booking implements BookingInterface
 	 *
 	 * @return Booking
 	 */
-	public function setContact(\WarehouseBundle\Entity\BookingContact $contact = null)
+	public function setContact(BookingContact $contact = null)
 	{
 		if (!is_null($contact)) $contact->setBooking($this);
 		$this->contact = $contact;
@@ -627,7 +657,7 @@ class Booking implements BookingInterface
 	/**
 	 * Get user
 	 *
-	 * @return \WarehouseBundle\Entity\User
+	 * @return User
 	 */
 	public function getUser()
 	{
@@ -637,11 +667,11 @@ class Booking implements BookingInterface
 	/**
 	 * Set user
 	 *
-	 * @param \WarehouseBundle\Entity\User $user
+	 * @param User $user
 	 *
 	 * @return Booking
 	 */
-	public function setUser(\WarehouseBundle\Entity\User $user = null)
+	public function setUser(User $user = null)
 	{
 		$this->user = $user;
 

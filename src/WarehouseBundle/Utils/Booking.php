@@ -9,6 +9,7 @@ use WarehouseBundle\Entity\BookingContact;
 use WarehouseBundle\Model\BookingInterface;
 use WarehouseBundle\Model\BookingManagerInterface;
 use WarehouseBundle\Entity\Booking as BookingEntity;
+use WarehouseBundle\Entity\BookingProduct as BookingProductEntity;
 
 define('BOOKING_STATE_INACTIVE', 0);
 define('BOOKING_STATE_ACTIVE', 1);
@@ -98,14 +99,14 @@ class Booking
 	public static function bookingStatusState($statusId)
 	{
 		switch ($statusId) {
-			case 0:
+			case BookingEntity::STATUS_DELETED:
 				return BOOKING_STATE_INACTIVE;
-			case 5:
+			case BookingEntity::STATUS_SHIPPED:
 				return BOOKING_STATE_COMPLETE;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
+			case BookingEntity::STATUS_AWAITING_FORWARD:
+			case BookingEntity::STATUS_ACCEPTED:
+			case BookingEntity::STATUS_PICKED:
+			case BookingEntity::STATUS_PACKED:
 			default:
 				return BOOKING_STATE_ACTIVE;
 		}
@@ -132,26 +133,26 @@ class Booking
 	public static function bookingCarrierList()
 	{
 		return array(
-			1 => 'XPO Logistics',
-			2 => 'Non Stop Delivery',
-			3 => 'UPS',
-			4 => 'FedEx',
-			5 => 'Home Direct',
-			6 => 'VITRAN',
-			7 => 'MACTRAN',
-			8 => 'CEVA Logistics',
-			9 => 'AGS Logistics',
-			10 => 'SEKO Logistics',
-			11 => 'Manna Logistics',
-			12 => 'Pilot Logistics',
-			13 => 'TEST Logistics',
-			14 => 'Propack Shipping',
-			16 => 'DWS Pickup',
-			17 => 'Sunshine',
-			18 => 'Customer Pickup',
-			19 => 'ATS',
-			20 => 'Wayfair Carrier',
-			21 => 'Amazon Carrier',
+			BookingEntity::CARRIER_XPO_LOGISTICS => 'XPO Logistics',
+			BookingEntity::CARRIER_NON_STOP_DELIVERY => 'Non Stop Delivery',
+			BookingEntity::CARRIER_UPS => 'UPS',
+			BookingEntity::CARRIER_FEDEX => 'FedEx',
+			BookingEntity::CARRIER_HOME_DIRECT => 'Home Direct',
+			BookingEntity::CARRIER_VITRAN => 'VITRAN',
+			BookingEntity::CARRIER_MACTRAN => 'MACTRAN',
+			BookingEntity::CARRIER_CEVA_LOGISTICS => 'CEVA Logistics',
+			BookingEntity::CARRIER_AGS_LOGISTICS => 'AGS Logistics',
+			BookingEntity::CARRIER_SEKO_LOGISTICS => 'SEKO Logistics',
+			BookingEntity::CARRIER_MANNA_LOGISTICS => 'Manna Logistics',
+			BookingEntity::CARRIER_PILOT_LOGISTICS => 'Pilot Logistics',
+			BookingEntity::CARRIER_TEST_LOGISTICS => 'TEST Logistics',
+			BookingEntity::CARRIER_PROPACK_SHIPPING => 'Propack Shipping',
+			BookingEntity::CARRIER_DWS_PICKUP => 'DWS Pickup',
+			BookingEntity::CARRIER_SUNSHINE => 'Sunshine',
+			BookingEntity::CARRIER_CUSTOMER_PICKUP => 'Customer Pickup',
+			BookingEntity::CARRIER_ATS => 'ATS',
+			BookingEntity::CARRIER_WAYFAIR_CARRIER => 'Wayfair Carrier',
+			BookingEntity::CARRIER_AMAZON_CARRIER => 'Amazon Carrier',
 		);
 	}
 
@@ -202,7 +203,7 @@ class Booking
 		$booking->setOrderType($orderType);
 		$booking->setCarrierId($carrierId);
 		$booking->setSkidCount(NULL);
-		$booking->setStatus(2); # Accepted
+		$booking->setStatus(BookingEntity::STATUS_ACCEPTED);
 		$booking->setFutureShip($futureShip);
 		$booking->setShipped(NULL);
 		$booking->setCreated(new \DateTime('now'));
@@ -222,11 +223,11 @@ class Booking
 	/**
 	 * Get the total number picked from a booking product.
 	 *
-	 * @param      \WarehouseBundle\Entity\BookingProduct $bookingProduct The booking product
+	 * @param      BookingProductEntity $bookingProduct The booking product
 	 *
 	 * @return     <type>                                  ( description_of_the_return_value )
 	 */
-	public function bookingProductPickedQty(\WarehouseBundle\Entity\BookingProduct $bookingProduct)
+	public function bookingProductPickedQty(BookingProductEntity $bookingProduct)
 	{
 		return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getPickedQtyByBookingProduct($bookingProduct);
 	}
@@ -275,7 +276,8 @@ class Booking
 	 */
 	public function formatContactAddress(BookingContact $contact)
 	{
-		return ($contact->getCompany() ? $contact->getCompany() . "\n" . 'c/o ' . $contact->getName() . "\n" : 'c/o ' . $contact->getName() . "\n") .
+		return ($contact->getCompany() ? $contact->getCompany() . "\n" . 'c/o ' .
+				$contact->getName() . "\n" : 'c/o ' . $contact->getName() . "\n") .
 			$contact->getStreet() . " " . $contact->getStreet2() . "\n" .
 			$contact->getCity() . ", " . $contact->getState() . "\n" .
 			$contact->getZip() . " " . $contact->getCountry();
@@ -301,10 +303,10 @@ class Booking
 	public static function bookingProductStatusList()
 	{
 		return array(
-			0 => 'Cancelled/Deleted/Invisible',
-			1 => 'Pending',
-			2 => 'In Progress',
-			3 => 'Picked',
+			BookingProductEntity::STATUS_DELETED => 'Cancelled/Deleted/Invisible',
+			BookingProductEntity::STATUS_PENDING => 'Pending',
+			BookingProductEntity::STATUS_IN_PROGRESS => 'In Progress',
+			BookingProductEntity::STATUS_PICKED => 'Picked',
 			//4 => 'Closed',
 		);
 	}
