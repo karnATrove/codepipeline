@@ -25,7 +25,13 @@ function ajaxUpdateIncomingScan(currentElement) {
 		success: function (data) {
 			if (data.error) {
 				if (data.error !== null) {
-					alert(data.error);
+					new Noty({
+						theme: 'relax',
+						type: 'error',
+						layout: 'topLeft',
+						text: data.error,
+						timeout: 2000
+					}).show();
 				} else {
 					alert("Unknown error");
 				}
@@ -34,7 +40,7 @@ function ajaxUpdateIncomingScan(currentElement) {
 				new Noty({
 					theme: 'relax',
 					type: 'success',
-					layout: 'topRight',
+					layout: 'topLeft',
 					text: data.message,
 					timeout: 2000
 				}).show();
@@ -49,7 +55,6 @@ function ajaxUpdateIncomingScan(currentElement) {
 			}
 		},
 		complete: function () {
-			// loading.hide();
 		}
 	});
 }

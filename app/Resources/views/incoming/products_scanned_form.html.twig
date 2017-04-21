@@ -24,6 +24,7 @@
                     {% if not incomingUtil.isComplete(incoming) %}
                         <form name="new-form" id="scan-incoming-product-new-form" method="post" class="ajaxForm"
                               action="{{ path('incoming_products_scanned_new_ajax',{'id':incoming.id}) }}">
+                            <a href="{{ path('incoming_products_scanned', {'id':incoming.id}) }}" class="btn btn-warning pull-left">Refresh total count</a>
                             <div class="input-group" style="max-width:200px;">
                                 {{ form_widget(form_new.new, {'attr': {'autofocus':true}}) }}
                                 <span class="input-group-btn">

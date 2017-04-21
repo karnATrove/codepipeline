@@ -57,18 +57,22 @@ class IncomingProductScanController extends Controller
 
 		$em = $this->getDoctrine()->getManager();
 		if ($locationId !== null) {
-			$location = $em->getRepository('WarehouseBundle:Location')->find($locationId);
-			if (!$location) {
-				throw new Exception('Location not found');
+			if (empty($locationId)) {
+				$incomingProductScan->setLocation(null);
+				$locationTitle = "NULL";
+			} else {
+				$location = $em->getRepository('WarehouseBundle:Location')->find($locationId);
+				if (!$location) {
+					throw new Exception('Location not found');
+				}
+				$incomingProductScan->setLocation($location);
+				$locationTitle = $location->printLocation();
 			}
-			$incomingProductScan->setLocation($location);
-			$locationTitle = $location->printLocation();
 		}
-
+		$incomingProductScan->setModified(new \DateTime());
 		//persist data
 		$em->persist($incomingProductScan);
 		$em->flush();
-
 
 		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: " .
 			$locationTitle . " Quantity: {$incomingProductScan->getQtyOnScan()}";

@@ -14,13 +14,19 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Incoming
 {
+	//region Constants
+
+	//Status
 	const STATUS_DELETED=0;
 	const STATUS_INBOUND=1;
 	const STATUS_ARRIVED=2;
 	const STATUS_COMPLETED=3;
 
+	//Type
 	const TYPE_OCEAN_FREIGHT=1;
 	const TYPE_FORWARD=2;
+
+	//endregion
 
     /**
      * @var int
@@ -118,6 +124,7 @@ class Incoming
      *
      * One Incoming has Many IncomingProductScan.
      * @ORM\OneToMany(targetEntity="IncomingProductScan", mappedBy="incoming", cascade={"persist","remove"})
+     * @ORM\OrderBy({"modified" = "DESC"})
      */
     private $incoming_scanned_products;
 

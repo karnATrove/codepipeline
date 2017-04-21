@@ -1,40 +1,45 @@
 {% for incomingScannedProduct in form.incomingScannedProducts %}
-    <tr>
-        <td width="60">
-            {% if not iscomplete %}
-                <a data-confirm="Are you sure!" title="Delete" class="btn btn-danger btn-sm ajaxLink"
-                   href="{{ path('incoming_products_scanned_delete_ajax', { 'id': incoming.incomingScannedProducts[loop.index0].id}) }}">
-                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                </a>
-            {% endif %}
-        </td>
-        <td>
-            {{ incoming.incomingScannedProducts[loop.index0].product.model }}
-        </td>
-        <td>
-            {% if incoming.incomingScannedProducts[loop.index0].incomingProduct %}
-                {{ incoming.incomingScannedProducts[loop.index0].incomingProduct.qty }}
-            {% else %}n/a{% endif %}</td>
-        <td>{{ incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) }}</td>
-        <td width="170">
-            {% if not iscomplete %}
-                {{ form_widget(incomingScannedProduct.locationId,
-                {'attr':
-                    {
-                        'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                        'data-type': 'location'
-                    }
-                }) }}
-            {% else %}-{% endif %}</td>
-        <td width="80">
-            {% if not iscomplete %}
-                {{ form_widget(incomingScannedProduct.qtyOnScan, {'attr':
-                    {
-                        'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                        'data-type': 'quantity'
-                    }
-                }) }}
-            {% else %}-{% endif %}
-        </td>
+    {% if incoming.incomingScannedProducts[loop.index0].incomingProduct and incoming.incomingScannedProducts[loop.index0].incomingProduct.qty == incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) %}
+        <tr>
+    {% else %}
+        <tr  class="warning">
+    {% endif %}
+
+    <td width="60">
+        {% if not iscomplete %}
+            <a data-confirm="Are you sure!" title="Delete" class="btn btn-danger btn-sm ajaxLink"
+               href="{{ path('incoming_products_scanned_delete_ajax', { 'id': incoming.incomingScannedProducts[loop.index0].id}) }}">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
+        {% endif %}
+    </td>
+    <td>
+        {{ incoming.incomingScannedProducts[loop.index0].product.model }}
+    </td>
+    <td>
+        {% if incoming.incomingScannedProducts[loop.index0].incomingProduct %}
+            {{ incoming.incomingScannedProducts[loop.index0].incomingProduct.qty }}
+        {% else %}n/a{% endif %}</td>
+    <td>{{ incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) }}</td>
+    <td width="170">
+        {% if not iscomplete %}
+            {{ form_widget(incomingScannedProduct.locationId,
+            {'attr':
+                {
+                    'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
+                    'data-type': 'location'
+                }
+            }) }}
+        {% else %}-{% endif %}</td>
+    <td width="80">
+        {% if not iscomplete %}
+            {{ form_widget(incomingScannedProduct.qtyOnScan, {'attr':
+                {
+                    'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
+                    'data-type': 'quantity'
+                }
+            }) }}
+        {% else %}-{% endif %}
+    </td>
     </tr>
 {% endfor %}
