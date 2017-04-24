@@ -35,28 +35,6 @@ class Booking implements BookingInterface
 	const TYPE_PICKUP_ORDER = 2;
 	const TYPE_TRANSFER = 3;
 
-	//carrier
-	const CARRIER_XPO_LOGISTICS = 1;
-	const CARRIER_NON_STOP_DELIVERY = 2;
-	const CARRIER_UPS = 3;
-	const CARRIER_FEDEX = 4;
-	const CARRIER_HOME_DIRECT = 5;
-	const CARRIER_VITRAN = 6;
-	const CARRIER_MACTRAN = 7;
-	const CARRIER_CEVA_LOGISTICS = 8;
-	const CARRIER_AGS_LOGISTICS = 9;
-	const CARRIER_SEKO_LOGISTICS = 10;
-	const CARRIER_MANNA_LOGISTICS = 11;
-	const CARRIER_PILOT_LOGISTICS = 12;
-	const CARRIER_TEST_LOGISTICS = 13;
-	const CARRIER_PROPACK_SHIPPING = 14;
-	const CARRIER_DWS_PICKUP = 16;
-	const CARRIER_SUNSHINE = 17;
-	const CARRIER_CUSTOMER_PICKUP = 18;
-	const CARRIER_ATS = 19;
-	const CARRIER_WAYFAIR_CARRIER = 20;
-	const CARRIER_AMAZON_CARRIER = 21;
-
 	//endregion
 
 	//region Parameters
@@ -195,6 +173,14 @@ class Booking implements BookingInterface
 	 * @ORM\OneToMany(targetEntity="BookingProduct", mappedBy="booking", cascade={"persist","remove"})
 	 */
 	private $products;
+
+	/**
+	 * @var Carrier
+	 *
+	 * Many booking have one carrier
+	 * @ORM\ManyToOne(targetEntity="Carrier")
+	 */
+	private $carrier;
 
 	/**
 	 * One Booking has Many BookingReturn.
@@ -676,5 +662,21 @@ class Booking implements BookingInterface
 		$this->user = $user;
 
 		return $this;
+	}
+
+	/**
+	 * @return Carrier
+	 */
+	public function getCarrier()
+	{
+		return $this->carrier;
+	}
+
+	/**
+	 * @param Carrier $carrier
+	 */
+	public function setCarrier($carrier)
+	{
+		$this->carrier = $carrier;
 	}
 }

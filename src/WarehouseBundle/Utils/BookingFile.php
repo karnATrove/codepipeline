@@ -1,23 +1,40 @@
 <?php
+
 namespace WarehouseBundle\Utils;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use WarehouseBundle\Entity\Booking as BookingEntity;
 
 class BookingFile
 {
-    private $targetDir;
+	private $targetDir;
 
-    public function __construct($targetDir)
-    {
-        $this->targetDir = $targetDir;
-    }
+	public function __construct($targetDir)
+	{
+		$this->targetDir = $targetDir;
+	}
 
-    public function upload(UploadedFile $file)
-    {
-        $fileName = md5(uniqid()) . '-' . $file->getClientOriginalName();
+	public function upload(UploadedFile $file)
+	{
+		$fileName = md5(uniqid()) . '-' . $file->getClientOriginalName();
 
-        $file->move($this->targetDir, $fileName);
+		$file->move($this->targetDir, $fileName);
 
-        return $fileName;
-    }
+		return $fileName;
+	}
+
+	public function getDefaultBolUrl(BookingEntity $booking)
+	{
+		switch ($booking->getCarrierId()) {
+			case BookingEntity::CARRIER_FEDEX:
+				break;
+			default:
+				break;
+		}
+	}
+
+	public function getDefaultLabelUrl(BookingEntity $booking)
+	{
+
+	}
 }
