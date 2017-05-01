@@ -76,7 +76,7 @@ class BuildDirectReport
 		$em = $this->container->get("doctrine")->getManager();
 		$query = $em->createQuery(
 			'SELECT count(DISTINCT s.booking)
-				FROM WarehouseBundle:Shipment s INNER JOIN WarehouseBundle:Booking b
+				FROM WarehouseBundle:Shipment s INNER JOIN WarehouseBundle:Booking b WITH s.booking=b
 				WHERE s.created>=:startTime AND s.created<= :endTime AND b.orderType=:orderType'
 		)
 			->setParameter('startTime', $start)
