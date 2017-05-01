@@ -4,6 +4,7 @@ namespace WarehouseBundle\Utils;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use WarehouseBundle\Entity\Booking as BookingEntity;
+use WarehouseBundle\Entity\Carrier;
 
 class BookingFile
 {
@@ -26,7 +27,7 @@ class BookingFile
 	public function getDefaultBolUrl(BookingEntity $booking)
 	{
 		switch ($booking->getCarrierId()) {
-			case BookingEntity::CARRIER_FEDEX:
+			case Carrier::CARRIER_FEDEX:
 				break;
 			default:
 				break;

@@ -164,19 +164,19 @@ class Booking
 		$carrierCode = $booking->getCarrier()->getCode();
 		switch ($booking->getCarrierId()) {
 			case Carrier::CARRIER_FEDEX:
-				$url .= "FEDEX/bols/FEDEX-BOL-{$carrierCode}-{$booking->getOrderReference()}.xlsx";
+				$url .= "FEDEX/bols/FEDEX-BOL-{$booking->getOrderReference()}.xlsx";
 				break;
 			case Carrier::CARRIER_MACTRAN:
-				$url .= "MAC/bols/VIT-BOL-{$carrierCode}-{$booking->getOrderReference()}.pdf";
+				$url .= "MAC/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
 				break;
 			case Carrier::CARRIER_CEVA_LOGISTICS:
-				$url .= "CE/bols/CEVABOL-{$carrierCode}-{$booking->getOrderReference()}-{$booking->getOrderNumber()}.xlsx";
+				$url .= "CE/bols/CEVABOL-{$booking->getOrderReference()}-{$booking->getOrderNumber()}.xlsx";
 				break;
 			case Carrier::CARRIER_VITRAN:
-				$url .= "VIT/bols/VIT-BOL-{$carrierCode}-{$booking->getOrderReference()}.pdf";
+				$url .= "VIT/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
 				break;
 			default:
-				$url .= "{$carrierCode}/bols/{$carrierCode}-BOL-{$carrierCode}-{$booking->getOrderReference()}.xlsx";
+				$url .= "{$carrierCode}/bols/{$carrierCode}-BOL-{$booking->getOrderReference()}.xlsx";
 				break;
 		}
 
@@ -205,7 +205,7 @@ class Booking
 		$url = self::BASE_WEBSITE_ADDRESS;
 		switch ($booking->getCarrierId()) {
 			case Carrier::CARRIER_FEDEX:
-				$url .= "FEDEX/label/{$booking->getCarrier()->getCode()}-{$booking->getOrderReference()}.zip";
+				$url .= "FEDEX/label/{$booking->getOrderReference()}.zip";
 				break;
 			case Carrier::CARRIER_MACTRAN:
 				return null;
