@@ -25,7 +25,7 @@ class Shipment
 	 * @var Booking
 	 *
 	 * Many Shipment has One Booking
-	 * @ORM\ManyToOne(targetEntity="booking")
+	 * @ORM\ManyToOne(targetEntity="booking", inversedBy="shipments")
 	 */
 	private $booking;
 

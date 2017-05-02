@@ -23,6 +23,7 @@ use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Utils\StringHelper;
+use WarehouseBundle\Utils\Booking as BookingUtility;
 
 /**
  * Booking controller.
@@ -221,9 +222,12 @@ class BookingController extends Controller
 						continue;
 						break;
 					case "status":
-						$changedFrom = \WarehouseBundle\Utils\Booking::bookingStatusName($change[0]);
-						$changedTo = \WarehouseBundle\Utils\Booking::bookingStatusName($change[1]);
+						$changedFrom = BookingUtility::bookingStatusName($change[0]);
+						$changedTo = BookingUtility::bookingStatusName($change[1]);
 						$note .= "Booking status changed from {$changedFrom} to {$changedTo}. ";
+						$booking->setShipped(new \DateTime('now'));
+						$bookingManager->updateBooking($booking, false);//persist not flush
+						$em->persist($booking);
 						//save shipment
 						if ($change[1] == Booking::STATUS_SHIPPED) {
 							$shipment = new Shipment();
@@ -235,14 +239,14 @@ class BookingController extends Controller
 						continue;
 						break;
 					case "carrierId":
-						$changedFrom = \WarehouseBundle\Utils\Booking::bookingCarrierName($change[0]);
-						$changedTo = \WarehouseBundle\Utils\Booking::bookingCarrierName($change[1]);
+						$changedFrom = BookingUtility::bookingCarrierName($change[0]);
+						$changedTo = BookingUtility::bookingCarrierName($change[1]);
 						$note .= "Booking Carrier changed from {$changedFrom} to {$changedTo}. ";
 						continue;
 						break;
 					case "orderType":
-						$changedFrom = \WarehouseBundle\Utils\Booking::bookingOrderTypeName($change[0]);
-						$changedTo = \WarehouseBundle\Utils\Booking::bookingOrderTypeName($change[1]);
+						$changedFrom = BookingUtility::bookingOrderTypeName($change[0]);
+						$changedTo = BookingUtility::bookingOrderTypeName($change[1]);
 						$note .= "Booking Order Type changed from {$changedFrom} to {$changedTo}. ";
 						continue;
 						break;
@@ -487,10 +491,5 @@ class BookingController extends Controller
 		));
 
 		return new Response($html, 200);
-	}
-
-	private function updateBookingAndSaveShipment()
-	{
-
 	}
 }

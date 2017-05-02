@@ -38,6 +38,7 @@ class Booking implements BookingInterface
 	//endregion
 
 	//region Parameters
+
 	/**
 	 * @var int
 	 *
@@ -187,6 +188,13 @@ class Booking implements BookingInterface
 	 * @ORM\OneToMany(targetEntity="BookingReturn", mappedBy="booking")
 	 */
 	private $returns;
+
+	/**
+	 * One Booking has Many Shipments.
+	 * @ORM\OneToMany(targetEntity="Shipment", mappedBy="booking")
+	 */
+	private $shipments;
+
 	//endregion
 
 	/**
@@ -679,4 +687,21 @@ class Booking implements BookingInterface
 	{
 		$this->carrier = $carrier;
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getShipments()
+	{
+		return $this->shipments;
+	}
+
+	/**
+	 * @param mixed $shipments
+	 */
+	public function setShipments($shipments)
+	{
+		$this->shipments = $shipments;
+	}
+
 }
