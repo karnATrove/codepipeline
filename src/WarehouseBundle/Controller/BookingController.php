@@ -16,6 +16,7 @@ use Pagerfanta\View\TwitterBootstrap3View;
 use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
 use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
 
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Timestampable\Fixture\Document\Book;
 use WarehouseBundle\Doctrine\BookingManager;
@@ -53,12 +54,12 @@ class BookingController extends Controller
 		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
 		list($bookings, $pagerHtml) = $this->paginator($queryBuilder, $request);
 
-		return $this->render('booking/index.html.twig', array(
+		return $this->render('booking/index.html.twig', [
 			'bookings' => $bookings,
 			'pagerHtml' => $pagerHtml,
 			'filterForm' => $filterForm->createView(),
 
-		));
+		]);
 	}
 
 	/**
@@ -108,7 +109,7 @@ class BookingController extends Controller
 				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 			}
 		}
-		return array($filterForm, $queryBuilder);
+		return [$filterForm, $queryBuilder];
 	}
 
 
@@ -144,13 +145,13 @@ class BookingController extends Controller
 
 		// Paginator - view
 		$view = new TwitterBootstrap3View();
-		$pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
+		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
 			'proximity' => 3,
 			'prev_message' => 'previous',
 			'next_message' => 'next',
-		));
+		]);
 
-		return array($entities, $pagerHtml);
+		return [$entities, $pagerHtml];
 	}
 
 
@@ -171,16 +172,16 @@ class BookingController extends Controller
 		if ($form->isSubmitted() && $form->isValid()) {
 			$bookingManager->updateBooking($booking, TRUE); # Persists/flush
 
-			$editLink = $this->generateUrl('booking_edit', array('id' => $booking->getId()));
+			$editLink = $this->generateUrl('booking_edit', ['id' => $booking->getId()]);
 			$this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New booking was created successfully.</a>");
 
 			$nextAction = $request->get('submit') == 'save' ? 'booking' : 'booking_new';
 			return $this->redirectToRoute($nextAction);
 		}
-		return $this->render('booking/new.html.twig', array(
+		return $this->render('booking/new.html.twig', [
 			'booking' => $booking,
 			'form' => $form->createView(),
-		));
+		]);
 	}
 
 	/**
@@ -204,7 +205,8 @@ class BookingController extends Controller
 
 			/**
 			 * find booking changes
-			 * @var UnitOfWork $uow */
+			 * @var UnitOfWork $uow
+			 */
 			$uow = $em->getUnitOfWork();
 			$uow->computeChangeSets();
 			$changes = $uow->getEntityChangeSet($booking);
@@ -219,15 +221,14 @@ class BookingController extends Controller
 						$changedFrom = $change[0] ? $change[0]->format('M d. Y') : "NULL";
 						$changedTo = $change[1] ? $change[1]->format('M d. Y') : "NULL";
 						$note .= "Future Ship Date changed from {$changedFrom} to {$changedTo}. ";
+						$booking->setShipped(new \DateTime('now'));
+						$em->persist($booking);
 						continue;
 						break;
 					case "status":
 						$changedFrom = BookingUtility::bookingStatusName($change[0]);
 						$changedTo = BookingUtility::bookingStatusName($change[1]);
 						$note .= "Booking status changed from {$changedFrom} to {$changedTo}. ";
-						$booking->setShipped(new \DateTime('now'));
-						$bookingManager->updateBooking($booking, false);//persist not flush
-						$em->persist($booking);
 						//save shipment
 						if ($change[1] == Booking::STATUS_SHIPPED) {
 							$shipment = new Shipment();
@@ -274,12 +275,12 @@ class BookingController extends Controller
 		$bookingLogs = $this->getDoctrine()
 			->getRepository('WarehouseBundle:BookingLog')
 			->getLogByBooking($booking, 10);
-		return $this->render('booking/edit.html.twig', array(
+		return $this->render('booking/edit.html.twig', [
 			'booking' => $booking,
 			'bookingLogs' => $bookingLogs,
 			'edit_form' => $editForm->createView(),
 			'delete_form' => $deleteForm->createView(),
-		));
+		]);
 	}
 
 	/**
@@ -292,7 +293,7 @@ class BookingController extends Controller
 	private function createDeleteForm(Booking $booking)
 	{
 		return $this->createFormBuilder()
-			->setAction($this->generateUrl('booking_delete', array('id' => $booking->getId())))
+			->setAction($this->generateUrl('booking_delete', ['id' => $booking->getId()]))
 			->setMethod('DELETE')
 			->getForm();
 	}
@@ -346,7 +347,7 @@ class BookingController extends Controller
 	 */
 	public function bulkAction(Request $request)
 	{
-		$ids = $request->get("ids", array());
+		$ids = $request->get("ids", []);
 		$action = $request->get("bulk_action", "delete");
 
 		/** @var BookingManager $bookingManager */
@@ -417,12 +418,12 @@ class BookingController extends Controller
 			$barCode = new barCode();
 			$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
 			$orderBarCode = $barCode->getBarcodePNGPath(str_pad($booking->getOrderNumber(), 12, 0, STR_PAD_LEFT), 'C128', 1.75, 45);
-			$html = $this->renderView('booking/pdf/booking.html.twig', array(
+			$html = $this->renderView('booking/pdf/booking.html.twig', [
 				'booking' => $booking,
 				'barcodePathAndFile' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
 				'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
 				//'productBarCodes' => $product_barcodes,
-			));
+			]);
 		} else {
 			$html = $this->pickListAction($request, $booking->getId());
 		}
@@ -478,17 +479,17 @@ class BookingController extends Controller
 		$barCode = new barCode();
 		$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
 		$orderBarCode = $barCode->getBarcodePNGPath('BO' . str_pad($booking->getOrderNumber(), 10, 0, STR_PAD_LEFT), 'C128', 1.75, 45);
-		$product_barcodes = array();
+		$product_barcodes = [];
 		foreach ($booking->getProducts() as $product) {
 			$product_barcodes[$product->getId()] = str_replace($this->get('kernel')->getRootDir() . '/../web', '', $barCode->getBarcodePNGPath($product->getProduct()->getModel(), 'C128', 1.5, 35));
 		}
 
-		$html = $this->renderView('booking/pdf/booking.html.twig', array(
+		$html = $this->renderView('booking/pdf/booking.html.twig', [
 			'booking' => $booking,
 			'orderBarCodeSku' => 'BO' . str_pad($booking->getOrderNumber(), 10, 0, STR_PAD_LEFT),
 			'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
 			'productBarCodes' => $product_barcodes,
-		));
+		]);
 
 		return new Response($html, 200);
 	}
