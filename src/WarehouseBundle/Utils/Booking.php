@@ -20,7 +20,7 @@ define('BOOKING_STATE_COMPLETE', 0);
 class Booking
 {
 
-	const BASE_WEBSITE_ADDRESS = "https://www.roveconcepts.com/sites/default/files/carrier_files/";
+	const BASE_WEBSITE_ADDRESS = "https://www.roveconcepts.com/remote/c9c078d09dbfa23992cb150ccadc238f/carrier/downloads/";
 	private $container;
 
 	/**
@@ -160,25 +160,26 @@ class Booking
 
 	public static function getDefaultBookingBol(BookingEntity $booking)
 	{
-		$url = self::BASE_WEBSITE_ADDRESS;
-		$carrierCode = $booking->getCarrier()->getCode();
-		switch ($booking->getCarrierId()) {
-			case Carrier::CARRIER_FEDEX:
-				$url .= "FEDEX/bols/FEDEX-BOL-{$booking->getOrderReference()}.xlsx";
-				break;
-			case Carrier::CARRIER_MACTRAN:
-				$url .= "MAC/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
-				break;
-			case Carrier::CARRIER_CEVA_LOGISTICS:
-				$url .= "CE/bols/CEVABOL-{$booking->getOrderReference()}-{$booking->getOrderNumber()}.xlsx";
-				break;
-			case Carrier::CARRIER_VITRAN:
-				$url .= "VIT/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
-				break;
-			default:
-				$url .= "{$carrierCode}/bols/{$carrierCode}-BOL-{$booking->getOrderReference()}.xlsx";
-				break;
-		}
+		$url = self::BASE_WEBSITE_ADDRESS.$booking->getCarrier()->getId()."/{$booking->getOrderReference()}/bol";
+//		$carrierCode = $booking->getCarrier()->getCode();
+//		switch ($booking->getCarrierId()) {
+//			case Carrier::CARRIER_FEDEX:
+//				$url .= "FEDEX/bols/FEDEX-BOL-{$booking->getOrderReference()}.xlsx";
+//				break;
+//			case Carrier::CARRIER_MACTRAN:
+//				$url .= "MAC/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
+//				break;
+//			case Carrier::CARRIER_CEVA_LOGISTICS:
+//				$url .= "CE/bols/CEVABOL-{$booking->getOrderReference()}-{$booking->getOrderNumber()}.xlsx";
+//				break;
+//			case Carrier::CARRIER_VITRAN:
+//				$url .= "VIT/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
+//				break;
+//			default:
+//				$url .= "{$carrierCode}/bols/{$carrierCode}-BOL-{$booking->getOrderReference()}.xlsx";
+//				break;
+//		}
+//		return $url;
 
 		return self::isLinkExist($url) ? $url : null;
 	}
@@ -192,7 +193,7 @@ class Booking
 	private static function isLinkExist($link)
 	{
 		$file_headers = @get_headers($link);
-		if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
+		if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'||$file_headers[0]=='HTTP/1.1 503 Backend fetch failed') {
 			$exists = false;
 		} else {
 			$exists = true;
@@ -202,24 +203,25 @@ class Booking
 
 	public static function getDefaultBookingLabel(BookingEntity $booking)
 	{
-		$url = self::BASE_WEBSITE_ADDRESS;
-		switch ($booking->getCarrierId()) {
-			case Carrier::CARRIER_FEDEX:
-				$url .= "FEDEX/label/{$booking->getOrderReference()}.zip";
-				break;
-			case Carrier::CARRIER_MACTRAN:
-				return null;
-				break;
-			case Carrier::CARRIER_CEVA_LOGISTICS:
-				return null;
-				break;
-			case Carrier::CARRIER_VITRAN:
-				return null;
-				break;
-			default:
-				return null;
-				break;
-		}
+//		$url = self::BASE_WEBSITE_ADDRESS;
+//		switch ($booking->getCarrierId()) {
+//			case Carrier::CARRIER_FEDEX:
+//				$url .= "FEDEX/label/{$booking->getOrderReference()}.zip";
+//				break;
+//			case Carrier::CARRIER_MACTRAN:
+//				return null;
+//				break;
+//			case Carrier::CARRIER_CEVA_LOGISTICS:
+//				return null;
+//				break;
+//			case Carrier::CARRIER_VITRAN:
+//				return null;
+//				break;
+//			default:
+//				return null;
+//				break;
+//		}
+		$url = self::BASE_WEBSITE_ADDRESS.$booking->getCarrier()->getId()."/{$booking->getOrderReference()}/label";
 		return self::isLinkExist($url) ? $url : null;
 	}
 
