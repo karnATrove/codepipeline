@@ -195,6 +195,12 @@ class Booking implements BookingInterface
 	 */
 	private $shipments;
 
+	/**
+	 * One Booking has Many BookingStatusLog.
+	 * @ORM\OneToMany(targetEntity="BookingStatusLog", mappedBy="booking")
+	 */
+	private $bookingStatusLogs;
+
 	//endregion
 
 	/**
@@ -702,6 +708,22 @@ class Booking implements BookingInterface
 	public function setShipments($shipments)
 	{
 		$this->shipments = $shipments;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getBookingStatusLogs()
+	{
+		return $this->bookingStatusLogs;
+	}
+
+	/**
+	 * @param mixed $bookingStatusLogs
+	 */
+	public function setBookingStatusLogs($bookingStatusLogs)
+	{
+		$this->bookingStatusLogs = $bookingStatusLogs;
 	}
 
 }

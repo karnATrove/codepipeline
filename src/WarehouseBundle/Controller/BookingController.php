@@ -22,6 +22,7 @@ use Timestampable\Fixture\Document\Book;
 use WarehouseBundle\Doctrine\BookingManager;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
+use WarehouseBundle\Entity\BookingStatusLog;
 use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Utils\Booking as BookingUtility;
@@ -201,6 +202,9 @@ class BookingController extends Controller
 			$em = $this->getDoctrine()->getManager();
 			$booking->setModified(new \DateTime('now'));
 			$bookingManager->updateBooking($booking, false);//persist not flush
+			if ($booking->getStatus()==Booking::STATUS_SHIPPED){
+				$booking->setShipped(new \DateTime('now'));
+			}
 			$em->persist($booking);
 
 			/**
@@ -217,18 +221,27 @@ class BookingController extends Controller
 					case "modified":
 						continue;
 						break;
+					case "shipped":
+						continue;
+						break;
 					case "futureship":
 						$changedFrom = $change[0] ? $change[0]->format('M d. Y') : "NULL";
 						$changedTo = $change[1] ? $change[1]->format('M d. Y') : "NULL";
 						$note .= "Future Ship Date changed from {$changedFrom} to {$changedTo}. ";
-						$booking->setShipped(new \DateTime('now'));
-						$em->persist($booking);
 						continue;
 						break;
 					case "status":
 						$changedFrom = BookingUtility::bookingStatusName($change[0]);
 						$changedTo = BookingUtility::bookingStatusName($change[1]);
 						$note .= "Booking status changed from {$changedFrom} to {$changedTo}. ";
+
+						//save status log
+						$statusLog = new BookingStatusLog();
+						$statusLog->setOldBookingStatus($change[0]);
+						$statusLog->setNewBookingStatus($change[1]);
+						$statusLog->setBooking($booking);
+						$em->persist($statusLog);
+
 						//save shipment
 						if ($change[1] == Booking::STATUS_SHIPPED) {
 							$shipment = new Shipment();
@@ -253,7 +266,7 @@ class BookingController extends Controller
 						break;
 					default:
 						$field = StringHelper::printCamel($name);
-						$note .= "{$field} changed from {$change[0]} to {$change[1]}. ";
+						$note .= "{$field} changed from ".print_r($change[0])." to ".print_r($change[1]).". ";
 						break;
 				}
 
