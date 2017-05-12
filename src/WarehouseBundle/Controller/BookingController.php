@@ -423,7 +423,7 @@ class BookingController extends Controller
 		if (FALSE) {
 			if (!$booking) {
 				throw $this->createNotFoundException(
-					'No booking found for id ' . $id
+					'No booking found for id ' . $booking->getId()
 				);
 			}
 

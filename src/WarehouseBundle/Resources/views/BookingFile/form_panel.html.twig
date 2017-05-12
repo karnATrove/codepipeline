@@ -12,13 +12,11 @@
     <div class="x_content">
         <ul class="list-unstyled project_files">
 
-            {% set bol = bookingUtil.getDefaultBookingBol(booking) %}
             {% if bol %}
                 <li><a href="{{ bol }}"><i class="fa fa-sticky-note-o"></i>
                         <label>Default</label> BOL</a></li>
             {% endif %}
 
-            {% set label = bookingUtil.getDefaultBookingLabel(booking) %}
             {% if label %}
                 <li><a href="{{ label }}"><i class="fa fa-sticky-note-o"></i>
                         <label>Default</label> LABEL</a></li>
