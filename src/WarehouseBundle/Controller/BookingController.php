@@ -24,6 +24,7 @@ use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingStatusLog;
 use WarehouseBundle\Entity\Shipment;
+use WarehouseBundle\Form\BookingFilterType;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Utils\Booking as BookingUtility;
 
@@ -43,18 +44,18 @@ class BookingController extends Controller
 	public function indexAction(Request $request)
 	{
 		$em = $this->getDoctrine()->getManager();
-		/** @var QueryBuilder $queryBuilder */
-		$queryBuilder = $em->getRepository('WarehouseBundle:Booking')->createQueryBuilder('e');
+		$bookingRepository = $em->getRepository('WarehouseBundle:Booking');
+		$queryBuilder = $bookingRepository->createQueryBuilder('e');
 
 		// Remove deleted
-		if (empty($request->get('status')) && !(is_numeric($request->get('status')) && intval($request->get('status')) == 0)) {
+		if (empty($request->get('status')) || !(is_numeric($request->get('status'))
+				|| intval($request->get('status')) == 0)
+		) {
 			$queryBuilder->andWhere('e.status <> :bstatus');
-			$queryBuilder->setParameter('bstatus', 0);
+			$queryBuilder->setParameter('bstatus', Booking::STATUS_DELETED);
 		}
-
 		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
 		list($bookings, $pagerHtml) = $this->paginator($queryBuilder, $request);
-
 		return $this->render('booking/index.html.twig', [
 			'bookings' => $bookings,
 			'pagerHtml' => $pagerHtml,
@@ -70,7 +71,7 @@ class BookingController extends Controller
 	protected function filter(QueryBuilder $queryBuilder, Request $request)
 	{
 		$session = $request->getSession();
-		$filterForm = $this->createForm('WarehouseBundle\Form\BookingFilterType');
+		$filterForm = $this->createForm(BookingFilterType::class);
 
 		# Default sort
 		if (empty($request->request->set('pcg_sort_col', ''))) {
@@ -106,7 +107,7 @@ class BookingController extends Controller
 					}
 				}
 
-				$filterForm = $this->createForm('WarehouseBundle\Form\BookingFilterType', $filterData);
+				$filterForm = $this->createForm(BookingFilterType::class, $filterData);
 				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 			}
 		}
@@ -202,7 +203,7 @@ class BookingController extends Controller
 			$em = $this->getDoctrine()->getManager();
 			$booking->setModified(new \DateTime('now'));
 			$bookingManager->updateBooking($booking, false);//persist not flush
-			if ($booking->getStatus()==Booking::STATUS_SHIPPED){
+			if ($booking->getStatus() == Booking::STATUS_SHIPPED) {
 				$booking->setShipped(new \DateTime('now'));
 			}
 			$em->persist($booking);
@@ -266,7 +267,7 @@ class BookingController extends Controller
 						break;
 					default:
 						$field = StringHelper::printCamel($name);
-						$note .= "{$field} changed from ".print_r($change[0])." to ".print_r($change[1]).". ";
+						$note .= "{$field} changed from " . print_r($change[0]) . " to " . print_r($change[1]) . ". ";
 						break;
 				}
 
