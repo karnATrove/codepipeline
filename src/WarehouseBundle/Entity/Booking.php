@@ -610,7 +610,7 @@ class Booking implements BookingInterface
 	}
 
 	/**
-	 * @return ArrayCollection|Product[]
+	 * @return ArrayCollection|BookingProduct[]
 	 */
 	public function getProducts()
 	{

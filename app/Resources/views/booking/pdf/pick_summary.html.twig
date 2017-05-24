@@ -1,0 +1,20 @@
+{% extends 'WarehouseBundle::pdf_layout.html.twig' %}
+
+
+{% block body %}
+    {% block content_header %}
+        <div class="content_heading">Pick Summary - As of {{ "now"|date('Y-m-d H:i A') }}</div>
+    {% endblock %}
+
+    {% block content %}
+        <div class="row">
+            <div class="col-xs-12">
+                <h2>Order
+                    {% for booking in bookings %}
+                        #{{ booking.orderNumber }}
+                    {% endfor %}
+                </h2>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}

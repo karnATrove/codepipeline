@@ -16,14 +16,19 @@ use Pagerfanta\View\TwitterBootstrap3View;
 use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
 use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
 
+use Symfony\Component\Security\Acl\Exception\Exception;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Timestampable\Fixture\Document\Book;
 use WarehouseBundle\Doctrine\BookingManager;
+use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingStatusLog;
 use WarehouseBundle\Entity\Shipment;
+use WarehouseBundle\Enum\SessionEnum;
 use WarehouseBundle\Form\BookingFilterType;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Utils\Booking as BookingUtility;
@@ -35,6 +40,7 @@ use WarehouseBundle\Utils\Booking as BookingUtility;
  */
 class BookingController extends Controller
 {
+
 	/**
 	 * Lists all Booking entities.
 	 *
@@ -60,7 +66,6 @@ class BookingController extends Controller
 			'bookings' => $bookings,
 			'pagerHtml' => $pagerHtml,
 			'filterForm' => $filterForm->createView(),
-
 		]);
 	}
 
@@ -81,25 +86,24 @@ class BookingController extends Controller
 
 		// Reset filter
 		if ($request->get('filter_action') == 'reset') {
-			$session->remove('BookingControllerFilter');
+			$session->remove(SessionEnum::BOOKING_CONTROLLER_FILTER);
 		}
 
 		// Filter action
 		if ($request->get('filter_action') == 'filter') {
 			// Bind values from the request
 			$filterForm->handleRequest($request);
-
 			if ($filterForm->isValid()) {
 				// Build the query from the given form object
 				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 				// Save filter to session
 				$filterData = $filterForm->getData();
-				$session->set('BookingControllerFilter', $filterData);
+				$session->set(SessionEnum::BOOKING_CONTROLLER_FILTER, $filterData);
 			}
 		} else {
 			// Get filter from session
-			if ($session->has('BookingControllerFilter')) {
-				$filterData = $session->get('BookingControllerFilter');
+			if ($session->has(SessionEnum::BOOKING_CONTROLLER_FILTER)) {
+				$filterData = $session->get(SessionEnum::BOOKING_CONTROLLER_FILTER);
 
 				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
 					if (is_object($filter)) {
@@ -343,13 +347,12 @@ class BookingController extends Controller
 	public function deleteByIdAction(Booking $booking)
 	{
 		try {
-			$bookingManager = $this->get('BookingManager');
-			$bookingManager->deleteBooking($booking);
+			$bookingManager = $this->get('warehouse.manager.booking_manager');
+			$bookingManager->deleteBookingById($booking->getId());
 			$this->get('session')->getFlashBag()->add('success', 'The Booking was deleted successfully');
 		} catch (\Exception $ex) {
 			$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Booking');
 		}
-
 		return $this->redirect($this->generateUrl('booking'));
 
 	}
@@ -361,56 +364,23 @@ class BookingController extends Controller
 	 */
 	public function bulkAction(Request $request)
 	{
-		$ids = $request->get("ids", []);
-		$action = $request->get("bulk_action", "delete");
-
-		/** @var BookingManager $bookingManager */
-		$bookingManager = $this->get('BookingManager');
-
-		$cnt_changes = 0;
-		if ($action == "delete") {
-			try {
-				foreach ($ids as $id) {
-					$booking = $bookingManager->findBookingById($id);
-					$bookingManager->deleteBooking($booking);
-					$cnt_changes++;
-				}
-				$this->get('session')->getFlashBag()->add('success', $cnt_changes . ' bookings were deleted successfully!');
-			} catch (\Exception $ex) {
-				$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
-			}
+		$form = $request->get('form');
+		if (!$form) {
+			$this->get('session')->getFlashBag()->add('error',
+				'No form submitted');
+			return $this->redirect($this->generateUrl('booking'));
 		}
-
-		if ($action == "pickingon" || $action == "pickingoff") {
-			try {
-				foreach ($ids as $id) {
-					$booking = $bookingManager->findBookingById($id);
-					$booking->setPickingFlag($action == 'pickingon' ? 1 : 0);
-					$bookingManager->updateBooking($booking, true); # persist, flush
-					$cnt_changes++;
-				}
-
-				$this->get('session')->getFlashBag()->add('success', $cnt_changes . ' bookings were successfully updated!');
-
-			} catch (\Exception $ex) {
-				$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
-			}
+		try {
+			$serializer = new Serializer([new ObjectNormalizer()]);
+			/** @var BulkAction $bulkAction */
+			$bulkAction = $serializer->denormalize($form, BulkAction::class);
+			$this->get('warehouse.work_flow.booking_work_flow')->bulkAction($bulkAction);
+			$this->get('session')->getFlashBag()->add('success',
+				'Bookings get updated');
+		} catch (\Exception $exception) {
+			$this->get('session')->getFlashBag()->add('error',
+				"Error: {$exception->getMessage()}. please resolve errors and redo");
 		}
-
-		if ($action == "print" || $action == "print_w_documents" || $action == "print_wo_documents") {
-			try {
-				foreach ($ids as $id) {
-					$booking = $bookingManager->findBookingById($id);
-					// TODO
-				}
-
-				$this->get('session')->getFlashBag()->add('success', $cnt_changes . ' bookings were deleted successfully!');
-
-			} catch (\Exception $ex) {
-				$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the bookings ');
-			}
-		}
-
 		return $this->redirect($this->generateUrl('booking'));
 	}
 
@@ -427,7 +397,6 @@ class BookingController extends Controller
 					'No booking found for id ' . $booking->getId()
 				);
 			}
-
 			//$my2dBarcode = new matrixCode();
 			$barCode = new barCode();
 			$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
@@ -505,6 +474,25 @@ class BookingController extends Controller
 			'productBarCodes' => $product_barcodes,
 		]);
 
+		return new Response($html, 200);
+	}
+
+	/**
+	 * @param $ids
+	 * @Route("/pick-summary", name="booking_pick_summary")
+	 */
+	public function pickSummaryAction(Request $request)
+	{
+		$this->getDoctrine()->getRepository('WarehouseBundle:Booking')->pickingSummaryByBookingIds([1]);
+
+		$this->get('warehouse.manager.booking_manager')->getPickSummaryData([1]);
+		$ids = $request->get('ids');
+		if (empty($ids)) {
+			$this->createNotFoundException("booking not found");
+		}
+		$bookingIdList = explode(',', $ids);
+		$bookings = $this->get('warehouse.manager.booking_manager')->getBookingByIdList($bookingIdList);
+		$html = $this->renderView('booking/pdf/pick_summary.html.twig', ['bookings' => $bookings]);
 		return new Response($html, 200);
 	}
 }
