@@ -9,7 +9,7 @@
 namespace WarehouseBundle\DTO\Booking\PickSummary;
 
 
-class ItemLocation
+class PickSummaryItemLocationDTO
 {
 	private $aisle;
 	private $row;

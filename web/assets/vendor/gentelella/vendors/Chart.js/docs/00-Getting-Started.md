@@ -263,7 +263,7 @@ img.onload = function() {
 
     var chart = new Chart(ctx, {
         data: {
-            labels: ['Item 1', 'Item 2', 'Item 3'],
+            labels: [PickSummaryItemDTO, PickSummaryItemDTO, PickSummaryItemDTO],
             datasets: [{
                 data: [10, 20, 30],
                 backgroundColor: fillPattern

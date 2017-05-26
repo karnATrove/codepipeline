@@ -21,6 +21,9 @@ services:
     warehouse.manager.booking_manager:
       class: WarehouseBundle\Manager\BookingManager
       arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.product_manager:
+      class: WarehouseBundle\Manager\ProductManager
+      arguments: ['@doctrine.orm.entity_manager']
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
-      arguments: ['@warehouse.manager.booking_manager', '@doctrine.orm.entity_manager']
+      arguments: ['@service_container']

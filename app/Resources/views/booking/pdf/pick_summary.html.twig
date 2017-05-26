@@ -8,13 +8,63 @@
 
     {% block content %}
         <div class="row">
-            <div class="col-xs-12">
-                <h2>Order
-                    {% for booking in bookings %}
-                        #{{ booking.orderNumber }}
-                    {% endfor %}
-                </h2>
+            <div class="row">
+                <div class="col-xs-3">
+                    <h1>Orders</h1>
+                </div>
+
+                <div class="col-xs-9">
+                    <div class="booking_carrier">
+                        {% for booking in bookings %}
+                            #{{ booking.orderNumber }}
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Items</h2>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="30"></th>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Detail</th>
+                        <th>Box</th>
+                        <th>Locations</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pickSummaryItem in pickSummary.items %}
+                        <tr>
+                            <td><i class="fa fa-square-o" style="font-size:24px;"></i></td>
+                            <td>{{ pickSummaryItem.sku }}</td>
+                            <td>{{ pickSummaryItem.description }}</td>
+                            <td>{{ pickSummaryItem.orderedQuantity }}</td>
+                            <td>
+                                {% for order in pickSummaryItem.orders %}
+                                    <p>#{{ order.orderNumber }} ordered {{ order.quantity }}</p>
+                                {% endfor %}
+                            </td>
+                            <td>{{ pickSummaryItem.boxCount }}</td>
+                            <td>
+                                {% for location in pickSummaryItem.itemLocations %}
+                                    <p>
+                                        Aisle: {{ location.aisle }} Row: {{ location.row }} Level: {{ location.level }}
+                                        Qty: {{ location.quantity }}
+                                    </p>
+                                {% endfor %}
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     {% endblock %}
 {% endblock %}

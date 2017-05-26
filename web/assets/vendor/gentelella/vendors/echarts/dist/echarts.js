@@ -18647,7 +18647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._itemVisuals = [];
 
 	        /**
-	         * Item layout properties after layout
+	         * PickSummaryItemDTO layout properties after layout
 	         * @type {Array.<Object>}
 	         * @private
 	         */

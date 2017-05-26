@@ -2,36 +2,33 @@
 
 namespace WarehouseBundle\Controller;
 
+use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\View\TwitterBootstrap3View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-
-use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
-use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
-
-use Symfony\Component\Security\Acl\Exception\Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Validator\Constraints\Date;
-use Symfony\Component\Validator\Constraints\DateTime;
-use Timestampable\Fixture\Document\Book;
-use WarehouseBundle\Doctrine\BookingManager;
+use WarehouseBundle\DTO\AjaxResponse\AjaxCommand;
+use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
+use WarehouseBundle\DTO\AjaxResponse\ResponseDTO;
 use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingStatusLog;
 use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Enum\SessionEnum;
+use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Form\BookingFilterType;
-use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Utils\Booking as BookingUtility;
+use WarehouseBundle\Utils\StringHelper;
+use WarehouseBundle\Workflow\BookingWorkflow;
 
 /**
  * Booking controller.
@@ -70,8 +67,7 @@ class BookingController extends Controller
 	}
 
 	/**
-	 * Create filter form and process filter request.
-	 *
+	 * Create filter form and process filter request
 	 */
 	protected function filter(QueryBuilder $queryBuilder, Request $request)
 	{
@@ -326,7 +322,6 @@ class BookingController extends Controller
 	{
 		$form = $this->createDeleteForm($booking);
 		$form->handleRequest($request);
-
 		if ($form->isSubmitted() && $form->isValid()) {
 			$bookingManager = $this->get('BookingManager');
 			$bookingManager->deleteBooking($booking);
@@ -334,7 +329,6 @@ class BookingController extends Controller
 		} else {
 			$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Booking');
 		}
-
 		return $this->redirectToRoute('booking');
 	}
 
@@ -374,13 +368,35 @@ class BookingController extends Controller
 			$serializer = new Serializer([new ObjectNormalizer()]);
 			/** @var BulkAction $bulkAction */
 			$bulkAction = $serializer->denormalize($form, BulkAction::class);
-			$this->get('warehouse.work_flow.booking_work_flow')->bulkAction($bulkAction);
+			$ids = $bulkAction->getOrderIds();
+			if (empty($ids)) {
+				$this->get('session')->getFlashBag()->add('error',
+					"Error: no booking selected");
+				return $this->redirect($this->generateUrl('booking'));
+			}
+			$responseData = null;
+			$response = $this->get('warehouse.work_flow.booking_work_flow')->bulkAction($bulkAction, $responseData);
+			switch ($response) {
+				case BookingWorkflow::BULK_ACTION_TYPE_RENDER_PDF:
+					return new Response($responseData, 200);
+					break;
+				default:
+					break;
+			}
 			$this->get('session')->getFlashBag()->add('success',
 				'Bookings get updated');
+		} catch (BookingManagerException $bookingManagerException) {
+			$this->get('session')->getFlashBag()->add('error',
+				"Error: {$bookingManagerException->getdetail()}. please resolve errors and redo");
 		} catch (\Exception $exception) {
 			$this->get('session')->getFlashBag()->add('error',
 				"Error: {$exception->getMessage()}. please resolve errors and redo");
 		}
+
+//		  = new AjaxCommandDTO('booking_modal', AjaxCommandDTO::OP_MODAL, 'show');
+//		$response = new ResponseDTO();
+//		$response->addAjaxCommand($ajaxCommand);
+
 		return $this->redirect($this->generateUrl('booking'));
 	}
 
@@ -404,8 +420,7 @@ class BookingController extends Controller
 			$html = $this->renderView('booking/pdf/booking.html.twig', [
 				'booking' => $booking,
 				'barcodePathAndFile' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
-				'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
-				//'productBarCodes' => $product_barcodes,
+				'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode)
 			]);
 		} else {
 			$html = $this->pickListAction($request, $booking->getId());
@@ -483,16 +498,19 @@ class BookingController extends Controller
 	 */
 	public function pickSummaryAction(Request $request)
 	{
-		$this->getDoctrine()->getRepository('WarehouseBundle:Booking')->pickingSummaryByBookingIds([1]);
-
-		$this->get('warehouse.manager.booking_manager')->getPickSummaryData([1]);
 		$ids = $request->get('ids');
 		if (empty($ids)) {
-			$this->createNotFoundException("booking not found");
+			throw $this->createNotFoundException("booking not found");
 		}
 		$bookingIdList = explode(',', $ids);
+		$pickSummaryModel = $this->get('warehouse.manager.booking_manager')->getPickSummaryModel($bookingIdList);
+		$pickSummaryDTO = $this->get('warehouse.manager.booking_manager')->getPickSummaryDTO($pickSummaryModel);
 		$bookings = $this->get('warehouse.manager.booking_manager')->getBookingByIdList($bookingIdList);
-		$html = $this->renderView('booking/pdf/pick_summary.html.twig', ['bookings' => $bookings]);
+		$html = $this->renderView('booking/pdf/pick_summary.html.twig', [
+			'bookings' => $bookings,
+			'pickSummary' => $pickSummaryDTO]);
 		return new Response($html, 200);
 	}
+
+	
 }

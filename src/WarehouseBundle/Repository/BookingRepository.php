@@ -55,12 +55,14 @@ class BookingRepository extends EntityRepository
 		$query = $this->getEntityManager()->createQuery(
 			'SELECT
 				  b.id       AS bookingId,
+				  b.orderNumber AS orderNumber,
 				  bp.id      AS bookingProductId,
 				  bp.qty     AS orderedQuantity,
 				  p.id       AS productId,
+				  p.description AS description,
 				  p.model    AS sku,
 				  l.id       AS locationId,
-				  l.aisle    AS aile,
+				  l.aisle    AS aisle,
 				  l.row      AS row,
 				  l.level    AS level,
 				  lp.onHand AS quantityLevel,

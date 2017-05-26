@@ -12,12 +12,14 @@ namespace WarehouseBundle\Model\Booking\PickSummary;
 class PickSummaryItemModel
 {
 	private $bookingId;
+	private $orderNumber;
 	private $bookingProductId;
 	private $orderedQuantity;
 	private $productId;
+	private $description;
 	private $sku;
 	private $locationId;
-	private $aile;
+	private $aisle;
 	private $row;
 	private $level;
 	private $quantityLevel;
@@ -122,22 +124,6 @@ class PickSummaryItemModel
 	/**
 	 * @return mixed
 	 */
-	public function getAile()
-	{
-		return $this->aile;
-	}
-
-	/**
-	 * @param mixed $aile
-	 */
-	public function setAile($aile)
-	{
-		$this->aile = $aile;
-	}
-
-	/**
-	 * @return mixed
-	 */
 	public function getRow()
 	{
 		return $this->row;
@@ -197,6 +183,54 @@ class PickSummaryItemModel
 	public function setQuantityPerCarton($quantityPerCarton)
 	{
 		$this->quantityPerCarton = $quantityPerCarton;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getAisle()
+	{
+		return $this->aisle;
+	}
+
+	/**
+	 * @param mixed $aisle
+	 */
+	public function setAisle($aisle)
+	{
+		$this->aisle = $aisle;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+
+	/**
+	 * @param mixed $description
+	 */
+	public function setDescription($description)
+	{
+		$this->description = $description;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getOrderNumber()
+	{
+		return $this->orderNumber;
+	}
+
+	/**
+	 * @param mixed $orderNumber
+	 */
+	public function setOrderNumber($orderNumber)
+	{
+		$this->orderNumber = $orderNumber;
 	}
 
 }

@@ -33,7 +33,6 @@ class BookingFileController extends Controller
 	 * Lists all Booking entities.
 	 *
 	 * @Route("/new/{id}", name="file_new")
-	 * @Template()
 	 * @param Request $request
 	 * @param Booking $booking
 	 * @return JsonResponse|string

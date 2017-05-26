@@ -8357,7 +8357,7 @@
                     add( prefix, v );
 
                 } else {
-                    // Item is non-scalar (array or object), encode its numeric index.
+                    // PickSummaryItemDTO is non-scalar (array or object), encode its numeric index.
                     buildParams( prefix + "[" + ( typeof v === "object" ? i : "" ) + "]", v, traditional, add );
                 }
             });

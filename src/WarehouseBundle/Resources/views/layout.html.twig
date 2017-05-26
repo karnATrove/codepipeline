@@ -205,9 +205,7 @@
 
 {% javascripts
 'assets/js/custom.js'
-'@WarehouseBundle/Resources/public/js/scan.js'
-'@WarehouseBundle/Resources/public/js/warehouse.js'
-'@WarehouseBundle/Resources/public/js/scanned_products_page.js' output='js/compiled/main.js' %}
+'@WarehouseBundle/Resources/public/js/*' output='js/compiled/main.js' %}
 <script src="{{ asset_url }}"></script>
 {% endjavascripts %}
 <!-- FastClick -->

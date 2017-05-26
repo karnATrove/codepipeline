@@ -6,7 +6,7 @@ describe("Test the bubble chart default config", function() {
 		// Title is always blank
 		expect(config.tooltips.callbacks.title()).toBe('');
 
-		// Item label
+		// PickSummaryItemDTO label
 		var data = {
 			datasets: [{
 				label: 'My dataset',
@@ -34,7 +34,7 @@ describe('Test the doughnut chart default config', function() {
 		// Title is always blank
 		expect(config.tooltips.callbacks.title()).toBe('');
 
-		// Item label
+		// PickSummaryItemDTO label
 		var data = {
 			labels: ['label1', 'label2', 'label3'],
 			datasets: [{
@@ -166,7 +166,7 @@ describe('Test the polar area chart default config', function() {
 		// Title is always blank
 		expect(config.tooltips.callbacks.title()).toBe('');
 
-		// Item label
+		// PickSummaryItemDTO label
 		var data = {
 			labels: ['label1', 'label2', 'label3'],
 			datasets: [{

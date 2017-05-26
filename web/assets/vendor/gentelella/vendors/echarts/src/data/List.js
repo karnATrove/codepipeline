@@ -141,14 +141,14 @@ define(function (require) {
         this._layout = {};
 
         /**
-         * Item visual properties after visual coding
+         * PickSummaryItemDTO visual properties after visual coding
          * @type {Array.<Object>}
          * @private
          */
         this._itemVisuals = [];
 
         /**
-         * Item layout properties after layout
+         * PickSummaryItemDTO layout properties after layout
          * @type {Array.<Object>}
          * @private
          */

@@ -125,30 +125,28 @@
                     </div>
 
                     <div class="col-md-12">
-                        {%- if form_errors(filterForm) %}
+                        {% if form_errors(filterForm) %}
                             <div class="alert alert-block alert-error fade in form-errors">
                                 {{ form_errors(filterForm) }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <form method="POST" id="bulk_form" action="{{ path('booking_bulk_action') }} ">
+                    <form class="" method="POST" id="bulk_form" action="{{ path('booking_bulk_action') }} ">
                         {% include 'booking/_index_booking_content.html.twig' with {'bookings':bookings} %}
                         <div class="row">
                             <div class="col-md-4 pull-left">
                                 <div class="pagination form-inline ">
                                     <select class="form-control" name="form[action]">
-                                        <option value="delete">DELETE</option>
-                                        <option value="pickingOn">PICKING YES</option>
-                                        <option value="pickingOff">PICKING NO</option>
+                                        <option value="pickingOn">Picking Yes</option>
+                                        <option value="pickingOff">Picking No</option>
+                                        <option value="delete">Delete</option>
                                         <optgroup label="PICKING">
-                                        <option value="pickSummary">PICK SUMMARY</option>
+                                            <option value="pickSummary">Pick Summary</option>
                                         </optgroup>
-                                        {#<optgroup label="PRINT">#}
-                                            {#<option value="print">Print list</option>#}
-                                            {#<option value="printWithDocuments">Print w/ Documents</option>#}
-                                            {#<option value="printWithoutDocuments">Print w/o Documents</option>#}
-                                        {#</optgroup>#}
+                                        <optgroup label="PRINT">
+                                            <option value="printWithDocuments">Print w/ Documents</option>
+                                        </optgroup>
                                     </select>
                                     <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')"
                                            class="form-control btn btn-danger btn-sm" disabled>
@@ -165,6 +163,19 @@
         </div>
     </div>
 
+    <div class="modal fade" id="booking_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id="modal_content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal_title"></h4>
+                </div>
+                <div class="modal-body" id="modal_body">
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
