@@ -264,7 +264,7 @@ class BookingController extends Controller
 						break;
 					default:
 						$field = StringHelper::printCamel($name);
-						$note .= "{$field} changed from " . print_r($change[0]) . " to " . print_r($change[1]) . ". ";
+						$note .= "{$field} changed from " . $change[0] . " to " . $change[1] . ". ";
 						break;
 				}
 
