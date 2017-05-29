@@ -77,7 +77,7 @@ class ProductRepository extends EntityRepository
 				GROUP BY p.model'
 		)->setParameter('sku', $sku);
 		$results = $query->getResult();
-		return isset($results['quantity']) ? $results['quantity'] : 0;
+		return isset($results[0]) ? $results[0]['quantity'] : 0;
 	}
 
 }
