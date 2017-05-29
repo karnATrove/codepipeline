@@ -5,13 +5,12 @@ namespace WarehouseBundle\Utils;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Timestampable\Fixture\Document\Book;
+use WarehouseBundle\Entity\Booking as BookingEntity;
 use WarehouseBundle\Entity\BookingContact;
+use WarehouseBundle\Entity\BookingProduct as BookingProductEntity;
 use WarehouseBundle\Entity\Carrier;
 use WarehouseBundle\Model\BookingInterface;
 use WarehouseBundle\Model\BookingManagerInterface;
-use WarehouseBundle\Entity\Booking as BookingEntity;
-use WarehouseBundle\Entity\BookingProduct as BookingProductEntity;
 
 define('BOOKING_STATE_INACTIVE', 0);
 define('BOOKING_STATE_ACTIVE', 1);
@@ -134,7 +133,7 @@ class Booking
 	 */
 	public static function bookingCarrierList()
 	{
-		return array(
+		return [
 			Carrier::CARRIER_XPO_LOGISTICS => 'XPO Logistics',
 			Carrier::CARRIER_NON_STOP_DELIVERY => 'Non Stop Delivery',
 			Carrier::CARRIER_UPS => 'UPS',
@@ -155,74 +154,7 @@ class Booking
 			Carrier::CARRIER_ATS => 'ATS',
 			Carrier::CARRIER_WAYFAIR_CARRIER => 'Wayfair Carrier',
 			Carrier::CARRIER_AMAZON_CARRIER => 'Amazon Carrier',
-		);
-	}
-
-	public static function getDefaultBookingBol(BookingEntity $booking)
-	{
-		$url = self::BASE_WEBSITE_ADDRESS.$booking->getCarrier()->getId()."/{$booking->getOrderReference()}/bol";
-//		$carrierCode = $booking->getCarrier()->getCode();
-//		switch ($booking->getCarrierId()) {
-//			case Carrier::CARRIER_FEDEX:
-//				$url .= "FEDEX/bols/FEDEX-BOL-{$booking->getOrderReference()}.xlsx";
-//				break;
-//			case Carrier::CARRIER_MACTRAN:
-//				$url .= "MAC/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
-//				break;
-//			case Carrier::CARRIER_CEVA_LOGISTICS:
-//				$url .= "CE/bols/CEVABOL-{$booking->getOrderReference()}-{$booking->getOrderNumber()}.xlsx";
-//				break;
-//			case Carrier::CARRIER_VITRAN:
-//				$url .= "VIT/bols/VIT-BOL-{$booking->getOrderReference()}.pdf";
-//				break;
-//			default:
-//				$url .= "{$carrierCode}/bols/{$carrierCode}-BOL-{$booking->getOrderReference()}.xlsx";
-//				break;
-//		}
-//		return $url;
-
-		return self::isLinkExist($url) ? $url : null;
-	}
-
-	/**
-	 * return if link exist
-	 *
-	 * @param string $link
-	 * @return bool
-	 */
-	private static function isLinkExist($link)
-	{
-		$file_headers = @get_headers($link);
-		if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'||$file_headers[0]=='HTTP/1.1 503 Backend fetch failed') {
-			$exists = false;
-		} else {
-			$exists = true;
-		}
-		return $exists;
-	}
-
-	public static function getDefaultBookingLabel(BookingEntity $booking)
-	{
-//		$url = self::BASE_WEBSITE_ADDRESS;
-//		switch ($booking->getCarrierId()) {
-//			case Carrier::CARRIER_FEDEX:
-//				$url .= "FEDEX/label/{$booking->getOrderReference()}.zip";
-//				break;
-//			case Carrier::CARRIER_MACTRAN:
-//				return null;
-//				break;
-//			case Carrier::CARRIER_CEVA_LOGISTICS:
-//				return null;
-//				break;
-//			case Carrier::CARRIER_VITRAN:
-//				return null;
-//				break;
-//			default:
-//				return null;
-//				break;
-//		}
-		$url = self::BASE_WEBSITE_ADDRESS.$booking->getCarrier()->getId()."/{$booking->getOrderReference()}/label";
-		return self::isLinkExist($url) ? $url : null;
+		];
 	}
 
 	/**
@@ -232,8 +164,7 @@ class Booking
 	 *
 	 * @return     string  Human readable text.
 	 */
-	public
-	static function bookingOrderTypeName($orderTypeId)
+	public static function bookingOrderTypeName($orderTypeId)
 	{
 		return isset(self::bookingOrderTypeList()[$orderTypeId]) ? self::bookingOrderTypeList()[$orderTypeId] : 'Unknown';
 	}
@@ -243,29 +174,27 @@ class Booking
 	 *
 	 * @return     array  Available order types.
 	 */
-	public
-	static function bookingOrderTypeList()
+	public static function bookingOrderTypeList()
 	{
-		return array(
+		return [
 			BookingEntity::TYPE_CARRIER_ORDER => 'Carrier Order',
 			BookingEntity::TYPE_PICKUP_ORDER => 'Pickup Order',
 			BookingEntity::TYPE_TRANSFER => 'Transfer (Forward)',
-		);
+		];
 	}
 
 	/**
 	 * Creates a user and returns it.
 	 *
-	 * @param string $orderNumber
-	 * @param string $orderReference
-	 * @param int $orderType
-	 * @param int $carrierId
+	 * @param string    $orderNumber
+	 * @param string    $orderReference
+	 * @param int       $orderType
+	 * @param int       $carrierId
 	 * @param \DateTime $futureShip
 	 *
 	 * @return BookingInterface
 	 */
-	public
-	function create($orderNumber, $orderReference, $orderType, $carrierId, $futureShip = NULL)
+	public function create($orderNumber, $orderReference, $orderType, $carrierId, $futureShip = NULL)
 	{
 		#$manipulator = $this->getContainer()->get('app.booking');
 
@@ -299,8 +228,7 @@ class Booking
 	 *
 	 * @return     <type>                                  ( description_of_the_return_value )
 	 */
-	public
-	function bookingProductPickedQty(BookingProductEntity $bookingProduct)
+	public function bookingProductPickedQty(BookingProductEntity $bookingProduct)
 	{
 		return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getPickedQtyByBookingProduct($bookingProduct);
 	}
@@ -312,8 +240,7 @@ class Booking
 	 *
 	 * @return     boolean  ( description_of_the_return_value )
 	 */
-	public
-	function bookingIsFillable(BookingEntity $booking)
+	public function bookingIsFillable(BookingEntity $booking)
 	{
 		$fillable_products = 0;
 		foreach ($booking->getProducts() as $bookingProduct) {
@@ -332,8 +259,7 @@ class Booking
 	 *
 	 * @return     integer  ( description_of_the_return_value )
 	 */
-	public
-	function bookingProductQuantityTotal(\WarehouseBundle\Entity\Booking $booking)
+	public function bookingProductQuantityTotal(\WarehouseBundle\Entity\Booking $booking)
 	{
 		$qty = 0;
 		foreach ($booking->getProducts() as $bookingProduct) {
@@ -349,8 +275,7 @@ class Booking
 	 *
 	 * @return     <type>  ( description_of_the_return_value )
 	 */
-	public
-	function formatContactAddress(BookingContact $contact)
+	public function formatContactAddress(BookingContact $contact)
 	{
 		return ($contact->getCompany() ? $contact->getCompany() . "\n" . 'c/o ' .
 				$contact->getName() . "\n" : 'c/o ' . $contact->getName() . "\n") .
@@ -366,8 +291,7 @@ class Booking
 	 *
 	 * @return     <type>  ( description_of_the_return_value )
 	 */
-	public
-	function bookingProductStatusName($statusId)
+	public function bookingProductStatusName($statusId)
 	{
 		return isset($this->bookingProductStatusList()[$statusId]) ? $this->bookingProductStatusList()[$statusId] : 'Unknown';
 	}
@@ -377,23 +301,21 @@ class Booking
 	 *
 	 * @return     array  Available order types.
 	 */
-	public
-	static function bookingProductStatusList()
+	public static function bookingProductStatusList()
 	{
-		return array(
+		return [
 			BookingProductEntity::STATUS_DELETED => 'Cancelled/Deleted/Invisible',
 			BookingProductEntity::STATUS_PENDING => 'Pending',
 			BookingProductEntity::STATUS_IN_PROGRESS => 'In Progress',
 			BookingProductEntity::STATUS_PICKED => 'Picked',
 			//4 => 'Closed',
-		);
+		];
 	}
 
 	/**
 	 * @return Request
 	 */
-	private
-	function getRequest()
+	private function getRequest()
 	{
 		return $this->requestStack->getCurrentRequest();
 	}

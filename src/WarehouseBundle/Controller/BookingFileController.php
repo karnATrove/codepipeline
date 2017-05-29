@@ -15,6 +15,7 @@ use Pagerfanta\View\TwitterBootstrap3View;
 
 use Timestampable\Fixture\Document\Book;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Manager\BookingManager;
 use WarehouseBundle\Utils\Booking as BookingUtility;
 use WarehouseBundle\Entity\BookingFile;
 use WarehouseBundle\Entity\BookingLog;
@@ -47,8 +48,8 @@ class BookingFileController extends Controller
 			array('action' => $this->generateUrl('file_new', array('id' => $booking->getId())), 'method' => 'POST'));
 		$form->handleRequest($request);
 
-		$defaultBol = BookingUtility::getDefaultBookingBol($booking);
-		$defaultLabel = BookingUtility::getDefaultBookingLabel($booking);
+		$defaultBol = BookingManager::getDefaultBookingBol($booking);
+		$defaultLabel = BookingManager::getDefaultBookingLabel($booking);
 		if (!$request->isXmlHttpRequest()) {
 			// If not ajax request, return the actual form on the booking edit page
 			return $this->render('WarehouseBundle:BookingFile:form_panel.html.twig', array(

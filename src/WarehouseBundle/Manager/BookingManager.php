@@ -12,11 +12,16 @@ use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemLocationDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemOrder;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Exception\Utils\UrlFileNotFoundException;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryItemModel;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryModel;
+use WarehouseBundle\Utils\DownloadUtility;
+use WarehouseBundle\Utils\FileUtility;
 
 class BookingManager
 {
+	const BASE_WEBSITE_ADDRESS = "https://www.roveconcepts.com/remote/c9c078d09dbfa23992cb150ccadc238f/carrier/downloads/";
+
 	private $bookingRepository;
 	private $em;
 
@@ -31,17 +36,17 @@ class BookingManager
 		$this->bookingRepository = $this->em->getRepository('WarehouseBundle:Booking');
 	}
 
+	/**
+	 * @param $status
+	 *
+	 * @return \Doctrine\ORM\QueryBuilder
+	 */
 	public function getAllBookingByStatusQueryBuilder($status)
 	{
 		$queryBuilder = $this->bookingRepository->createQueryBuilder('e');
 		$queryBuilder->andWhere('e.status <> :status');
 		$queryBuilder->setParameter('status', $status);
 		return $queryBuilder;
-	}
-
-	public function getQueryBuilderForBooking()
-	{
-
 	}
 
 	/**
@@ -84,24 +89,14 @@ class BookingManager
 	}
 
 	/**
-	 * @param array $idList
-	 *
-	 * @return Booking[]
-	 */
-	public function getBookingByIdList(array $idList)
-	{
-		return $this->bookingRepository->findBookingByIds($idList);
-	}
-
-	/**
-	 * @param Booking[] $bookingList
+	 * @param Booking[] $bookings
 	 *
 	 * @return array
 	 */
-	public function getDistinctSkuQuantityByBookingList(array $bookingList)
+	public function getDistinctSkuQuantityByBookingList(array $bookings)
 	{
 		$skuList = [];
-		foreach ($bookingList as $booking) {
+		foreach ($bookings as $booking) {
 			foreach ($booking->getProducts() as $bookingProduct) {
 				$sku = $bookingProduct->getProduct()->getModel();
 				if (!isset($skuList[$sku])) {
@@ -115,13 +110,13 @@ class BookingManager
 	}
 
 	/**
-	 * @param array $orderIds
+	 * @param array $bookingIds
 	 *
 	 * @return PickSummaryModel
 	 */
-	public function getPickSummaryModel(array $orderIds): PickSummaryModel
+	public function getPickSummaryModel(array $bookingIds): PickSummaryModel
 	{
-		$data = $this->bookingRepository->pickingSummaryByBookingIds($orderIds);
+		$data = $this->bookingRepository->pickingSummaryByBookingIds($bookingIds);
 		$pickSummary = $this->denormalizePickSummaryModel($data);
 		return $pickSummary;
 	}
@@ -213,5 +208,75 @@ class BookingManager
 		}
 		$pickSummaryDTO = new PickSummaryDTO($pickSummaryItems);
 		return $pickSummaryDTO;
+	}
+
+	/**
+	 * @param array $bookingIds
+	 * @param       $dir
+	 */
+	public function downloadBookingDocs(array $bookingIds, $dir, $zipDir = null)
+	{
+		if (empty($bookingIds)) {
+			throw new Exception('No booking ids provided');
+		}
+
+		$bookings = $this->getBookingByIdList($bookingIds);
+		foreach ($bookings as $booking) {
+			$bolUrl = self::getDefaultBookingLabel($booking);
+			$labelUrl = self::getDefaultBookingBol($booking);
+			if (!empty($bolUrl)) {
+				try {
+					DownloadUtility::downloadFileFromUrl($bolUrl, $dir);
+				} catch (UrlFileNotFoundException $exception) {
+				}
+			}
+			if (!empty($labelUrl)) {
+				try {
+					DownloadUtility::downloadFileFromUrl($labelUrl, $dir);
+				} catch (UrlFileNotFoundException $exception) {
+				}
+			}
+		}
+		if (FileUtility::isDirEmpty($dir)) {
+			throw new Exception('No file need to be download');
+		}
+		$zipDir = $zipDir ?? $dir . '.zip';
+		FileUtility::zip($dir, $zipDir);
+	}
+
+	/**
+	 * @param array $bookingIds
+	 *
+	 * @return Booking[]
+	 */
+	public function getBookingByIdList(array $bookingIds)
+	{
+		return $this->bookingRepository->findBookingByIds($bookingIds);
+	}
+
+	/**
+	 * booking label from rove
+	 *
+	 * @param Booking $booking
+	 *
+	 * @return null|string
+	 */
+	public static function getDefaultBookingLabel(Booking $booking)
+	{
+		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/label";
+		return DownloadUtility::isLinkExist($url) ? $url : null;
+	}
+
+	/**
+	 * booking bol from rove
+	 *
+	 * @param Booking $booking
+	 *
+	 * @return null|string
+	 */
+	public static function getDefaultBookingBol(Booking $booking)
+	{
+		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/bol";
+		return DownloadUtility::isLinkExist($url) ? $url : null;
 	}
 }

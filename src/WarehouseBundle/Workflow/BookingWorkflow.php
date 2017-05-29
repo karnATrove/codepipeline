@@ -5,14 +5,17 @@ namespace WarehouseBundle\Workflow;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Utils\FileUtility;
 
 class BookingWorkflow
 {
 	const BULK_ACTION_TYPE_RENDER_PDF = "RENDER_PDF";
+	const BULK_ACTION_TYPE_RETURN = "RETURN";
 
 	private $bookingManager;
 	/** @var EntityManagerInterface $em */
@@ -64,6 +67,10 @@ class BookingWorkflow
 			case BulkAction::ACTION_PICK_SUMMARY:
 				$responseData = $this->handlePickSummary($bookingIds);
 				$action = self::BULK_ACTION_TYPE_RENDER_PDF;
+				break;
+			case BulkAction::ACTION_PRINT_WITH_DOCUMENTS:
+				$responseData = $this->downloadDocuments($bookingIds);
+				$action = self::BULK_ACTION_TYPE_RETURN;
 				break;
 			default:
 				throw new \Exception('Not implemented');
@@ -142,4 +149,28 @@ class BookingWorkflow
 		}
 		return $unavailableBooking;
 	}
+
+	/**
+	 * @param $bookingIdList
+	 *
+	 * @return Response
+	 */
+	public function downloadDocuments($bookingIdList)
+	{
+		$dir = "temp/booking_documents_" . $this->container->get('security.token_storage')->getToken()->getUsername()
+			. "_" . date('YmdHis');
+		mkdir($dir, 0777, true);
+		$zipDir = $dir . '.zip';
+		$this->bookingManager->downloadBookingDocs($bookingIdList, $dir, $zipDir);
+		$content = file_get_contents($zipDir);
+		$response = new Response();
+		//set headers
+		$response->headers->set('Content-Type', 'application/zip');
+		$response->headers->set('Content-Disposition', 'attachment;filename="' . basename($zipDir));
+		$response->setContent($content);
+		FileUtility::recursiveRemoveDirectory($dir);
+		unlink($zipDir);
+		return $response;
+	}
+
 }

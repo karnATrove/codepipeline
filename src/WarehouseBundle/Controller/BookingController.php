@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use WarehouseBundle\DTO\AjaxResponse\AjaxCommand;
-use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
-use WarehouseBundle\DTO\AjaxResponse\ResponseDTO;
 use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
@@ -380,6 +377,8 @@ class BookingController extends Controller
 				case BookingWorkflow::BULK_ACTION_TYPE_RENDER_PDF:
 					return new Response($responseData, 200);
 					break;
+				case BookingWorkflow::BULK_ACTION_TYPE_RETURN:
+					return $responseData;
 				default:
 					break;
 			}
@@ -512,5 +511,18 @@ class BookingController extends Controller
 		return new Response($html, 200);
 	}
 
-	
+	/**
+	 * @param $ids
+	 * @Route("/download-documents", name="booking_download_documents")
+	 */
+	public function downloadDocumentsAction(Request $request)
+	{
+		$ids = $request->get('ids');
+		if (empty($ids)) {
+			throw $this->createNotFoundException("booking not found");
+		}
+		$bookingIdList = explode(',', $ids);
+		$response = $this->get('warehouse.work_flow.booking_work_flow')->downloadDocuments($bookingIdList);
+		return $response;
+	}
 }
