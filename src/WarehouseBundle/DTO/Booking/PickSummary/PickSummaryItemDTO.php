@@ -27,7 +27,7 @@ class PickSummaryItemDTO
 	/**
 	 * @return string
 	 */
-	public function getSku(): ?string
+	public function getSku()
 	{
 		return $this->sku;
 	}
@@ -43,7 +43,7 @@ class PickSummaryItemDTO
 	/**
 	 * @return int
 	 */
-	public function getBoxCount(): ?int
+	public function getBoxCount()
 	{
 		return $this->boxCount;
 	}
@@ -91,7 +91,7 @@ class PickSummaryItemDTO
 	/**
 	 * @return string
 	 */
-	public function getDescription(): ?string
+	public function getDescription()
 	{
 		return $this->description;
 	}

@@ -140,7 +140,7 @@ class BookingManager
 	 *
 	 * @return null|PickSummaryDTO
 	 */
-	public function getPickSummaryDTO(PickSummaryModel $pickSummaryModel): ?PickSummaryDTO
+	public function getPickSummaryDTO(PickSummaryModel $pickSummaryModel)
 	{
 		$pickSummaryItems = [];
 		$processedLog = [];
