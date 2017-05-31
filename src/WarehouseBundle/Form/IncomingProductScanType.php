@@ -110,7 +110,7 @@ class IncomingProductScanType extends AbstractType
 		$locations = $this->em->getRepository('WarehouseBundle:Location')->findAll();
 		$selection = [];
 		foreach ($locations as $location) {
-			$selection[$location->getId()] = $location->printLocation();
+			$selection[$location->printLocation()] = $location->getId();
 		}
 		$this->locationSelection = $selection;
 		return $selection;
