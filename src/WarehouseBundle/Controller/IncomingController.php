@@ -201,6 +201,7 @@ class IncomingController extends Controller
         $imports = 0;
 
         # First loop for creating non existing products
+        $queued_products = array(); # Insert only once
         foreach($sheetData as $row => $data) {
             if (is_numeric($data['A'])) { # Indicates the entry row number
                 $model = strtoupper(trim($data['B']));
@@ -215,7 +216,7 @@ class IncomingController extends Controller
 
                 # Find the product
                 $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
-                if (!$product) {
+                if (!$product && !in_array($model,$queued_products)) {
                     # Create new product
                     $product = (new Product())->setUser($this->getUser())
                         ->setModel($model)
@@ -225,6 +226,7 @@ class IncomingController extends Controller
                         ->setDimUnits('in') # default inches
                         ->setWeightUnits('lbs') # default lbs
                         ->setQtyPerCarton(intval($qty) / intval($ctns));
+                    $queued_products[] = $model;
                     $em->persist($product);
 
                     $this->get('session')->getFlashBag()->add('success', "Created new product (".$model.'").' );
