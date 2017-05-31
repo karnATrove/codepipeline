@@ -23,7 +23,7 @@ use WarehouseBundle\Form\LocationType;
 #http://codemonkeys.be/2013/01/ajaxify-your-symfony2-forms-with-jquery/
 
 /**
- * Booking controller.
+ * Location controller.
  *
  * @Route("/location")
  */
@@ -49,6 +49,38 @@ class LocationController extends Controller
 			'filterForm' => $filterForm->createView(),
 
 		));
+	}
+
+	/**
+	 * Lists all Location entities.
+	 *
+	 * @Route("/batchinsert", name="batchinsert")
+	 * @Method("GET")
+	 */
+	public function batchInsertAction(Request $request)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$queryBuilder = $em->getRepository('WarehouseBundle:Location')->createQueryBuilder('e');
+
+		$aisles = ['A','B','C','D','E','F','G','H','I'];
+		$aisles = ['J','K'];
+		$num_rows = TRUE ? 21 : 27;
+		foreach($aisles as $a) {
+			for($x=1;$x<=$num_rows;$x++) {
+				$ent = (new Location())
+					->setAisle($a)
+					->setRow($x)
+					->setLevel(1)
+					->setUser($this->getUser())
+					->setCreated(new \DateTime('now'));
+				$em->persist($ent);
+				$em->flush();
+			}
+		}
+
+		$this->get('session')->getFlashBag()->add('success', "Successfully added batch locations." );
+
+		return $this->redirect($this->generateUrl('location'));
 	}
 
 	/**

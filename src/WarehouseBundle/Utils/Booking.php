@@ -23,7 +23,7 @@ class Booking
 	private $container;
 
 	/**
-	 * User manager.
+	 * Booking manager.
 	 *
 	 * @var BookingManagerInterface
 	 */
@@ -180,11 +180,12 @@ class Booking
 			BookingEntity::TYPE_CARRIER_ORDER => 'Carrier Order',
 			BookingEntity::TYPE_PICKUP_ORDER => 'Pickup Order',
 			BookingEntity::TYPE_TRANSFER => 'Transfer (Forward)',
+			BookingEntity::TYPE_PICKONLY => 'Pick Only',
 		];
 	}
 
 	/**
-	 * Creates a user and returns it.
+	 * Creates a booking and returns it.
 	 *
 	 * @param string    $orderNumber
 	 * @param string    $orderReference

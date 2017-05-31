@@ -34,6 +34,7 @@ class Booking implements BookingInterface
 	const TYPE_CARRIER_ORDER = 1;
 	const TYPE_PICKUP_ORDER = 2;
 	const TYPE_TRANSFER = 3;
+	const TYPE_PICKONLY = 4;
 
 	//endregion
 

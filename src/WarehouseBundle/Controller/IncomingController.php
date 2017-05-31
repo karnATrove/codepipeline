@@ -379,9 +379,24 @@ class IncomingController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
+            # Remove incoming products scans before being able to delete incoming container
+            foreach($incoming->getIncomingScannedProducts() as $scannedProduct) {
+                $em->remove($scannedProduct);
+            }
+
             # Remove incoming products before being able to delete incoming container
             foreach($incoming->getIncomingProducts() as $incomingProduct) {
                 $em->remove($incomingProduct);
+            }
+
+            # Remove incoming comments before being able to delete incoming container
+            foreach($incoming->getComments() as $comment) {
+                $em->remove($comment);
+            }
+
+            # Remove incoming files before being able to delete incoming container
+            foreach($incoming->getFiles() as $file) {
+                $em->remove($file);
             }
 
             $em->remove($incoming);
@@ -469,9 +484,25 @@ class IncomingController extends Controller
 
                 foreach ($ids as $id) {
                     $incoming = $repository->find($id);
+
+                    # Remove incoming products scans before being able to delete incoming container
+                    foreach($incoming->getIncomingScannedProducts() as $scannedProduct) {
+                        $em->remove($scannedProduct);
+                    }
+
                     # Remove incoming products before being able to delete incoming container
                     foreach($incoming->getIncomingProducts() as $incomingProduct) {
                         $em->remove($incomingProduct);
+                    }
+
+                    # Remove incoming comments before being able to delete incoming container
+                    foreach($incoming->getComments() as $comment) {
+                        $em->remove($comment);
+                    }
+
+                    # Remove incoming files before being able to delete incoming container
+                    foreach($incoming->getFiles() as $file) {
+                        $em->remove($file);
                     }
 
                     $em->remove($incoming);

@@ -6,13 +6,18 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+
+use WarehouseBundle\Model\ProductInterface;
+
 /**
  * Product
  * @Gedmo\Loggable
  * @ORM\Table(name="warehouse_product")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\ProductRepository")
  */
-class Product
+class Product implements ProductInterface
 {
     /**
      * @var int

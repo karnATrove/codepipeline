@@ -2,6 +2,12 @@
 namespace WarehouseBundle\Utils;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use WarehouseBundle\Model\ProductInterface;
+use WarehouseBundle\Model\ProductManagerInterface;
+use WarehouseBundle\Entity\Product as ProductEntity;
+use WarehouseBundle\Entity\LocationProduct as LocationProductEntity;
 
 class Product
 {
@@ -10,14 +16,86 @@ class Product
 	 */
 	private $container;
 
+    /**
+     * Product manager.
+     *
+     * @var ProductManagerInterface
+     */
+    private $productManager;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
 	/**
 	 * Make this utility container-aware (adding availaiblity of doctrine for example)
 	 *
 	 * @param      <type>  $container  The container
 	 */
-	public function __construct(Container $container) {
+	public function __construct(Container $container,ProductManagerInterface $productManager, RequestStack $requestStack) {
 		$this->container = $container;
+        $this->productManager = $productManager;
+        $this->requestStack = $requestStack;
 	}
+
+    /**
+     * Creates a product and returns it.
+     *
+     * @param string $model
+     * @param string $description
+     * @param int $qtyPerCarton
+     * @param float $length
+     * @param float $width
+     * @param float $height
+     * @param string $dimUnits
+     * @param float $weight
+     * @param string $weightUnits
+     * @param int $status
+     *
+     * @return ProductInterface
+     */
+    public function create($model, $description, $qtyPerCarton, $length, $width, $height, $dimUnits, $weight, $weightUnits, $status)
+    {
+        #$manipulator = $this->getContainer()->get('app.booking');
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        if (get_class($user) !== 'WarehouseBundle\Entity\User') {
+            $user = NULL;
+        }
+
+        $product = $this->productManager->createProduct();
+        $product->setModel($model);
+        $product->setDescription($description);
+        $product->setQtyPerCarton($qtyPerCarton?$qtyPerCarton:1);
+        $product->setLength($length);
+        $product->setWidth($width);
+        $product->setHeight($height);
+        $product->setDimUnits($dimUnits?$dimUnits:'in');
+        $product->setWeight($weight);
+        $product->setWeightUnits($weightUnits?$weightUnits:'lbs');
+        $product->setStatus($status?$status:ProductEntity::PRODUCT_STATUS_ACTIVE);
+        $product->setUser($user);
+
+        # Validate that the product does not already exist
+        if ($this->productManager->validateExists($product)) {
+            if (FALSE) {
+                # We can optionally update the product...
+                $original = $this->productManager->findByModel($product->getModel());
+                $product->setId($original->getId()); # Swap the id
+            } else {
+                return $this->productManager->findByModel($product->getModel());
+            }
+        }
+
+        # Create product if it does not exist.
+        $this->productManager->updateProduct($product);
+
+        # Use below if we ever use EventDispatching
+        #$event = new ProductEvent($product, $this->getRequest());
+        #$this->dispatcher->dispatch(WarehouseProductEvents::PRODUCT_CREATED, $event);
+
+        return $product;
+    }
 
     /**
      * Get on hand from Locations

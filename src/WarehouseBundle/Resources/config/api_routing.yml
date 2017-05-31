@@ -4,6 +4,12 @@ service_token:
     resource: WarehouseBundle\Controller\TokenRestController
     name_prefix:  api_1_ # naming collision
 
+service_product:
+    type: rest
+    prefix: /v1
+    resource: WarehouseBundle\Controller\ProductRestController
+    name_prefix:  api_1_ # naming collision
+
 service_booking:
     type: rest
     prefix: /v1

@@ -13,7 +13,7 @@ services:
         arguments: ["@service_container","@BookingManager","@request_stack"]
     app.product:
         class: WarehouseBundle\Utils\Product
-        arguments: ["@service_container"]
+        arguments: ["@service_container","@ProductManager","@request_stack"]
     app.document_uploader:
         class: WarehouseBundle\Utils\BookingFile
         arguments: ['%documents_directory%']
