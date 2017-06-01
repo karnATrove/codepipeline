@@ -153,12 +153,12 @@ class BookingManager extends BaseBookingManager
             ->setLocation($locationProduct->getLocation())
             ->setBookingProduct($bookingProduct)
             ->setQty($qty_picked)
-            ->setUser($this->container->get('security.context')->getToken()->getUser());
+            ->setUser($this->container->get('security.token_storage')->getToken()->getUser());
         $this->objectManager->persist($bookingProductLocation);
         $this->objectManager->flush();
 
         # Reduce the location quantity
-        $em = $this->container->get('doctrine')->getEntityManager();
+        $em = $this->container->get('doctrine.orm.entity_manager');
         if ($locationProduct->getOnHand() - $qty_picked <= 0) {
             # Remove empty location product
             $em->remove($locationProduct);

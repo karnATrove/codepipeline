@@ -54,8 +54,8 @@ class BookingProductController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
-    
-    
+
+
 
     /**
      * Deletes an BookingProduct entity.
@@ -110,7 +110,7 @@ class BookingProductController extends Controller
      */
     public function deleteByIdAction(BookingProduct $bookingProduct){
         $em = $this->getDoctrine()->getManager();
-        
+
         try {
             $bookingManager = $this->get('BookingManager');
             $bookingManager->deleteBookingProduct($bookingProduct);
@@ -128,7 +128,7 @@ class BookingProductController extends Controller
         return $this->redirect($this->generateUrl('bookingProduct'));
 
     }
-    
+
 
     /**
     * Bulk Action
