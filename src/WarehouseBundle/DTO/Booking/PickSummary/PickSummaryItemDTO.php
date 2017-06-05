@@ -119,6 +119,4 @@ class PickSummaryItemDTO
 	{
 		$this->orders = $orders;
 	}
-
-
 }

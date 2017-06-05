@@ -123,12 +123,17 @@ class BookingWorkflow
 		}
 		$pickSummaryModel = $this->bookingManager->getPickSummaryModel($bookingIds);
 		$pickSummaryDTO = $this->bookingManager->getPickSummaryDTO($pickSummaryModel);
+		BookingManager::validatePickSummaryDto($pickSummaryDTO);
+		$viewData = BookingManager::formatPickSummaryForView($pickSummaryDTO);
 		return $this->templating->render('booking/pdf/pick_summary.html.twig', [
 			'bookings' => $bookings,
-			'pickSummary' => $pickSummaryDTO]);
+			'viewData' => $viewData
+		]);
 	}
 
 	/**
+	 * can only validate for each order, not working for two order ordered same item
+	 *
 	 * @param Booking[] $bookings
 	 *
 	 * @return array

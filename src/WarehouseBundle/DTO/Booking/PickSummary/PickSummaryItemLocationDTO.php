@@ -19,6 +19,27 @@ class PickSummaryItemLocationDTO
 	/**
 	 * @return mixed
 	 */
+	public function getQuantity()
+	{
+		return $this->quantity;
+	}
+
+	/**
+	 * @param mixed $quantity
+	 */
+	public function setQuantity($quantity)
+	{
+		$this->quantity = $quantity;
+	}
+
+	public function __toString()
+	{
+		return $this->getAisle() . '-' . $this->getRow() . '-' . $this->getLevel();
+	}
+
+	/**
+	 * @return mixed
+	 */
 	public function getAisle()
 	{
 		return $this->aisle;
@@ -64,20 +85,7 @@ class PickSummaryItemLocationDTO
 		$this->level = $level;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	public function getQuantity()
-	{
-		return $this->quantity;
+	public function printLocation(){
+		return $this->getAisle(). ' - '. $this->getRow(). ' - '. $this->getLevel();
 	}
-
-	/**
-	 * @param mixed $quantity
-	 */
-	public function setQuantity($quantity)
-	{
-		$this->quantity = $quantity;
-	}
-
 }

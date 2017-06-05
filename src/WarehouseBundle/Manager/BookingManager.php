@@ -12,6 +12,7 @@ use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemLocationDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemOrder;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Exception\Utils\UrlFileNotFoundException;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryItemModel;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryModel;
@@ -34,6 +35,52 @@ class BookingManager
 	{
 		$this->em = $entityManager;
 		$this->bookingRepository = $this->em->getRepository('WarehouseBundle:Booking');
+	}
+
+	public static function formatPickSummaryForView(PickSummaryDTO $pickSummaryDTO)
+	{
+		$resp = [];
+		foreach ($pickSummaryDTO->getItems() as $item) {
+			$sku = $item->getSku();
+			$sizeOfOrders = sizeof($item->getOrders());
+			$sizeOfLocations = sizeof($item->getItemLocations());
+			$loop = $sizeOfOrders > $sizeOfLocations ? $sizeOfOrders : $sizeOfLocations;
+
+			$orderList = [];
+			foreach ($item->getOrders() as $order){
+				$orderList[]=$order;
+			}
+
+			$locationList = [];
+			foreach ($item->getItemLocations() as $location){
+				$locationList[]=$location;
+			}
+
+
+			for ($i = 0; $i < $loop; $i++) {
+				$order = isset($orderList[$i])?$orderList[$i]:null;
+				$location = isset($locationList[$i])?$locationList[$i]:null;
+				if ($i == 0) {
+					$resp[] = ['sku' => $sku,
+						'description' => $item->getDescription(),
+						'qty' => $item->getOrderedQuantity() . "({$item->getBoxCount()})",
+						'detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}",
+						'location' => $location->printLocation(),
+						'stockLevel' => $location->getQuantity(),
+					];
+				} else {
+					if ($order) {
+						$resp[$i] = ['detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}"];
+					}
+					if ($location) {
+						$resp[$i] = [
+							'location' => $location->printLocation(),
+							'stockLevel' => $location->getQuantity(),];
+					}
+				}
+			}
+		}
+		return $resp;
 	}
 
 	/**
@@ -184,6 +231,28 @@ class BookingManager
 			}
 		}
 		return $this->denormalizePickSummaryDTO($pickSummaryItems);
+	}
+
+
+	public static function validatePickSummaryDto(PickSummaryDTO $pickSummaryDTO){
+		$error='';
+		foreach ($pickSummaryDTO->getItems() as $pickSummaryItemDTO){
+			$orderNumbers="";
+			foreach ($pickSummaryItemDTO->getOrders() as $order){
+				$orderNumbers.="#{$order->getOrderNumber()} ";
+			}
+			$totalOrderedQuantity = $pickSummaryItemDTO->getOrderedQuantity();
+			$stockCount=0;
+			foreach ($pickSummaryItemDTO->getItemLocations() as $location){
+				$stockCount+=$location->getQuantity();
+			}
+			if ($totalOrderedQuantity>$stockCount){
+				$error.="Not enough quantity for order {$orderNumbers}";
+			}
+		}
+		if (!empty($error)){
+			throw new BookingManagerException('Error',$error);
+		}
 	}
 
 	/**

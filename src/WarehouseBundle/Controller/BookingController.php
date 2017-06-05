@@ -23,6 +23,7 @@ use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Enum\SessionEnum;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Form\BookingFilterType;
+use WarehouseBundle\Manager\BookingManager;
 use WarehouseBundle\Utils\Booking as BookingUtility;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Workflow\BookingWorkflow;
@@ -505,9 +506,10 @@ class BookingController extends Controller
 		$pickSummaryModel = $this->get('warehouse.manager.booking_manager')->getPickSummaryModel($bookingIdList);
 		$pickSummaryDTO = $this->get('warehouse.manager.booking_manager')->getPickSummaryDTO($pickSummaryModel);
 		$bookings = $this->get('warehouse.manager.booking_manager')->getBookingByIdList($bookingIdList);
+		$viewData = BookingManager::formatPickSummaryForView($pickSummaryDTO);
 		$html = $this->renderView('booking/pdf/pick_summary.html.twig', [
 			'bookings' => $bookings,
-			'pickSummary' => $pickSummaryDTO]);
+			'viewData' => $viewData]);
 		return new Response($html, 200);
 	}
 
