@@ -22,14 +22,18 @@ services:
       class: WarehouseBundle\Doctrine\ProductManager
       arguments: [ "@doctrine.orm.entity_manager" , "@service_container" ]
     warehouse.manager.booking_manager:
-      class: WarehouseBundle\Manager\BookingManager
-      arguments: ['@doctrine.orm.entity_manager']
+        class: WarehouseBundle\Manager\BookingManager
+        arguments: ['@doctrine.orm.entity_manager']
     warehouse.manager.product_manager:
-      class: WarehouseBundle\Manager\ProductManager
-      arguments: ['@doctrine.orm.entity_manager']
+        class: WarehouseBundle\Manager\ProductManager
+        arguments: ['@doctrine.orm.entity_manager']
     warehouse.manager.user_manager:
         class: WarehouseBundle\Manager\UserManager
         arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.user_group_manager:
+        class: WarehouseBundle\Manager\UserGroupManager
+        arguments: ['@doctrine.orm.entity_manager']
+
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
       arguments: ['@service_container']

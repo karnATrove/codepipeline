@@ -31,7 +31,22 @@ class UserManager
 	/**
 	 * @return array|User[]
 	 */
-	public function getAllUsers(){
+	public function getAllUsers()
+	{
 		return $this->userRepository->findAll();
+	}
+
+	/**
+	 * @param User                        $user
+	 * @param EntityManagerInterface|null $entityManager
+	 */
+	public function updateUser(User $user, EntityManagerInterface $entityManager = null)
+	{
+		$flush = $entityManager ? false : true;
+		$entityManager = $entityManager ? $entityManager : $this->entityManager;
+		$entityManager->persist($user);
+		if ($flush) {
+			$entityManager->flush();
+		}
 	}
 }

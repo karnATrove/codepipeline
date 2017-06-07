@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,6 +15,7 @@ use WarehouseBundle\Entity\User;
  * User controller.
  *
  * @Route("/user")
+ * @Security("has_role('ROLE_ADMIN')")
  */
 class UserController extends Controller
 {
@@ -53,8 +55,8 @@ class UserController extends Controller
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			$user->setRoles([User::ROLE_SUPER_ADMIN]);
-			$userManager->updateUser($user);
+			$userGroupIds = $form->get('userGroup')->getData();
+			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
 			return $this->redirectToRoute('user_view', ['id' => $user->getId()]);
 		}
 		return $this->render('user/user_create.html.twig', [
@@ -72,7 +74,8 @@ class UserController extends Controller
 		$form = $this->get('warehouse.workflow.user_workflow')->makeUserCreateEditForm($user);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
-			$userManager->updateUser($user);
+			$userGroupIds = $form->get('userGroup')->getData();
+			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
 		}
 		return $this->render('user/user_edit.html.twig', [
 			'form' => $form->createView()
