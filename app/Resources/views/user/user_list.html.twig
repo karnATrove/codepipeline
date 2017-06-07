@@ -1,16 +1,11 @@
 {% extends 'WarehouseBundle::layout.html.twig' %}
-{% block page_title %}
+{% block title %}
     Users
 {% endblock %}
 
 {% block body %}
     {#<a href="{{ path('admin_user_create') }}" class="btn btn-success pull-right">#}
         {#<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</a>#}
-
-    {{ form_start(form, { 'attr': {'class': 'form-inline'} }) }}
-    {{ form_errors(form.search) }}
-    {{ form_widget(form.search, { 'attr': {'class': 'form-control', 'id':'search_input'} }) }}
-    {{ form_end(form) }}
 
     <table class="table table-striped table-hover">
         <thead>

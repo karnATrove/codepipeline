@@ -18,32 +18,67 @@ use WarehouseBundle\Entity\User;
 class UserTestController extends Controller
 {
 	/**
-	 * @Route("/", name="admin_user_list")
+	 * @Route("/", name="user_list")
 	 */
 	public function indexAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
-		/** @var User[] $users */
-		$users = $em->getRepository('WarehouseBundle:User')->findAll();
-
-		$selection = [];
-		foreach ($users as $user) {
-			$selection[$user->getEmail()] = $user->getId();
-		}
-
-		$form = $this->createFormBuilder()
-			->add('search', ChoiceType::class, array(
-				'choices' => $selection,
-				'placeholder' => 'Search by email',
-			))
-			->getForm();
-
-		// replace this example code with whatever you need
+		$users = $this->container->get('warehouse.manager.user_manager')->getAllUsers();
 		return $this->render('user/user_list.html.twig', [
-			'users' => $users,
-			'form' => $form->createView()
+			'users' => $users
 		]);
 	}
 
+	/**
+	 * @Route("/users/view/{id}", name="user_view")
+	 */
+	public function viewAction($id)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$user = $em->getRepository('AppBundle:User')->find($id);
 
+		if (!$user) {
+			throw new Exception('not found');
+		}
+
+		return $this->render('user/user_view.html.twig', [
+			'user' => $user,
+		]);
+	}
+
+	/**
+	 * @Route("/createUser", name="user_create")
+	 */
+	public function createUserAction(Request $request)
+	{
+		$userManager = $this->get('fos_user.user_manager.default');
+		$user = $userManager->createUser();
+		$user->setEnabled(true);
+		$form = $this->get('warehouse.workflow.user_workflow')->makeUserCreateEditForm($user);
+		$form->handleRequest($request);
+
+		if ($form->isSubmitted() && $form->isValid()) {
+			$userManager->updateUser($user);
+			return $this->redirectToRoute('user_view', ['id' => $user->getId()]);
+		}
+		return $this->render('user/user_create.html.twig', [
+			'form' => $form->createView(),
+		]);
+	}
+
+	/**
+	 * @Route("/{id}/editUser", name="user_edit")
+	 */
+	public function editUserAction(Request $request, $id)
+	{
+		$userManager = $this->get('fos_user.user_manager.default');
+		$user = $userManager->findUserBy(['id' => $id]);
+		$form = $this->get('warehouse.workflow.user_workflow')->makeUserCreateEditForm($user);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$userManager->updateUser($user);
+		}
+		return $this->render('user/user_edit.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
 }

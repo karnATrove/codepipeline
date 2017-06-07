@@ -1,0 +1,12 @@
+{% extends '@Admin/base.html.twig' %}
+
+{% block body %}
+    {{ form_start(form) }}
+    {% include '@Admin/user/_user_form.html.twig' with {'form':form} %}
+
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block title %}
+    Create User
+{% endblock %}
