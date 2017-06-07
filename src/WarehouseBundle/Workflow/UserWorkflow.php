@@ -10,8 +10,8 @@ namespace WarehouseBundle\Workflow;
 
 
 use FOS\UserBundle\Model\UserInterface;
-use JMS\DiExtraBundle\Annotation\FormType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WarehouseBundle\Entity\User;
@@ -40,9 +40,7 @@ class UserWorkflow
 		$formBuilder = $this->container->get('form.factory')->createBuilder(FormType::class, $user);
 		$formBuilder->add('username', TextType::class)
 			->add('email', TextType::class)
-			->add('firstName', TextType::class);
-		$formBuilder->add('lastName', TextType::class)
-			->add('company', TextType::class, ['required' => false])
+			->add('name', TextType::class)
 			->add('plainPassword', PasswordType::class, ['required' => false]);
 		return $formBuilder->getForm();
 	}

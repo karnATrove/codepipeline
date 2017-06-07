@@ -1,27 +1,10 @@
-{% extends '@Admin/base.html.twig' %}
+{% extends 'WarehouseBundle::layout.html.twig' %}
 
 {% block body %}
     {{ form_start(form) }}
 
-    {% include '@Admin/user/_user_form.html.twig' with {'form':form} %}
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for discountRule in userDiscountRules %}
-            <tr>
-                <td>{{ discountRule.displayName }}</td>
-                <td>{{ discountRule.type }}</td>
-                <td>{{ discountRule.description }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% include '/user/_user_form.html.twig' with {'form':form} %}
+
     {{ form_end(form) }}
 {% endblock %}
 

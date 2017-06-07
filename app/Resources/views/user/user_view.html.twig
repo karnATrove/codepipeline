@@ -1,10 +1,10 @@
-{% extends '@Admin/base.html.twig' %}
+{% extends 'WarehouseBundle::layout.html.twig' %}
 
 {% block body %}
     {{ user.email }}
 {% endblock %}
 
 {% block title %}
-    {{ user.firstName }}
+    {{ user.name }}
 {% endblock %}
 
