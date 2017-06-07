@@ -70,10 +70,10 @@ class BookingManager
 					];
 				} else {
 					if ($order) {
-						$resp[$i] = ['detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}"];
+						$resp[] = ['detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}"];
 					}
 					if ($location) {
-						$resp[$i] = [
+						$resp[] = [
 							'location' => $location->printLocation(),
 							'stockLevel' => $location->getQuantity(),];
 					}
