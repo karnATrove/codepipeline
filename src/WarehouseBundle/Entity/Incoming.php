@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Entity;
 
+use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -46,7 +47,7 @@ class Incoming
     /**
      * @var int
      * @Gedmo\Versioned
-     * @ORM\Column(name="type", type="smallint")
+     * @ORM\Column(name="type", type="integer")
      */
     private $type;
 
@@ -95,7 +96,7 @@ class Incoming
     /**
      * @var int
      * @Gedmo\Versioned
-     * @ORM\Column(name="status", type="smallint")
+     * @ORM\Column(name="status", type="integer")
      */
     private $status;
 
@@ -118,6 +119,18 @@ class Incoming
      * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="incoming", cascade={"persist","remove"})
      */
     private $incoming_products;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
+	 * @JoinColumn(name="type", referencedColumnName="id")
+	 */
+    private $incomingType;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
+	 * @JoinColumn(name="status", referencedColumnName="id")
+	 */
+	private $incomingStatus;
 
     /**
      * @var IncomingProductScan[]
@@ -507,4 +520,36 @@ class Incoming
     {
         return $this->user;
     }
+
+	/**
+	 * @return mixed
+	 */
+	public function getIncomingType()
+	{
+		return $this->incomingType;
+	}
+
+	/**
+	 * @param mixed $incomingType
+	 */
+	public function setIncomingType($incomingType)
+	{
+		$this->incomingType = $incomingType;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getIncomingStatus()
+	{
+		return $this->incomingStatus;
+	}
+
+	/**
+	 * @param mixed $incomingStatus
+	 */
+	public function setIncomingStatus($incomingStatus)
+	{
+		$this->incomingStatus = $incomingStatus;
+	}
 }
