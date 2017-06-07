@@ -1,8 +1,20 @@
 Update log
 =
 
-2017-06-06
+v1.0.0
 -
+Supporting user management feature.
+Supporting user group feature.
+User group only support admin/user for now. Only admin group have permission to edit/create/delete user.
+
+Supporting profile feature.
+User can update profile info and password by clicking into profile menu from top right nav bar.
+
+
+Run
+````
+composer update
+````
 
 Execute:
 
