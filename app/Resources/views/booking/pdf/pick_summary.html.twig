@@ -31,12 +31,10 @@
                         <th>SKU</th>
                         <th>Description</th>
                         <th>Qty</th>
-                        <th>Detail</th>
                         <th>Locations</th>
                         <th>Stock Level</th>
                         <th>Driver</th>
-                        <th>Picker</th>
-                        <th>Confirmation</th>
+                        <th style="width: 20%;"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -60,12 +58,6 @@
                                 <td></td>
                             {% endif %}
 
-                            {% if pickSummaryItem.detail is defined %}
-                                <td>{{ pickSummaryItem.detail }}</td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-
                             {% if pickSummaryItem.location is defined %}
                                 <td>{{ pickSummaryItem.location }}</td>
                             {% else %}
@@ -77,8 +69,6 @@
                             {% else %}
                                 <td></td>
                             {% endif %}
-
-                            <td></td>
                             <td></td>
                             <td></td>
                         </tr>

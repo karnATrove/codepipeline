@@ -42,9 +42,7 @@ class BookingManager
 		$resp = [];
 		foreach ($pickSummaryDTO->getItems() as $item) {
 			$sku = $item->getSku();
-			$sizeOfOrders = sizeof($item->getOrders());
 			$sizeOfLocations = sizeof($item->getItemLocations());
-			$loop = $sizeOfOrders > $sizeOfLocations ? $sizeOfOrders : $sizeOfLocations;
 
 			$orderList = [];
 			foreach ($item->getOrders() as $order){
@@ -57,21 +55,16 @@ class BookingManager
 			}
 
 
-			for ($i = 0; $i < $loop; $i++) {
-				$order = isset($orderList[$i])?$orderList[$i]:null;
+			for ($i = 0; $i < $sizeOfLocations; $i++) {
 				$location = isset($locationList[$i])?$locationList[$i]:null;
 				if ($i == 0) {
 					$resp[] = ['sku' => $sku,
 						'description' => $item->getDescription(),
 						'qty' => $item->getOrderedQuantity() . "({$item->getBoxCount()})",
-						'detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}",
 						'location' => $location->printLocation(),
 						'stockLevel' => $location->getQuantity(),
 					];
 				} else {
-					if ($order) {
-						$resp[] = ['detail' => $order->getOrderNumber() . " ordered {$order->getQuantity()}"];
-					}
 					if ($location) {
 						$resp[] = [
 							'location' => $location->printLocation(),

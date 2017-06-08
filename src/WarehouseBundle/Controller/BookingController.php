@@ -393,10 +393,6 @@ class BookingController extends Controller
 				"Error: {$exception->getMessage()}. please resolve errors and redo");
 		}
 
-//		  = new AjaxCommandDTO('booking_modal', AjaxCommandDTO::OP_MODAL, 'show');
-//		$response = new ResponseDTO();
-//		$response->addAjaxCommand($ajaxCommand);
-
 		return $this->redirect($this->generateUrl('booking'));
 	}
 
