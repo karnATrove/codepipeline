@@ -54,7 +54,7 @@ twig:
         returnUtil: "@app.return"
         fileUtil: "@app.document_uploader"
         documents_directory: '%documents_directory%'
-        site_name: "DX Supply Chain"
+        site_name: "%business.name%"
 
 # Doctrine Configuration
 doctrine:
