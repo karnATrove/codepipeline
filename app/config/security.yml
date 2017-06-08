@@ -23,7 +23,7 @@ security:
         api:
             anonymous: ~
             pattern: ^/
-            host: api.roveconcepts.com
+            host: "%api_host%"
             http_basic:
                 realm: "Demo REST API (username: restapi, password: secretpw)"
             stateless:  true
@@ -35,9 +35,8 @@ security:
             form_login:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
-
             provider: fos_userbundle
-            logout:       true
+            logout: true
 
             # activate different ways to authenticate
 
@@ -55,9 +54,11 @@ security:
         ROLE_ADMIN:       ROLE_USER
         ROLE_API:         ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        #ROLE_SUPER_ADMIN: ROLE_USER
 
     access_control:
-        - { path: ^/login$, role: ROLE_USER }
-        - { path: ^/register, role: ROLE_USER }
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, role: ROLE_USER }
+        - { path: ^/api, role: [ROLE_ADMIN, ROLE_API] }
+        - { path: ^/, role: ROLE_ADMIN }

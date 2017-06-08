@@ -17,7 +17,10 @@ parameters:
 
 framework:
     #esi:             ~
-    translator:      { fallbacks: ["%locale%"] }
+    translator:      
+        fallbacks: ["%locale%"]
+        paths: []
+        enabled: false
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -112,7 +115,7 @@ fos_user:
 
 assetic:
     debug:          '%kernel.debug%'
-    use_controller: false
+    use_controller: '%kernel.debug%'
     filters:
         cssrewrite: ~
         #closure:
