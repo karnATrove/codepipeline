@@ -57,8 +57,8 @@ security:
         #ROLE_SUPER_ADMIN: ROLE_USER
 
     access_control:
-        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, role: ROLE_USER }
+        - { path: ^/register, role: ROLE_USER }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api, role: [ROLE_ADMIN, ROLE_API] }
-        - { path: ^/, role: ROLE_ADMIN }
+        - { path: ^/, role: ROLE_USER }
