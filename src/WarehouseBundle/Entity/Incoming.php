@@ -45,9 +45,9 @@ class Incoming
     private $user;
 
     /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="type", type="integer")
+     * Many Incoming have One IncomingType
+     * @ORM\ManyToOne(targetEntity="IncomingType", inversedBy="incoming")
+     * @ORM\JoinColumn(name="type", referencedColumnName="id")
      */
     private $type;
 
@@ -94,9 +94,9 @@ class Incoming
     private $modified;
 
     /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="status", type="integer")
+     * Many Incoming have One IncomingStatus.
+     * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
+     * @JoinColumn(name="status", referencedColumnName="id")
      */
     private $status;
 
@@ -119,18 +119,6 @@ class Incoming
      * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="incoming", cascade={"persist","remove"})
      */
     private $incoming_products;
-
-//	/**
-//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
-//	 * @JoinColumn(name="type", referencedColumnName="id")
-//	 */
-//    private $incomingType;
-//
-//	/**
-//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
-//	 * @JoinColumn(name="status", referencedColumnName="id")
-//	 */
-//	private $incomingStatus;
 
     /**
      * @var IncomingProductScan[]
@@ -526,7 +514,7 @@ class Incoming
 	 */
 	public function getIncomingType()
 	{
-		return $this->incomingType;
+		return $this->getType();  /* TODO: This is not needed. */
 	}
 
 	/**
@@ -534,7 +522,7 @@ class Incoming
 	 */
 	public function setIncomingType($incomingType)
 	{
-		$this->incomingType = $incomingType;
+		$this->setType($incomingType);  /* TODO: This is not needed. */
 	}
 
 	/**
@@ -542,7 +530,7 @@ class Incoming
 	 */
 	public function getIncomingStatus()
 	{
-		return $this->incomingStatus;
+		return $this->getStatus(); /* TODO: This is not needed. */
 	}
 
 	/**
@@ -550,6 +538,6 @@ class Incoming
 	 */
 	public function setIncomingStatus($incomingStatus)
 	{
-		$this->incomingStatus = $incomingStatus;
+		$this->setStatus($incomingStatus);  /* TODO: This is not needed. */
 	}
 }

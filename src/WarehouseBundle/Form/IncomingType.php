@@ -8,7 +8,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+use WarehouseBundle\Entity\IncomingType as entityIncomingType;
+use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Form\IncomingFileType;
 
 class IncomingType extends AbstractType
@@ -20,17 +23,25 @@ class IncomingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('type', ChoiceType::class, array(
-                'choices' => array_flip(\WarehouseBundle\Utils\Incoming::incomingTypeList()),
-                'choices_as_values' => true,
+            //->add('type', ChoiceType::class, array(
+            //    'choices' => array_flip(\WarehouseBundle\Utils\Incoming::incomingTypeList()),
+            //    'choices_as_values' => true,
+            //))
+            ->add('type', EntityType::class, array(
+                'class' => EntityIncomingType::class,
+                'choice_label' => 'detail',
             ))
             ->add('name')
             ->add('eta')
             ->add('scheduled')
             ->add('arrived')
-            ->add('status', ChoiceType::class, array(
-                'choices' => array(''=>'') + array_flip(\WarehouseBundle\Utils\Incoming::incomingStatusList()),
-                'choices_as_values' => true,
+            //->add('status', ChoiceType::class, array(
+            //    'choices' => array(''=>'') + array_flip(\WarehouseBundle\Utils\Incoming::incomingStatusList()),
+            //    'choices_as_values' => true,
+            //))
+            ->add('status', EntityType::class, array(
+                'class' => IncomingStatus::class,
+                'choice_label' => 'detail',
             ))
         ;
     }
