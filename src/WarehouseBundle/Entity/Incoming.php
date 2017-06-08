@@ -120,17 +120,17 @@ class Incoming
      */
     private $incoming_products;
 
-	/**
-	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
-	 * @JoinColumn(name="type", referencedColumnName="id")
-	 */
-    private $incomingType;
-
-	/**
-	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
-	 * @JoinColumn(name="status", referencedColumnName="id")
-	 */
-	private $incomingStatus;
+//	/**
+//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
+//	 * @JoinColumn(name="type", referencedColumnName="id")
+//	 */
+//    private $incomingType;
+//
+//	/**
+//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
+//	 * @JoinColumn(name="status", referencedColumnName="id")
+//	 */
+//	private $incomingStatus;
 
     /**
      * @var IncomingProductScan[]
