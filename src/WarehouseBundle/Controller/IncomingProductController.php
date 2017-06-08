@@ -103,7 +103,6 @@ class IncomingProductController extends Controller
 		$em = $this->getDoctrine()->getManager();
 
 		$form_scan = $this->createModifyScannedForm($incoming);
-		dump($request);
 		$form_scan->handleRequest($request);
 
 		# Submissions will be by ajax
@@ -128,7 +127,6 @@ class IncomingProductController extends Controller
 					}
 				} else {
 					$items = $form_scan->getData();
-					dump($items);
 					$em->persist($items);
 					$em->flush();
 					
@@ -141,7 +139,6 @@ class IncomingProductController extends Controller
 					}
 					
 				}
-
 
 				$response['ajaxCommand'][] = array(
 					'selector' => '#scanned_form_wrap',
