@@ -94,7 +94,7 @@ class IncomingProductController extends Controller
 
 
 	/**
-	 * Lists all Incoming entity products.
+	 * Submits incoming products scanned form (ajax).
 	 *
 	 * @Route("/{id}/ajax/products_scanned", name="incoming_products_scanned_ajax")
 	 */
@@ -103,6 +103,7 @@ class IncomingProductController extends Controller
 		$em = $this->getDoctrine()->getManager();
 
 		$form_scan = $this->createModifyScannedForm($incoming);
+		dump($request);
 		$form_scan->handleRequest($request);
 
 		# Submissions will be by ajax
@@ -127,9 +128,10 @@ class IncomingProductController extends Controller
 					}
 				} else {
 					$items = $form_scan->getData();
+					dump($items);
 					$em->persist($items);
 					$em->flush();
-
+					
 					if ($form_scan->get('complete')->isClicked()) {
 						if ($this->get('app.incoming')->setComplete($incoming)) {
 							$this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete.");
@@ -137,6 +139,7 @@ class IncomingProductController extends Controller
 							$this->get('session')->getFlashBag()->add('error', "An error occurred while trying to set incoming to complete.");
 						}
 					}
+					
 				}
 
 

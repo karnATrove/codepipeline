@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex,nofollow"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}rLogistics{% endblock %}</title>
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap/dist/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
     <link href="{{ asset('assets/vendor/gentelella/vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
@@ -31,7 +31,7 @@
             <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
                     <a class="site_title scan-trigger" data-toggle="modal" data-target=".bs-scan-modal"><i
-                                class="fa fa-truck"></i> <span>rLogistics</span></a>
+                                class="fa fa-truck"></i> <span>{{ site_name }}</span></a>
                 </div>
 
                 <div class="clearfix"></div>
