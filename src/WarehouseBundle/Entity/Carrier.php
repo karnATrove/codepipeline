@@ -36,6 +36,8 @@ class Carrier
 	const CARRIER_ATS = 19;
 	const CARRIER_WAYFAIR_CARRIER = 20;
 	const CARRIER_AMAZON_CARRIER = 21;
+	const CARRIER_BUILDDIRECT_CARRIER = 22;
+	const CARRIER_HAYNEEDLE_CARRIER = 23;
 
 	//endregion
 

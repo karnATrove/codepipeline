@@ -154,6 +154,8 @@ class Booking
 			Carrier::CARRIER_ATS => 'ATS',
 			Carrier::CARRIER_WAYFAIR_CARRIER => 'Wayfair Carrier',
 			Carrier::CARRIER_AMAZON_CARRIER => 'Amazon Carrier',
+			Carrier::CARRIER_BUILDDIRECT_CARRIER => 'BuildDirect Carrier',
+			Carrier::CARRIER_HAYNEEDLE_CARRIER => 'HayNeedle Carrier',
 		];
 	}
 
