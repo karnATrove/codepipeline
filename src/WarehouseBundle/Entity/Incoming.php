@@ -430,7 +430,7 @@ class Incoming
     /**
      * Get incomingProducts
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return IncomingProduct[]
      */
     public function getIncomingProducts()
     {
@@ -474,7 +474,7 @@ class Incoming
     }
 
 	/**
-	 * @return ArrayCollection
+	 * @return IncomingProductScan[]
 	 */
 	public function getIncomingScannedProducts()
     {

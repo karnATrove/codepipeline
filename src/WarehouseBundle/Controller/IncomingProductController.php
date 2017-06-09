@@ -14,6 +14,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
+use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Form\IncomingProductScanType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -115,7 +116,7 @@ class IncomingProductController extends Controller
 				'allow_delete' => TRUE,
 				'prototype' => TRUE,
 			]);
-		if ($incoming->getStatus() < 3) {
+		if ($incoming->getStatus()->getId() < IncomingStatus::COMPLETED) {
 			$form->add('complete', SubmitType::class, [
 				'label' => 'COMPLETE SCAN',
 				'attr' => [
@@ -123,7 +124,6 @@ class IncomingProductController extends Controller
 					'data-confirm' => 'This will mark the container are closed. It will also assign all items to active inventory. Are you sure you are complete?',
 				],
 			]);
-//
 			$form->add('load_data', SubmitType::class, [
 				'label' => 'LOAD FROM PACKING LIST',
 				'attr' => [
@@ -172,6 +172,7 @@ class IncomingProductController extends Controller
 	 */
 	public function incomingProductsScannedAjaxAction(Request $request, Incoming $incoming)
 	{
+		//todo test this function
 		if (!$request->isXmlHttpRequest()) {
 			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
 			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
@@ -187,53 +188,45 @@ class IncomingProductController extends Controller
 			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
 		}
 
-
 		// Ensure it isn't already completed.
 		if (IncomingManager::isComplete($incoming)) {
 			$this->get('session')->getFlashBag()->add('error', "Incoming is already set to complete.");
-			return new JsonResponse([], 200);
+			return new JsonResponse([], JsonResponse::HTTP_OK);
 		}
-
-		if ($form_scan->get('load_data')->isClicked()) {
-			if ($this->get('app.incoming')->preloadScannedProducts($incoming)) {
-				$repository = $this->getDoctrine()->getRepository('WarehouseBundle:IncomingProductScan');
-				//reload scanned form
-				$incomingProductScan = $repository->findBy(['incoming' => $incoming]);
+		try {
+			if ($form_scan->get('load_data')->isClicked()) {
+				$this->get('warehouse.workflow.incoming_workflow')->loadScannedProducts($incoming);
+				$incomingProductScan = $this->get('warehouse.manager.incoming_product_scan_manager')
+					->getByIncoming($incoming);
 				$incoming->setIncomingScannedProducts($incomingProductScan);
 				$form_scan = $this->createModifyScannedForm($incoming);
 				$this->get('session')->getFlashBag()
 					->add('success', "Packing list pre-loaded.");
 			} else {
-				$this->get('session')->getFlashBag()
-					->add('error', "An error occurred while trying to load products.");
-			}
-		} else {
-			$items = $form_scan->getData();
-			$em->persist($items);
-			$em->flush();
-
-			if ($form_scan->get('complete')->isClicked()) {
-				if ($this->get('app.incoming')->setComplete($incoming)) {
+				$items = $form_scan->getData();
+				$em->persist($items);
+				$em->flush();
+				if ($form_scan->get('complete')->isClicked()) {
+					$this->get('warehouse.workflow.incoming_workflow')->setIncomingComplete($incoming);
 					$this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete.");
-				} else {
-					$this->get('session')->getFlashBag()->add('error', "An error occurred while trying to set incoming to complete.");
 				}
 			}
-
+			$response = [];
+			$response['ajaxCommand'][] = [
+				'selector' => '#scanned_form_wrap',
+				'op' => 'html',
+				'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
+					'form_scan' => $form_scan->createView(),
+					'form_new' => $this->createNewScannedForm($incoming)->createView(),
+					'incoming' => $incoming,
+				]),
+			];
+			return new JsonResponse($response, 200);
+		} catch (\Exception $exception) {
+			$msg = "An error occurred. " . $exception->getMessage();
+			$this->get('session')->getFlashBag()->add('error', $msg);
+			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
 		}
-
-		$response = [];
-		$response['ajaxCommand'][] = [
-			'selector' => '#scanned_form_wrap',
-			'op' => 'html',
-			'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
-				'form_scan' => $form_scan->createView(),
-				'form_new' => $this->createNewScannedForm($incoming)->createView(),
-				'incoming' => $incoming,
-			]),
-		];
-
-		return new JsonResponse($response, 200);
 	}
 
 	/**
@@ -505,10 +498,4 @@ class IncomingProductController extends Controller
 		return $this->redirect($this->generateUrl('incoming_products', ['incoming_id' => $incoming->getId()]));
 	}
 
-}
-
-function rutime($ru, $rus, $index)
-{
-	return ($ru["ru_$index.tv_sec"] * 1000 + intval($ru["ru_$index.tv_usec"] / 1000))
-		- ($rus["ru_$index.tv_sec"] * 1000 + intval($rus["ru_$index.tv_usec"] / 1000));
 }

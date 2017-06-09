@@ -42,9 +42,19 @@ services:
     warehouse.manager.incoming_status_manager:
         class: WarehouseBundle\Manager\IncomingStatusManager
         arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.incoming_product_scan_manager:
+        class: WarehouseBundle\Manager\IncomingProductScanManager
+        arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.incoming_product_manager:
+        class: WarehouseBundle\Manager\IncomingProductManager
+        arguments: ['@doctrine.orm.entity_manager']
+
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
       arguments: ['@service_container']
     warehouse.workflow.user_workflow:
         class: WarehouseBundle\Workflow\UserWorkflow
+        arguments: ['@service_container']
+    warehouse.workflow.incoming_workflow:
+        class: WarehouseBundle\Workflow\IncomingWorkflow
         arguments: ['@service_container']

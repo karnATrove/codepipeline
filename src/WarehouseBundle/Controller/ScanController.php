@@ -31,6 +31,7 @@ use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingProductScan;
+use WarehouseBundle\Manager\IncomingManager;
 
 /**
  * Scan controller.
@@ -155,17 +156,16 @@ class ScanController extends Controller
         return $response;
     }
 
-    public function scanModeStock($incoming_id) {
+    public function scanModeStock($incomingId) {
         $response = array();
-
         $em = $this->getDoctrine()->getManager();
-        $incoming = $em->getRepository('WarehouseBundle:Incoming')->findOneById($incoming_id);
-        if (!$incoming || !in_array($incoming->getStatus(),array(1,2))) {
+        $incoming = $em->getRepository('WarehouseBundle:Incoming')->find($incomingId);
+        if (!$incoming || !IncomingManager::isActive($incoming)) {
             $response['ajaxCommand'][] = array(
                 'selector' => '#scan-result',
                 'op' => 'html',
                 'value' => $this->renderView('WarehouseBundle::Scan/stock/error.html.twig', array(
-                    'search' => $incoming_id,
+                    'search' => $incomingId,
                     'error' => 'Container/forward not found or the container/forward is not in an active status.',
                 )),
             );
@@ -181,7 +181,7 @@ class ScanController extends Controller
         $html = $this->renderView('WarehouseBundle::Scan/stock/incoming.html.twig', array(
             'form' => $form->createView(),
             'form_scan' => $form_scan->createView(),
-            'search' => $incoming_id,
+            'search' => $incomingId,
             'incoming' => $incoming,
         ));
 
@@ -474,56 +474,50 @@ class ScanController extends Controller
      * @Template()
      */
     public function formAjaxStockIncomingProductForm(Request $request, Incoming $incoming) {
-        //$incoming = $this->getDoctrine()->getRepository('WarehouseBundle:Incoming')->find($incoming_id);
         $form = $this->createModifyForm($incoming);
         $form->handleRequest($request);
 
         $response = array();
         if ($form->isSubmitted() && $form->isValid()) {
-            // $form->getData() holds the submitted values
-            // but, the original `$task` variable has also been updated
             $items = $form->getData();
-            //$action = $request->get("bulk_action", "delete");
-
             $em = $this->getDoctrine()->getManager();
             foreach($items as $item) {
                 $item->setModified(new \DateTime('now'));
             }
             $em->persist($items);
             $em->flush();
-
             $response['success'] = true;
 
             // Is COMPLETE clicked
             if ($form->get('complete')->isClicked()) {
-
-                if ($this->get('app.incoming')->setComplete($incoming)) {
-                    $this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete." );
-                    $response['ajaxCommand'][] = array(
-                        'selector' => '#scan-result .x_content',
-                        'op' => 'html',
-                        'value' => '<div class="alert alert-success">Incoming products were successfully assigned to inventory and Incoming container was set to completed.</div>',
-                    );
-                    $response['ajaxCommand'][] = array(
-                        'selector' => '#form_incoming [value="'.$incoming->getId().'"]',
-                        'op' => 'remove',   # could be 'attr' so we can just disable it
-                        'value' => array(
-                            'disabled' => 'disabled',
-                        ),
-                    );
-                    $response['ajaxCommand'][] = array(
-                        'selector' => '#form_scanIncoming',
-                        'op' => 'remove',
-                        'value' => '',
-                    );
-                } else {
-                    $this->get('session')->getFlashBag()->add('error', "An error occured while trying to set incoming to complete." );
-                    $response['ajaxCommand'][] = array(
-                        'selector' => '.error_zone',
-                        'op' => 'html',
-                        'value' => '<div class="alert alert-error"><p><strong>Error:</strong> An error occured while trying to set incoming to complete.</p></div>',
-                    );
-                }
+            	try{
+            		$this->get('warehouse.workflow.incoming_workflow')->setIncomingComplete($incoming);
+		            $this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete." );
+		            $response['ajaxCommand'][] = array(
+			            'selector' => '#scan-result .x_content',
+			            'op' => 'html',
+			            'value' => '<div class="alert alert-success">Incoming products were successfully assigned to inventory and Incoming container was set to completed.</div>',
+		            );
+		            $response['ajaxCommand'][] = array(
+			            'selector' => '#form_incoming [value="'.$incoming->getId().'"]',
+			            'op' => 'remove',   # could be 'attr' so we can just disable it
+			            'value' => array(
+				            'disabled' => 'disabled',
+			            ),
+		            );
+		            $response['ajaxCommand'][] = array(
+			            'selector' => '#form_scanIncoming',
+			            'op' => 'remove',
+			            'value' => '',
+		            );
+	            }catch (\Exception $exception){
+		            $this->get('session')->getFlashBag()->add('error', "An error occured while trying to set incoming to complete." );
+		            $response['ajaxCommand'][] = array(
+			            'selector' => '.error_zone',
+			            'op' => 'html',
+			            'value' => '<div class="alert alert-error"><p><strong>Error:</strong> An error occured while trying to set incoming to complete.</p></div>',
+		            );
+	            }
             } else {
                 $response['ajaxCommand'][] = array(
                     'selector' => '.incomingScannedProducts',
@@ -551,13 +545,13 @@ class ScanController extends Controller
         return new JsonResponse($response, 200);
     }
 
-    /**
-     * Creates a form to modify a Incoming with IncomingProductScan entity.
-     *
-     * @param WarehouseBundle\Entity\Incoming $incoming The incoming
-     *
-     * @return SymfonyComponentFormForm The form
-     */
+	/**
+	 * Creates a form to modify a Incoming with IncomingProductScan entity.
+	 *
+	 * @param Incoming $incoming
+	 *
+	 * @return mixed
+	 */
     function createModifyForm(Incoming $incoming) {
          $form = $this->createFormBuilder($incoming)
             ->setAction($this->generateUrl('scan_stock_product_ajax', array('id' => $incoming->getId())))

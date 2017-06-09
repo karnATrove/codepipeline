@@ -12,11 +12,12 @@ namespace WarehouseBundle\Manager;
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingStatus;
+use WarehouseBundle\Entity\IncomingType;
 
-class IncomingStatusManager extends BaseManager
+class IncomingTypeManager extends BaseManager
 {
 
-	private $incomingStatusRepository;
+	private $incomingTypeRepository;
 
 	/**
 	 * IncomingProductScanManager constructor.
@@ -26,17 +27,7 @@ class IncomingStatusManager extends BaseManager
 	public function __construct(EntityManagerInterface $entityManager)
 	{
 		parent::__construct($entityManager);
-		$this->incomingStatusRepository = $entityManager->getRepository('WarehouseBundle:IncomingStatus');
-	}
-
-	/**
-	 * @param $id
-	 *
-	 * @return null|object|IncomingStatus
-	 */
-	public function find($id)
-	{
-		return $this->incomingStatusRepository->find($id);
+		$this->incomingTypeRepository = $entityManager->getRepository('WarehouseBundle:IncomingType');
 	}
 
 	/**
@@ -44,13 +35,12 @@ class IncomingStatusManager extends BaseManager
 	 *
 	 * @return array
 	 */
-	public static function incomingStatusList()
+	public static function incomingTypeList()
 	{
 		return [
-			IncomingStatus::DELETED => 'Deleted',
-			IncomingStatus::INBOUND => 'Inbound',
-			IncomingStatus::ARRIVED => 'Arrived',
-			IncomingStatus::COMPLETED => 'Completed',
+			IncomingType::OCEAN_FREIGHT => 'Ocean Freight',
+			IncomingType::FORWARD => 'Forward',
 		];
 	}
+
 }
