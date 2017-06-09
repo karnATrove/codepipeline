@@ -53,14 +53,14 @@
                             <div class="form-group">
                                 <label>Container Status</label>
                                 <div>
-                                    {{ incomingUtil.incomingStatusName(incoming.status) }}
+                                    {#{ incomingUtil.incomingStatusName(incoming.status) }#}{{ incoming.status.detail }}
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Container Type</label>
                                 <div>
-                                    {{ incomingUtil.incomingTypeName(incoming.type) }}
+                                    {#{ incomingUtil.incomingTypeName(incoming.type) }#}{{ incoming.type.detail }}
                                 </div>
                             </div>
                         </div>

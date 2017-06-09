@@ -14,8 +14,8 @@
       	{% for incomingProduct in items %}
         <tr>
           <th scope="row"><a href="{{ path('booking_edit',{'id':incomingProduct.incoming.id}) }}">{{ incomingProduct.incoming.name }}</a></th>
-          <td>{{ incomingUtil.incomingTypeName(incomingProduct.incoming.type) }}</td>
-          <td>{{ incomingUtil.incomingStatusName(incomingProduct.incoming.status) }}</td>
+          <td>{#{ incomingUtil.incomingTypeName(incomingProduct.incoming.type) }#}{{ incomingProduct.incoming.type.detail }}</td>
+          <td>{#{ incomingUtil.incomingStatusName(incomingProduct.incoming.status) }#}{{ incomingProduct.incoming.status.detail }}</td>
           <td>{{ incomingProduct.incoming.eta|date('Y-m-d') }}</td>
         </tr>
         {% endfor %}

@@ -142,8 +142,8 @@
                                         <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{inbound.id}}"/></td>
                                         <!--<td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.id }}</a></td>-->
                                         <td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.name }}</a></td>
-                                        <td>{{ incomingUtil.incomingTypeName(inbound.type) }}</td>
-                                        <td>{{ incomingUtil.incomingStatusName(inbound.status) }}</td>
+                                        <td>{#{ incomingUtil.incomingTypeName(inbound.type) }#}{{ inbound.type.detail }}</td>
+                                        <td>{#{ incomingUtil.incomingStatusName(inbound.status) }#}{{ inbound.status.detail }}</td>
                                         <td>{% if inbound.eta %}{{ inbound.eta|date('Y-m-d') }}{% endif %}</td>
                                         <td>{% if inbound.scheduled %}{{ inbound.scheduled|date('Y-m-d H:i:s') }}{% else %}Unscheduled{% endif %}</td>
                                         <td>{% if inbound.arrived %}{{ inbound.arrived|date('Y-m-d') }}{% else %}-{% endif %}</td>

@@ -160,10 +160,12 @@ class IncomingController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $incoming->setCreated(new \DateTime('now'));
-
+dump($request);
+dump($incoming);
             $em->persist($incoming);
             $em->flush();
 
+dump($incoming);
             $editLink = $this->generateUrl('incoming_edit', array('id' => $incoming->getId()));
             $this->get('session')
                 ->getFlashBag()

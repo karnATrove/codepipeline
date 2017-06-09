@@ -45,8 +45,8 @@ class Incoming
 	public static function incomingTypeList()
 	{
 		return array(
-			IncomingEntity::TYPE_OCEAN_FREIGHT => 'Ocean Freight',
-			IncomingEntity::TYPE_FORWARD => 'Forward',
+			intval(IncomingEntity::TYPE_OCEAN_FREIGHT) => 'Ocean Freight',
+			intval(IncomingEntity::TYPE_FORWARD) => 'Forward',
 		);
 	}
 
