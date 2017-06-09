@@ -40,6 +40,16 @@ class IncomingStatusManager extends BaseManager
 	}
 
 	/**
+	 * @param Incoming $incoming
+	 * @param          $statusList
+	 *
+	 * @return bool
+	 */
+	public static function haveStatus(Incoming $incoming, $statusList){
+		return in_array($incoming->getStatus()->getId(),$statusList);
+	}
+
+	/**
 	 * can change to read from db
 	 *
 	 * @return array

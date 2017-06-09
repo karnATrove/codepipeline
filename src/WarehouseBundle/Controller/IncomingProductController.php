@@ -29,6 +29,7 @@ use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Manager\IncomingManager;
+use WarehouseBundle\Manager\IncomingStatusManager;
 
 /**
  * Booking controller.
@@ -315,7 +316,7 @@ class IncomingProductController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$response = [];
 		$incoming = $incomingProductScan->getIncoming();
-		if ($incoming->getStatus(1, 2)) { # Inbound or Arrived
+		if (IncomingStatusManager::haveStatus($incoming, [IncomingStatus::INBOUND, IncomingStatus::ARRIVED])) {
 			$em->remove($incomingProductScan);
 			$em->flush();
 		} else {

@@ -57,7 +57,8 @@ class IncomingWorkflow extends BaseWorkflow
 					->createLocationProductByIncomingProductScan($incomingScannedProduct, $this->entityManager);
 			} else {
 				$locationProduct->setModified(new \DateTime('now'));
-				$locationProduct->setOnHand($locationProduct->getOnHand());
+				$quantity = $locationProduct->getOnHand() + $incomingScannedProduct->getQtyOnScan();
+				$locationProduct->setOnHand($quantity);
 				$this->locationProductManager->updateLocationProduct($locationProduct, $this->entityManager);
 			}
 		}
