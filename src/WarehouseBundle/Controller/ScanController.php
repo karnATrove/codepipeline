@@ -63,7 +63,7 @@ class ScanController extends Controller
                 'query_builder' => function(EntityRepository $er) {
                     return $er->createQueryBuilder('i')
                         ->where('i.status IN (:status)')
-                        ->setParameter('status',array(2));   # Arrived
+                        ->setParameter('status',array(1,2));   # Arrived
                 },
                 'placeholder' => 'Choose incoming',
                 'choice_label' => 'name',
@@ -160,7 +160,7 @@ class ScanController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $incoming = $em->getRepository('WarehouseBundle:Incoming')->findOneById($incoming_id);
-        if (!$incoming || !in_array($incoming->getStatus(),array(1,2))) {
+        if (!$incoming || !in_array($incoming->getStatus()->getCode(),array('INBOUND','ARRIVED'))) {
             $response['ajaxCommand'][] = array(
                 'selector' => '#scan-result',
                 'op' => 'html',
@@ -177,7 +177,7 @@ class ScanController extends Controller
 
         // IncomingProductScan item form
         $form_scan = $this->createModifyForm($incoming);
-
+        
         $html = $this->renderView('WarehouseBundle::Scan/stock/incoming.html.twig', array(
             'form' => $form->createView(),
             'form_scan' => $form_scan->createView(),

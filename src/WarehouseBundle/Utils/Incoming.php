@@ -90,7 +90,7 @@ class Incoming
 	 */
 	public function isComplete(\WarehouseBundle\Entity\Incoming $incoming)
 	{
-		if ($this->incomingStatusName($incoming->getStatus()) == 'Completed') return TRUE;
+		if ($this->incomingStatusName($incoming->getStatus()->getCode()) == 'COMPLETED') return TRUE;
 		return FALSE;
 	}
 
@@ -167,7 +167,7 @@ class Incoming
 	{
 		$em = $this->container->get("doctrine")->getManager();
 
-		if (in_array($incoming->getStatus(), array(1, 2))) {
+		if (in_array($incoming->getStatus()->getCode(), array('INBOUND', 'ARRIVED'))) {
 			# Add items to inventory - We use this loop because some items scanned may not be in the container
 			foreach ($incoming->getIncomingScannedProducts() as $incomingScannedProduct) {
 				# Look for an existing location with this specific product then modifiy it, otherwise make new.

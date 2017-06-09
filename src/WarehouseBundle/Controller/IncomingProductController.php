@@ -323,7 +323,7 @@ class IncomingProductController extends Controller
 				'allow_delete' => TRUE,
 				'prototype' => TRUE,
 			));
-		if ($incoming->getStatus() < 3) {
+		if ($incoming->getStatus()->getCode() !== 'COMPLETED' && $incoming->getStatus()->getCode() !== 'DELETED') {
 			$form->add('complete', SubmitType::class, array(
 				'label' => 'COMPLETE SCAN',
 				'attr' => array(

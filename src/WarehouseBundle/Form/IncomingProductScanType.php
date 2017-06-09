@@ -49,9 +49,9 @@ class IncomingProductScanType extends AbstractType
 					// Do what ever you like with $child entity data
 					$incoming = $child->getIncoming();
 
-					//$this->get('app.incoming')->isComplete($incoming->getStatus());
+					//$this->get('app.incoming')->isComplete($incoming);
 					// If not completed
-					if ($incoming->getStatus() !== 3) {
+					if ($incoming->getStatus()->getCode() !== 'COMPLETED' && $incoming->getStatus()->getCode() !== 'DELETED') {
 						$form->add('qtyOnScan', IntegerType::class, array('label' => 'Qty', 'attr' => array('min' => 0)));
 						$form->add('locationId', ChoiceType::class, array(
 							'choices' => $locationSelection,
