@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Component\DependencyInjection\Container;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\Incoming;
+use WarehouseBundle\Form\IncomingType;
 
 class BuildDirectReport
 {
@@ -40,7 +41,7 @@ class BuildDirectReport
 				FROM WarehouseBundle:Incoming i 
 				WHERE i.type=:incomingType AND i.arrived>=:startTime AND i.arrived<= :endTime'
 		)
-			->setParameter('incomingType', Incoming::TYPE_OCEAN_FREIGHT)
+			->setParameter('incomingType', IncomingType::OCEAN_FREIGHT)
 			->setParameter('startTime', $start)
 			->setParameter('endTime', $end);
 		try {

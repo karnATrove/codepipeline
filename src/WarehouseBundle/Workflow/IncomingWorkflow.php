@@ -51,15 +51,15 @@ class IncomingWorkflow extends BaseWorkflow
 			$product = $incomingScannedProduct->getProduct();
 			$location = $incomingScannedProduct->getLocation();
 			$locationProduct = $this->locationProductManager->findOneByProductAndLocation($product, $location);
-
+			$currentUser = $this->container->get('security.token_storage')->getToken()->getUser();
 			if (!$locationProduct) {
 				$this->locationProductManager
-					->createLocationProductByIncomingProductScan($incomingScannedProduct, $this->entityManager);
+					->createLocationProductByIncomingProductScan($incomingScannedProduct, $this->entityManager, $currentUser);
 			} else {
 				$locationProduct->setModified(new \DateTime('now'));
 				$quantity = $locationProduct->getOnHand() + $incomingScannedProduct->getQtyOnScan();
 				$locationProduct->setOnHand($quantity);
-				$this->locationProductManager->updateLocationProduct($locationProduct, $this->entityManager);
+				$this->locationProductManager->updateLocationProduct($locationProduct, $this->entityManager, $currentUser);
 			}
 		}
 

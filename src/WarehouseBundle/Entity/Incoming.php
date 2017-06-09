@@ -18,490 +18,492 @@ class Incoming
 	//region Constants
 
 	//Status
-	const STATUS_DELETED=0;
-	const STATUS_INBOUND=1;
-	const STATUS_ARRIVED=2;
-	const STATUS_COMPLETED=3;
-
-	//Type
-	const TYPE_OCEAN_FREIGHT=1;
-	const TYPE_FORWARD=2;
+//	const STATUS_DELETED = 0;
+//	const STATUS_INBOUND = 1;
+//	const STATUS_ARRIVED = 2;
+//	const STATUS_COMPLETED = 3;
+//
+//	//Type
+//	const TYPE_OCEAN_FREIGHT = 1;
+//	const TYPE_FORWARD = 2;
 
 	//endregion
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+	/**
+	 * @var int
+	 *
+	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	private $id;
 
-    /**
-     * One Incoming has One User
-     * @ORM\ManyToOne(targetEntity="User")
-     */
-    private $user;
+	/**
+	 * One Incoming has One User
+	 * @ORM\ManyToOne(targetEntity="User")
+	 */
+	private $user;
 
-    /**
-     * @var string
-     * @Gedmo\Versioned
-     * @ORM\Column(name="name", type="string", length=50)
-     */
-    private $name;
+	/**
+	 * @var string
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="name", type="string", length=50)
+	 */
+	private $name;
 
-    /**
-     * @var \DateTime
-     * @Gedmo\Versioned
-     * @ORM\Column(name="eta", type="date", nullable=true)
-     */
-    private $eta;
+	/**
+	 * @var \DateTime
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="eta", type="date", nullable=true)
+	 */
+	private $eta;
 
-    /**
-     * @var \DateTime
-     * @Gedmo\Versioned
-     * @ORM\Column(name="scheduled", type="datetime", nullable=true)
-     */
-    private $scheduled;
+	/**
+	 * @var \DateTime
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="scheduled", type="datetime", nullable=true)
+	 */
+	private $scheduled;
 
-    /**
-     * @var \DateTime
-     * @Gedmo\Versioned
-     * @ORM\Column(name="arrived", type="datetime", nullable=true)
-     */
-    private $arrived;
+	/**
+	 * @var \DateTime
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="arrived", type="datetime", nullable=true)
+	 */
+	private $arrived;
 
-    /**
-     * @var \DateTime
-     * @Gedmo\Versioned
-     * @ORM\Column(name="created", type="datetime")
-     */
-    private $created;
+	/**
+	 * @var \DateTime
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="created", type="datetime")
+	 */
+	private $created;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="modified", type="datetime", nullable=true)
-     */
-    private $modified;
+	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="modified", type="datetime", nullable=true)
+	 */
+	private $modified;
 
-    /**
-     * One Incoming has Many IncomingFile.
-     * @ORM\OneToMany(targetEntity="IncomingFile", mappedBy="incoming")
-     */
-    private $files;
+	/**
+	 * One Incoming has Many IncomingFile.
+	 * @ORM\OneToMany(targetEntity="IncomingFile", mappedBy="incoming")
+	 */
+	private $files;
 
-    /**
-     * @var ArrayCollection
-     *
-     * One Incoming has Many IncomingComment.
-     * @ORM\OneToMany(targetEntity="IncomingComment", mappedBy="incoming")
-     */
-    private $comments;
+	/**
+	 * @var ArrayCollection
+	 *
+	 * One Incoming has Many IncomingComment.
+	 * @ORM\OneToMany(targetEntity="IncomingComment", mappedBy="incoming")
+	 */
+	private $comments;
 
-    /**
-     * One Incoming has Many IncomingProduct.
-     * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="incoming", cascade={"persist","remove"})
-     */
-    private $incoming_products;
+	/**
+	 * One Incoming has Many IncomingProduct.
+	 * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="incoming", cascade={"persist","remove"})
+	 */
+	private $incoming_products;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
 	 */
-    private $type;
+	private $type;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
 	 */
 	private $status;
 
-    /**
-     * @var IncomingProductScan[]
-     *
-     * One Incoming has Many IncomingProductScan.
-     * @ORM\OneToMany(targetEntity="IncomingProductScan", mappedBy="incoming", cascade={"persist","remove"})
-     * @ORM\OrderBy({"id" = "ASC", "modified" = "DESC"})
-     */
-    private $incoming_scanned_products;
+	/**
+	 * @var IncomingProductScan[]
+	 *
+	 * One Incoming has Many IncomingProductScan.
+	 * @ORM\OneToMany(targetEntity="IncomingProductScan", mappedBy="incoming", cascade={"persist","remove"})
+	 * @ORM\OrderBy({"id" = "ASC", "modified" = "DESC"})
+	 */
+	private $incoming_scanned_products;
 
-    public function __construct() {
-        $this->files = new ArrayCollection();
-        $this->incoming_products = new ArrayCollection();
-        $this->incoming_scanned_products = new ArrayCollection();
-    }
+	public function __construct()
+	{
+		$this->files = new ArrayCollection();
+		$this->incoming_products = new ArrayCollection();
+		$this->incoming_scanned_products = new ArrayCollection();
+	}
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+	/**
+	 * Get id
+	 *
+	 * @return int
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
 
-    /**
-     * Set type
-     *
-     * @param integer $type
-     *
-     * @return Incoming
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
+	/**
+	 * Get type
+	 *
+	 * @return int
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set type
+	 *
+	 * @param integer $type
+	 *
+	 * @return Incoming
+	 */
+	public function setType($type)
+	{
+		$this->type = $type;
 
-    /**
-     * Get type
-     *
-     * @return int
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
+		return $this;
+	}
 
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Incoming
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
+	/**
+	 * Get name
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set name
+	 *
+	 * @param string $name
+	 *
+	 * @return Incoming
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
 
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
+		return $this;
+	}
 
-    /**
-     * Set eta
-     *
-     * @param \DateTime $eta
-     *
-     * @return Incoming
-     */
-    public function setEta($eta)
-    {
-        $this->eta = $eta;
+	/**
+	 * Get eta
+	 *
+	 * @return \DateTime
+	 */
+	public function getEta()
+	{
+		return $this->eta;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set eta
+	 *
+	 * @param \DateTime $eta
+	 *
+	 * @return Incoming
+	 */
+	public function setEta($eta)
+	{
+		$this->eta = $eta;
 
-    /**
-     * Get eta
-     *
-     * @return \DateTime
-     */
-    public function getEta()
-    {
-        return $this->eta;
-    }
+		return $this;
+	}
 
-    /**
-     * Set scheduled
-     *
-     * @param \DateTime $scheduled
-     *
-     * @return Incoming
-     */
-    public function setScheduled($scheduled)
-    {
-        $this->scheduled = $scheduled;
+	/**
+	 * Get scheduled
+	 *
+	 * @return \DateTime
+	 */
+	public function getScheduled()
+	{
+		return $this->scheduled;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set scheduled
+	 *
+	 * @param \DateTime $scheduled
+	 *
+	 * @return Incoming
+	 */
+	public function setScheduled($scheduled)
+	{
+		$this->scheduled = $scheduled;
 
-    /**
-     * Get scheduled
-     *
-     * @return \DateTime
-     */
-    public function getScheduled()
-    {
-        return $this->scheduled;
-    }
+		return $this;
+	}
 
-    /**
-     * Set arrived
-     *
-     * @param \DateTime $arrived
-     *
-     * @return Incoming
-     */
-    public function setArrived($arrived)
-    {
-        $this->arrived = $arrived;
+	/**
+	 * Get arrived
+	 *
+	 * @return \DateTime
+	 */
+	public function getArrived()
+	{
+		return $this->arrived;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set arrived
+	 *
+	 * @param \DateTime $arrived
+	 *
+	 * @return Incoming
+	 */
+	public function setArrived($arrived)
+	{
+		$this->arrived = $arrived;
 
-    /**
-     * Get arrived
-     *
-     * @return \DateTime
-     */
-    public function getArrived()
-    {
-        return $this->arrived;
-    }
+		return $this;
+	}
 
-    /**
-     * Set created
-     *
-     * @param \DateTime $created
-     *
-     * @return Incoming
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
+	/**
+	 * Get created
+	 *
+	 * @return \DateTime
+	 */
+	public function getCreated()
+	{
+		return $this->created;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set created
+	 *
+	 * @param \DateTime $created
+	 *
+	 * @return Incoming
+	 */
+	public function setCreated($created)
+	{
+		$this->created = $created;
 
-    /**
-     * Get created
-     *
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
+		return $this;
+	}
 
-    /**
-     * Set modified
-     *
-     * @param \DateTime $modified
-     *
-     * @return Incoming
-     */
-    public function setModified($modified)
-    {
-        $this->modified = $modified;
+	/**
+	 * Get modified
+	 *
+	 * @return \DateTime
+	 */
+	public function getModified()
+	{
+		return $this->modified;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set modified
+	 *
+	 * @param \DateTime $modified
+	 *
+	 * @return Incoming
+	 */
+	public function setModified($modified)
+	{
+		$this->modified = $modified;
 
-    /**
-     * Get modified
-     *
-     * @return \DateTime
-     */
-    public function getModified()
-    {
-        return $this->modified;
-    }
+		return $this;
+	}
 
-    /**
-     * Set status
-     *
-     * @param IncomingStatus $status
-     *
-     * @return Incoming
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
+	/**
+	 * Get status
+	 *
+	 * @return IncomingStatus
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set status
+	 *
+	 * @param IncomingStatus $status
+	 *
+	 * @return Incoming
+	 */
+	public function setStatus($status)
+	{
+		$this->status = $status;
 
-    /**
-     * Get status
-     *
-     * @return IncomingStatus
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
+		return $this;
+	}
 
-    /**
-     * Add file
-     *
-     * @param IncomingFile $file
-     *
-     * @return Incoming
-     */
-    public function addFile(IncomingFile $file)
-    {
-        $file->setIncoming($this);
-        $this->files[] = $file;
+	/**
+	 * Add file
+	 *
+	 * @param IncomingFile $file
+	 *
+	 * @return Incoming
+	 */
+	public function addFile(IncomingFile $file)
+	{
+		$file->setIncoming($this);
+		$this->files[] = $file;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove file
-     *
-     * @param IncomingFile $file
-     */
-    public function removeFile(IncomingFile $file)
-    {
-        $this->files->removeElement($file);
-    }
+	/**
+	 * Remove file
+	 *
+	 * @param IncomingFile $file
+	 */
+	public function removeFile(IncomingFile $file)
+	{
+		$this->files->removeElement($file);
+	}
 
-    /**
-     * Get files
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getFiles()
-    {
-        return $this->files;
-    }
+	/**
+	 * Get files
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getFiles()
+	{
+		return $this->files;
+	}
 
-    /**
-     * Add comment
-     *
-     * @param IncomingComment $comment
-     *
-     * @return Incoming
-     */
-    public function addComment(IncomingComment $comment)
-    {
-        $comment->setIncoming($this);
-        $this->comments[] = $comment;
-        return $this;
-    }
+	/**
+	 * Add comment
+	 *
+	 * @param IncomingComment $comment
+	 *
+	 * @return Incoming
+	 */
+	public function addComment(IncomingComment $comment)
+	{
+		$comment->setIncoming($this);
+		$this->comments[] = $comment;
+		return $this;
+	}
 
-    /**
-     * Remove comment
-     *
-     * @param IncomingComment $comment
-     */
-    public function removeComment(IncomingComment $comment)
-    {
-        $this->comments->removeElement($comment);
-    }
+	/**
+	 * Remove comment
+	 *
+	 * @param IncomingComment $comment
+	 */
+	public function removeComment(IncomingComment $comment)
+	{
+		$this->comments->removeElement($comment);
+	}
 
-    /**
-     * Get comments
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getComments()
-    {
-        return $this->comments;
-    }
+	/**
+	 * Get comments
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getComments()
+	{
+		return $this->comments;
+	}
 
-    /**
-     * Add incomingProduct
-     *
-     * @param IncomingProduct $incomingProduct
-     *
-     * @return Incoming
-     */
-    public function addIncomingProduct(IncomingProduct $incomingProduct)
-    {
-        $incomingProduct->setIncoming($this);
-        $this->incoming_products[] = $incomingProduct;
+	/**
+	 * Add incomingProduct
+	 *
+	 * @param IncomingProduct $incomingProduct
+	 *
+	 * @return Incoming
+	 */
+	public function addIncomingProduct(IncomingProduct $incomingProduct)
+	{
+		$incomingProduct->setIncoming($this);
+		$this->incoming_products[] = $incomingProduct;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove incomingProduct
-     *
-     * @param IncomingProduct $incomingProduct
-     */
-    public function removeIncomingProduct(IncomingProduct $incomingProduct)
-    {
-        $this->incoming_products->removeElement($incomingProduct);
-    }
+	/**
+	 * Remove incomingProduct
+	 *
+	 * @param IncomingProduct $incomingProduct
+	 */
+	public function removeIncomingProduct(IncomingProduct $incomingProduct)
+	{
+		$this->incoming_products->removeElement($incomingProduct);
+	}
 
-    /**
-     * Get incomingProducts
-     *
-     * @return IncomingProduct[]
-     */
-    public function getIncomingProducts()
-    {
-        return $this->incoming_products;
-    }
+	/**
+	 * Get incomingProducts
+	 *
+	 * @return IncomingProduct[]|ArrayCollection
+	 */
+	public function getIncomingProducts()
+	{
+		return $this->incoming_products;
+	}
 
-    /**
-     * Add incomingProduct
-     *
-     * @param IncomingProductScan $incomingScannedProduct
-     *
-     * @return Incoming
-     */
-    public function addIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
-    {
-        $incomingScannedProduct->setIncoming($this);
-        $this->incoming_scanned_products[] = $incomingScannedProduct;
+	/**
+	 * Add incomingProduct
+	 *
+	 * @param IncomingProductScan $incomingScannedProduct
+	 *
+	 * @return Incoming
+	 */
+	public function addIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
+	{
+		$incomingScannedProduct->setIncoming($this);
+		$this->incoming_scanned_products[] = $incomingScannedProduct;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @param IncomingProductScan[] $incomingScannedProducts
-     * @return $this
-     */
-    public function setIncomingScannedProducts($incomingScannedProducts)
-    {
-        $this->incoming_scanned_products = $incomingScannedProducts;
-
-        return $this;
-    }
-
-    /**
-     * Remove incomingScannedProduct
-     *
-     * @param IncomingProductScan $incomingScannedProduct
-     */
-    public function removeIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
-    {
-        $this->incoming_scanned_products->removeElement($incomingScannedProduct);
-    }
+	/**
+	 * Remove incomingScannedProduct
+	 *
+	 * @param IncomingProductScan $incomingScannedProduct
+	 */
+	public function removeIncomingScannedProduct(IncomingProductScan $incomingScannedProduct)
+	{
+		$this->incoming_scanned_products->removeElement($incomingScannedProduct);
+	}
 
 	/**
 	 * @return IncomingProductScan[]
 	 */
 	public function getIncomingScannedProducts()
-    {
-        return $this->incoming_scanned_products;
-    }
+	{
+		return $this->incoming_scanned_products;
+	}
 
-    /**
-     * Set user
-     *
-     * @param User $user
-     *
-     * @return Incoming
-     */
-    public function setUser(User $user = null)
-    {
-        $this->user = $user;
+	/**
+	 * @param IncomingProductScan[] $incomingScannedProducts
+	 *
+	 * @return $this
+	 */
+	public function setIncomingScannedProducts($incomingScannedProducts)
+	{
+		$this->incoming_scanned_products = $incomingScannedProducts;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Get user
-     *
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
+	/**
+	 * Get user
+	 *
+	 * @return User
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
+	 * Set user
+	 *
+	 * @param User $user
+	 *
+	 * @return Incoming
+	 */
+	public function setUser(User $user = null)
+	{
+		$this->user = $user;
+
+		return $this;
+	}
 }

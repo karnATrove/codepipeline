@@ -14,6 +14,7 @@ use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\Location;
 use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Entity\User;
 
 class LocationProductManager extends BaseManager
 {
@@ -34,7 +35,7 @@ class LocationProductManager extends BaseManager
 	 * @param Product  $product
 	 * @param Location $location
 	 *
-	 * @return mixed
+	 * @return LocationProduct
 	 */
 	public function findOneByProductAndLocation(Product $product, Location $location)
 	{
@@ -42,10 +43,11 @@ class LocationProductManager extends BaseManager
 	}
 
 	/**
-	 * @param IncomingProductScan $incomingProductScan
-	 * @param null                $entityManager
+	 * @param IncomingProductScan         $incomingProductScan
+	 * @param null|EntityManagerInterface $entityManager
+	 * @param null|User                   $user
 	 */
-	public function createLocationProductByIncomingProductScan(IncomingProductScan $incomingProductScan, $entityManager = null)
+	public function createLocationProductByIncomingProductScan(IncomingProductScan $incomingProductScan, $entityManager = null, $user = null)
 	{
 		$flush = $entityManager ? false : true;
 		$entityManager = $entityManager ? $entityManager : $this->entityManager;
@@ -54,6 +56,9 @@ class LocationProductManager extends BaseManager
 		$locationProduct->setLocation($incomingProductScan->getLocation());
 		$locationProduct->setOnHand($incomingProductScan->getQtyOnScan());
 		$locationProduct->setCreated(new \DateTime('now'));
+		if ($user) {
+			$locationProduct->setUser($user);
+		}
 		$entityManager->persist($locationProduct);
 		if ($flush) {
 			$entityManager->flush();
@@ -61,13 +66,17 @@ class LocationProductManager extends BaseManager
 	}
 
 	/**
-	 * @param LocationProduct $locationProduct
-	 * @param null            $entityManager
+	 * @param LocationProduct             $locationProduct
+	 * @param null|EntityManagerInterface $entityManager
+	 * @param null|User                   $user
 	 */
-	public function updateLocationProduct(LocationProduct $locationProduct, $entityManager = null)
+	public function updateLocationProduct(LocationProduct $locationProduct, $entityManager = null, $user = null)
 	{
 		$flush = $entityManager ? false : true;
 		$entityManager = $entityManager ? $entityManager : $this->entityManager;
+		if ($user) {
+			$locationProduct->setUser($user);
+		}
 		$entityManager->persist($locationProduct);
 		if ($flush) {
 			$entityManager->flush();
