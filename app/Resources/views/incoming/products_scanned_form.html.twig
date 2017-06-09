@@ -21,7 +21,7 @@
                     <small>{{ incoming.name }}</small>
                 </h2>
                 <div class="pull-right">
-                    {% if not incomingUtil.isComplete(incoming) %}
+                    {% if not incomingManager.isComplete(incoming) %}
                         <form name="new-form" id="scan-incoming-product-new-form" method="post" class="ajaxForm"
                               action="{{ path('incoming_products_scanned_new_ajax',{'id':incoming.id}) }}">
                             <a href="{{ path('incoming_products_scanned', {'id':incoming.id}) }}" class="btn btn-warning pull-left">Refresh total count</a>
@@ -38,7 +38,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                {% set iscomplete = incomingUtil.isComplete(incoming) %}
+                {% set iscomplete = incomingManager.isComplete(incoming) %}
                 <form name="modify-form" id="incoming-product-page-form" method="post" class="ajaxForm"
                       action="{{ path('incoming_products_scanned_ajax',{'id':incoming.id}) }}">
                     <div class="error_zone"></div>

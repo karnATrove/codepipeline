@@ -45,13 +45,6 @@ class Incoming
     private $user;
 
     /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="type", type="integer")
-     */
-    private $type;
-
-    /**
      * @var string
      * @Gedmo\Versioned
      * @ORM\Column(name="name", type="string", length=50)
@@ -94,13 +87,6 @@ class Incoming
     private $modified;
 
     /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="status", type="integer")
-     */
-    private $status;
-
-    /**
      * One Incoming has Many IncomingFile.
      * @ORM\OneToMany(targetEntity="IncomingFile", mappedBy="incoming")
      */
@@ -120,17 +106,15 @@ class Incoming
      */
     private $incoming_products;
 
-//	/**
-//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
-//	 * @JoinColumn(name="type", referencedColumnName="id")
-//	 */
-//    private $incomingType;
-//
-//	/**
-//	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
-//	 * @JoinColumn(name="status", referencedColumnName="id")
-//	 */
-//	private $incomingStatus;
+	/**
+	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
+	 */
+    private $type;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
+	 */
+	private $status;
 
     /**
      * @var IncomingProductScan[]
@@ -328,7 +312,7 @@ class Incoming
     /**
      * Set status
      *
-     * @param integer $status
+     * @param IncomingStatus $status
      *
      * @return Incoming
      */
@@ -342,7 +326,7 @@ class Incoming
     /**
      * Get status
      *
-     * @return int
+     * @return IncomingStatus
      */
     public function getStatus()
     {
@@ -551,5 +535,37 @@ class Incoming
 	public function setIncomingStatus($incomingStatus)
 	{
 		$this->incomingStatus = $incomingStatus;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTypeId()
+	{
+		return $this->typeId;
+	}
+
+	/**
+	 * @param int $typeId
+	 */
+	public function setTypeId($typeId)
+	{
+		$this->typeId = $typeId;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getStatusId()
+	{
+		return $this->statusId;
+	}
+
+	/**
+	 * @param int $statusId
+	 */
+	public function setStatusId($statusId)
+	{
+		$this->statusId = $statusId;
 	}
 }

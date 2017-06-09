@@ -1,5 +1,19 @@
 Update log
 =
+v1.0.1
+-
+clean up code
+
+```
+ALTER TABLE warehouse_incoming CHANGE type type_id INT NOT NULL;
+ALTER TABLE warehouse_incoming CHANGE status status_id INT NOT NULL;
+
+ALTER TABLE wms_production.warehouse_incoming MODIFY type_id INT(11) NOT NULL;
+ALTER TABLE wms_production.warehouse_incoming MODIFY status_id INT(11) NOT NULL;
+
+ALTER TABLE wms_production.warehouse_incoming_status MODIFY id INT(11) NOT NULL;
+
+```
 
 v1.0.0
 -

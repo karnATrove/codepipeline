@@ -86,15 +86,6 @@ class Incoming
 	}
 
 	/**
-	 * Returns a boolean if the incoming container is completed.
-	 */
-	public function isComplete(\WarehouseBundle\Entity\Incoming $incoming)
-	{
-		if ($this->incomingStatusName($incoming->getStatus()) == 'Completed') return TRUE;
-		return FALSE;
-	}
-
-	/**
 	 * Return a human readable format of the product status.
 	 *
 	 * @param      integer $status The product status identifier

@@ -52,6 +52,7 @@ twig:
         productUtil: "@app.product"
         incomingUtil: "@app.incoming"
         returnUtil: "@app.return"
+        incomingManager: "@warehouse.manager.incoming_manager"
         fileUtil: "@app.document_uploader"
         documents_directory: '%documents_directory%'
         site_name: "%business.name%"

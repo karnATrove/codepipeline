@@ -33,7 +33,15 @@ services:
     warehouse.manager.user_group_manager:
         class: WarehouseBundle\Manager\UserGroupManager
         arguments: ['@doctrine.orm.entity_manager']
-
+    warehouse.manager.incoming_manager:
+        class: WarehouseBundle\Manager\IncomingManager
+        arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.location_product_manager:
+        class: WarehouseBundle\Manager\LocationProductManager
+        arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.incoming_status_manager:
+        class: WarehouseBundle\Manager\IncomingStatusManager
+        arguments: ['@doctrine.orm.entity_manager']
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
       arguments: ['@service_container']
