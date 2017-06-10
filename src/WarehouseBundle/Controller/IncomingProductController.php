@@ -254,6 +254,7 @@ class IncomingProductController extends Controller
 			$incomingProduct = $em->getRepository('WarehouseBundle:IncomingProduct')->findOneByModel($incoming, $model);
 			$item = $em->getRepository('WarehouseBundle:IncomingProductScan')->findOneByModel($incoming, $model, FALSE); # Non assigned only
 			$product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
+			$numberPerScan = 0; # Number of qty to increment when added
 			#
 			if (!$item) {
 				# make a new scan item
@@ -273,7 +274,7 @@ class IncomingProductController extends Controller
 				$item = (new IncomingProductScan())
 					->setIncoming($incoming)
 					->setIncomingProduct($incomingProduct)
-					->setQtyOnScan(1)
+					->setQtyOnScan($numberPerScan)
 					->setProduct($product)
 					->setCreated(new \DateTime('now'));
 
@@ -284,7 +285,7 @@ class IncomingProductController extends Controller
 			} else {
 				# Update the scan item
 				$item->setModified(new \DateTime('now'));
-				$item->setQtyOnScan($item->getQtyOnScan() + 1);
+				$item->setQtyOnScan($item->getQtyOnScan() + $numberPerScan);
 				$this->get('session')->getFlashBag()->add('success', "Increased unassigned quantity to <strong>$model</strong>.");
 			}
 			$item->setUser($this->getUser());
@@ -304,6 +305,47 @@ class IncomingProductController extends Controller
 
 			return new JsonResponse($response, 200);
 		}
+	}
+
+	/**
+	 * Ajax split of an existing IncomingProductScan item.
+	 *
+	 * @Route("/incoming-scan-split/ajax/{id}", name="incoming_products_scanned_split_ajax")
+	 */
+	public function incomingProductsScannedSplitAjaxAction(Request $request, IncomingProductScan $incomingProductScan)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$response = [];
+		$incoming = $incomingProductScan->getIncoming();
+		if (IncomingStatusManager::haveStatus($incoming, [IncomingStatus::INBOUND, IncomingStatus::ARRIVED])) {
+			$newIncomingProductScan = (new IncomingProductScan())
+				->setIncoming($incoming)
+				->setIncomingProduct($incomingProductScan->getIncomingProduct())
+				->setUser($this->getUser())
+				->setCreated(new \DateTime('now'))
+				->setQtyOnScan(0)
+				->setProduct($incomingProductScan->getProduct());
+			$em->persist($newIncomingProductScan);
+			$em->flush();
+		} else {
+			$this->get('session')->getFlashBag()->add('error', "Incoming container is no longer in active/arrived status.");
+		}
+
+		$response['ajaxCommand'][] = [
+			'selector' => '.loading',
+			'op' => 'hide',
+			'value' => '',
+		];
+		$response['ajaxCommand'][] = [
+			'selector' => '#scanned_form_wrap',
+			'op' => 'html',
+			'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
+				'form_scan' => $this->createModifyScannedForm($incoming)->createView(),
+				'form_new' => $this->createNewScannedForm($incoming)->createView(),
+				'incoming' => $incoming,
+			]),
+		];
+		return new JsonResponse($response, 200);
 	}
 
 	/**

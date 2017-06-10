@@ -121,7 +121,7 @@ class Incoming
 	 *
 	 * One Incoming has Many IncomingProductScan.
 	 * @ORM\OneToMany(targetEntity="IncomingProductScan", mappedBy="incoming", cascade={"persist","remove"})
-	 * @ORM\OrderBy({"id" = "ASC", "modified" = "DESC"})
+	 * @ORM\OrderBy({"id" = "DESC", "modified" = "DESC"})
 	 */
 	private $incoming_scanned_products;
 
