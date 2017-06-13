@@ -13,10 +13,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
+use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Exception\Manager\ManagerException;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Manager\IncomingProductManager;
+use WarehouseBundle\Manager\IncomingStatusManager;
 use WarehouseBundle\Manager\LocationManager;
 
 class IncomingProductScanWorkflow extends BaseWorkflow
@@ -113,6 +115,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$incomingProduct = $this->incomingProductManager->getOneByIncomingAndSku($incoming, $sku);
 		$incomingProductScan = $this->incomingProductScanManager->getOneByIncomingAndSku($incoming, $sku, false);
 		$product = $this->productManager->getOneBySku($sku);
+		$numberPerScan = 0;
 		if (!$incomingProductScan) {
 			if (!$product) {
 				$product = $this->productManager->createNewProductWithDefaultInfo($sku, $this->user);
@@ -122,12 +125,12 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			$incomingProductScan = new IncomingProductScan();
 			$incomingProductScan->setIncoming($incoming);
 			$incomingProductScan->setIncomingProduct($incomingProduct);
-			$incomingProductScan->setQtyOnScan(1);
+			$incomingProductScan->setQtyOnScan($numberPerScan);
 			$incomingProductScan->setProduct($product);
 			$incomingProductScan->setCreated(new \DateTime());
 			$incomingProductScan->setModified(new \DateTime());
 			if (!$incomingProduct) {
-				$messages['success'][] = "<strong> {$sku} </strong> was not identified in the Incoming container ".
+				$messages['success'][] = "<strong> {$sku} </strong> was not identified in the Incoming container " .
 					"however it was added to this list.";
 
 			} else {
@@ -136,7 +139,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		} else {
 			# Update the scan item
 			$incomingProductScan->setModified(new \DateTime('now'));
-			$incomingProductScan->setQtyOnScan($incomingProductScan->getQtyOnScan() + 1);
+			$incomingProductScan->setQtyOnScan($incomingProductScan->getQtyOnScan() + $numberPerScan);
 			$messages['success'][] = "Increased unassigned quantity to <strong> {$sku} </strong>.";
 		}
 		$incomingProductScan->setUser($this->user);
@@ -186,6 +189,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
 		}
 		$this->entityManager->flush();
+		$this->entityManager->refresh($incoming);
 		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
 			AjaxCommandDTO::OP_HTML, $this->getScannedProductTableView($incoming));
 		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
@@ -232,6 +236,38 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
 			AjaxCommandDTO::OP_HTML, $this->getMessageBagView());
 		return $ajaxCommands;
+	}
 
+	/**
+	 * @param IncomingProductScan $incomingProductScan
+	 *
+	 * @return array
+	 * @throws WorkflowException
+	 */
+	public function splitProductScan(IncomingProductScan $incomingProductScan)
+	{
+		$incoming = $incomingProductScan->getIncoming();
+		if (!IncomingStatusManager::haveStatus($incoming, [IncomingStatus::INBOUND, IncomingStatus::ARRIVED])) {
+			throw new WorkflowException('Incoming container is no longer in active/arrived status.');
+		}
+		if (!$this->user) {
+			throw new WorkflowException("Failed! Can not identify user. Please refresh page and try again.");
+		}
+		$newIncomingProductScan = (new IncomingProductScan())
+			->setIncoming($incoming)
+			->setIncomingProduct($incomingProductScan->getIncomingProduct())
+			->setUser($this->user)
+			->setCreated(new \DateTime())
+			->setModified(new \DateTime())
+			->setQtyOnScan(0)
+			->setProduct($incomingProductScan->getProduct());
+		$this->incomingProductScanManager->update($newIncomingProductScan);
+		$messages['success'][] = "Incoming scanned product {$incomingProductScan->getProduct()->getModel()} split";
+		$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
+			AjaxCommandDTO::OP_HTML, $this->getScannedProductTableView($incoming));
+		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
+			AjaxCommandDTO::OP_HTML, $this->getMessageBagView());
+		return $ajaxCommands;
 	}
 }

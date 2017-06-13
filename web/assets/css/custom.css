@@ -2,6 +2,9 @@
 
 blockquote { font-size:14px; }
 #scan.form-control, #form_scan.form-control { text-align:center; padding:30px; height:60px; }
+
+.modal { z-index:9999; }
+
 #quick-scan #form_incoming { text-align:center; height:60px; }
 
 .left_col {

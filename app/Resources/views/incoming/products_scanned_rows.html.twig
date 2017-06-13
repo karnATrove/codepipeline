@@ -5,12 +5,20 @@
         <tr  class="warning">
     {% endif %}
 
-    <td width="60">
+    <td width="100" class="form-inline">
         {% if not isComplete %}
-            <a data-confirm="Are you sure!" title="Delete" class="btn btn-danger btn-sm ajaxLink"
-               href="{{ path('incoming_products_scanned_delete_ajax', { 'id': scannedProduct.id}) }}">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            </a>
+            <div class="form-group">
+                <a data-confirm="Are you sure!" title="Delete" class="btn btn-danger btn-sm ajaxLink"
+                   href="{{ path('incoming_products_scanned_delete_ajax', { 'id': scannedProduct.id}) }}">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="form-group">
+                <a title="Split" class="btn btn-success btn-sm ajaxLink"
+                   href="{{ path('incoming_products_scan_split_ajax', { 'id': scannedProduct.id}) }}">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </a>
+            </div>
         {% endif %}
     </td>
     <td>

@@ -114,7 +114,7 @@ class IncomingController extends Controller
         // Paginator
         $adapter = new DoctrineORMAdapter($queryBuilder);
         $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($request->get('pcg_show' , 10));
+        $pagerfanta->setMaxPerPage($request->get('pcg_show' , 20));
 
         try {
             $pagerfanta->setCurrentPage($request->get('pcg_page', 1));

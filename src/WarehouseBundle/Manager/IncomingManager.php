@@ -81,4 +81,11 @@ class IncomingManager extends BaseManager
 		}
 	}
 
+	/**
+	 * @param Incoming $incoming
+	 */
+	public function refresh(Incoming $incoming){
+		$this->entityManager->refresh($incoming);
+	}
+
 }

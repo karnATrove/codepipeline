@@ -172,4 +172,31 @@ class IncomingProductScanController extends Controller
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
 		return new JsonResponse($response, JsonResponse::HTTP_OK);
 	}
+
+	/**
+	 * Ajax split of an existing IncomingProductScan item.
+	 *
+	 * @Route("/incoming-scan-split/ajax/{id}", name="incoming_products_scan_split_ajax")
+	 */
+	public function incomingProductsScannedSplitAjaxAction(Request $request, IncomingProductScan $incomingProductScan)
+	{
+		if (!$request->isXmlHttpRequest()) {
+			$this->get('session')->getFlashBag()->add('error',
+				"Form should have been submitted via AJAX.");
+			return $this->redirect($this->generateUrl('incoming_products_scanned',
+				['id' => $incomingProductScan->getIncoming()->getId()]));
+		}
+		try {
+			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				->splitProductScan($incomingProductScan);
+		} catch (\Exception $exception) {
+			$messages['error'][] = "Error: {$exception->getMessage()}";
+			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
+				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+					->getMessageBagView());
+		}
+		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
+		return new JsonResponse($response, JsonResponse::HTTP_OK);
+	}
 }
