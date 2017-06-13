@@ -45,7 +45,8 @@
     "lexik/form-filter-bundle": "~5.0",
     "petkopara/crud-generator-bundle": "^3.0",
     "symfony/monolog-bundle": "^3.1",
-    "symfony/serializer": "^3.2"
+    "symfony/serializer": "^3.2",
+    "rove/canonical-dto": "^1.0"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",
@@ -68,7 +69,8 @@
     ]
   },
   "config": {
-    "bin-dir": "bin"
+    "bin-dir": "bin",
+    "secure-http": false
   },
   "extra": {
     "symfony-app-dir": "app",
@@ -80,5 +82,9 @@
       "file": "app/config/parameters.yml"
     },
     "branch-alias": null
-  }
+  },
+  "repositories": [{
+    "type": "composer",
+    "url": "http://satis.rove.team"
+  }]
 }

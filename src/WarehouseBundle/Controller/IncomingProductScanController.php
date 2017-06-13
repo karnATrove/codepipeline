@@ -171,7 +171,7 @@ class IncomingProductScanController extends Controller
 	 *
 	 * @Route("/{id}/ajax/complete-scan", name="incoming_products_scan_complete")
 	 */
-	public function incomingProductsScannedAjaxAction(Request $request, Incoming $incoming)
+	public function incomingProductsScannedCompleteAjaxAction(Request $request, Incoming $incoming)
 	{
 		if (!$request->isXmlHttpRequest()) {
 			$this->get('session')->getFlashBag()->add('error',
