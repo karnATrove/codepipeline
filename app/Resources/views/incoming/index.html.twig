@@ -32,7 +32,7 @@
         <div class="col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                  <h2><a href="{{ path('product') }}">Incoming</a> <small>Inbound products to warehouse</small></h2>
+                  <h2><a href="{{ path('incoming') }}">Incoming</a> <small>Inbound products to warehouse</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
                     <li><a class="close-link"><i class="fa fa-close"></i></a></li>
@@ -83,11 +83,11 @@
                         <!-- PAGE SIZE -->
                         <div class="pagination form-inline ">
                             <select class = "form-control"  onchange="window.location = this.value" >
-                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
-                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
-                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
-                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
-                                <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
+                                <option value='{{ path('incoming', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
+                                <option value='{{ path('incoming', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 or app.request.query.get('pcg_show') == '' %} selected {% endif %}>20</option>
+                                <option value='{{ path('incoming', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 %} selected {% endif %}>50</option>
+                                <option value='{{ path('incoming', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>100</option>
+                                <option value='{{ path('incoming', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>500</option>
                             </select>
                         </div>
                         <!-- END PAGE SIZE -->
@@ -141,7 +141,7 @@
                                     <tr>
                                         <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{inbound.id}}"/></td>
                                         <!--<td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.id }}</a></td>-->
-                                        <td><a href="{{ path('incoming_edit', { 'id': inbound.id }) }}">{{ inbound.name }}</a></td>
+                                        <td><a href="{{ path('incoming_products_scanned', app.request.query.all|merge({'id':inbound.id})) }}">{{ inbound.name }}</a></td>
                                         <td>{#{ incomingUtil.incomingTypeName(inbound.type) }#}{{ inbound.type.detail }}</td>
                                         <td>{#{ incomingUtil.incomingStatusName(inbound.status) }#}{{ inbound.status.detail }}</td>
                                         <td>{% if inbound.eta %}{{ inbound.eta|date('Y-m-d') }}{% endif %}</td>
