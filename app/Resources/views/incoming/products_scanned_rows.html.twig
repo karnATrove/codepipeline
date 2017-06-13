@@ -1,45 +1,65 @@
-{% for incomingScannedProduct in form.incomingScannedProducts %}
-    {% if incoming.incomingScannedProducts[loop.index0].incomingProduct and incoming.incomingScannedProducts[loop.index0].incomingProduct.qty == incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) %}
+{% for scannedProduct in scannedProducts %}
+    {% if scannedProduct.incomingProduct and scannedProduct.incomingProduct.qty == incomingUtil.getIncomingProductScanCountByModel(incoming,scannedProduct.product.model) %}
         <tr>
     {% else %}
         <tr  class="warning">
     {% endif %}
 
     <td width="60">
-        {% if not iscomplete %}
+        {% if not isComplete %}
             <a data-confirm="Are you sure!" title="Delete" class="btn btn-danger btn-sm ajaxLink"
-               href="{{ path('incoming_products_scanned_delete_ajax', { 'id': incoming.incomingScannedProducts[loop.index0].id}) }}">
+               href="{{ path('incoming_products_scanned_delete_ajax', { 'id': scannedProduct.id}) }}">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </a>
         {% endif %}
     </td>
     <td>
-        {{ incoming.incomingScannedProducts[loop.index0].product.model }}
+        {{ scannedProduct.product.model }}
     </td>
     <td>
-        {% if incoming.incomingScannedProducts[loop.index0].incomingProduct %}
-            {{ incoming.incomingScannedProducts[loop.index0].incomingProduct.qty }}
-        {% else %}n/a{% endif %}</td>
-    <td>{{ incomingUtil.getIncomingProductScanCountByModel(incoming,incoming.incomingScannedProducts[loop.index0].product.model) }}</td>
+        {% if scannedProduct.incomingProduct %}
+            {{ scannedProduct.incomingProduct.qty }}
+        {% else %}N/A{% endif %}</td>
+    <td>
+        {{ incomingUtil.getIncomingProductScanCountByModel(incoming,scannedProduct.product.model) }}
+    </td>
     <td width="170">
-        {% if not iscomplete %}
-            {{ form_widget(incomingScannedProduct.locationId,
-            {'attr':
-                {
-                    'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                    'data-type': 'location'
-                }
-            }) }}
-        {% else %}-{% endif %}</td>
+        {% if not isComplete %}
+            <select class="form-control" name="scannedProduct[{{ scannedProduct.id }}][location]"
+                    data-url="{{ path('incoming_product_scan_edit_ajax',{'id':scannedProduct.id}) }}"
+                    data-type="location"
+                    title="Location"
+                    required>
+                {% if scannedProduct.locationId==null %}
+                    <option selected value>select location</option>
+                {% else %}
+                    <option value>select location</option>
+                {% endif %}
+                {% for locationDropdown in locationDropdownList %}
+                    {% if scannedProduct.locationId ==  loop.index %}
+                        <option value="{{ loop.index }}" selected>{{ locationDropdown }}</option>
+                    {% else %}
+                        <option value="{{ loop.index }}">{{ locationDropdown }}</option>
+                    {% endif %}
+
+                {% endfor %}
+            </select>
+        {% else %}
+            {% if scannedProduct.location %}
+                {{ scannedProduct.location.printLocation }}
+            {% else %}
+                N/A
+            {% endif %}
+        {% endif %}
+    </td>
     <td width="80">
-        {% if not iscomplete %}
-            {{ form_widget(incomingScannedProduct.qtyOnScan, {'attr':
-                {
-                    'data-url':path('incoming_product_scan_edit_ajax',{'id':incoming.incomingScannedProducts[loop.index0].id}),
-                    'data-type': 'quantity'
-                }
-            }) }}
-        {% else %}-{% endif %}
+        {% if not isComplete %}
+            <input type="number" class="form-control" name="scannedProduct[{{ scannedProduct.id }}][quantity]"
+                   data-url="{{ path('incoming_product_scan_edit_ajax',{'id':scannedProduct.id}) }}"
+                   data-type="quantity"
+                   title="qty" value="{{ scannedProduct.qtyOnScan }}"
+                   required>
+        {% else %}{{ scannedProduct.qtyOnScan }}{% endif %}
     </td>
     </tr>
 {% endfor %}

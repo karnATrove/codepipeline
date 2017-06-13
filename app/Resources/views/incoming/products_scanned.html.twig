@@ -30,116 +30,18 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2><i class="fa fa-bars"></i> Container
-                        <small>{{ incoming.name }}</small>
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group">
-                                <label>Container Name</label>
-                                <div>
-                                    {{ incoming.name }}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Container Status</label>
-                                <div>
-                                    {#{ incomingUtil.incomingStatusName(incoming.status) }#}{{ incoming.status.detail }}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Container Type</label>
-                                <div>
-                                    {#{ incomingUtil.incomingTypeName(incoming.type) }#}{{ incoming.type.detail }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group">
-                                <label>ETA</label>
-                                <div>
-                                    {{ incoming.eta|date('Y-m-d') }}
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Scheduled</label>
-                                <div>
-                                    {% if incoming.scheduled %}{{ incoming.scheduled|date('Y-m-d H:i A') }}{% else %}-{% endif %}
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Arrived</label>
-                                <div>
-                                    {% if incoming.arrived %}{{ incoming.arrived|date('Y-m-d') }}{% else %}-{% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
+    {% include 'incoming/products_scanned_container_info.html.twig' with {'incoming':incoming} %}
 
     <!-- FORM -->
-    <div id="scanned_form_wrap" style="position:relative;">
-        {% include 'incoming/products_scanned_form.html.twig' with {'form_scan': form_scan, 'form_new': form_new, 'incoming':incoming} %}
+    <div id="scanned_form_wrap">
+        {% include 'incoming/products_scanned_form.html.twig'
+        with {'scannedProducts':scannedProducts, 'incoming':incoming,'locationDropdownList':locationDropdownList} %}
     </div>
     <!-- ENDFORM -->
 
     <div class="row">
-        <div class="col-xs-12">
-            <div class="x_panel">
-                <div class="x_title">
-                    <h2><i class="fa fa-bars"></i> Packing List
-                        <small>Assigned by client</small>
-                    </h2>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-
-                    <table id="datatable-keytable" class="table table-striped table-bordered">
-                        <thead>
-                        <tr>
-                            <th>{{ 'Model' }}</th>
-                            <th>{{ 'Qty Incoming' }}</th>
-                            <th>{{ 'Qty Scanned' }}</th>
-                        </tr>
-                        </thead>
-                        <tbody class="incomingProducts">
-                        {% for incomingProduct in incoming.incomingProducts %}
-                            {% if incomingProduct.qty==incomingUtil.getIncomingProductScanCountByModel(incoming,incomingProduct.product.model) %}
-                                <tr>
-                            {% else %}
-                                <tr class="warning">
-                            {% endif %}
-
-                                <td>{{ incomingProduct.product.model }}</td>
-                                <td>{{ incomingProduct.qty }}</td>
-                                <td>{{ incomingUtil.getIncomingProductScanCountByModel(incoming,incomingProduct.product.model) }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-
-                    <div class="clearfix"></div>
-
-                </div>
-            </div>
-
-        </div>
+        {% include 'incoming/products_scanned_packing_list.html.twig'
+        with {'incoming':incoming} %}
     </div>
 
 {% endblock %}

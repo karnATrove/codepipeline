@@ -30,6 +30,7 @@ use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Manager\IncomingStatusManager;
+use WarehouseBundle\Manager\LocationManager;
 
 /**
  * Booking controller.
@@ -63,34 +64,19 @@ class IncomingProductController extends Controller
 	 * Lists all Incoming entity products.
 	 *
 	 * @Route("/{id}/products_scanned", name="incoming_products_scanned")
-	 * xxxx@Method("GET")
+	 * @Method("GET")
 	 */
 	public function incomingProductsScannedAction(Request $request, Incoming $incoming)
 	{
-		$em = $this->getDoctrine()->getManager();
-		/** @var QueryBuilder $queryBuilder */
-		$queryBuilder = $em->getRepository('WarehouseBundle:IncomingProductScan')->createQueryBuilder('ips')
-			->where('ips.incoming = :incoming')
-			->setParameter('incoming', $incoming);
-
-		# TODO: This should go into a form type as it is duped from ScanController.php
-		$form_scan = $this->createModifyScannedForm($incoming);
-		$form_scan->handleRequest($request);
-
-		# Submissions will be by ajax
-
-		if ($form_scan->isSubmitted() && $form_scan->isValid()) {
-			if (!$request->isXmlHttpRequest()) {
-				$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
-				return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
-			}
-		}
-
+		$scannedProducts = $this->get('warehouse.manager.incoming_product_scan_manager')
+			->getByIncoming($incoming);
+		$locations = $this->get('warehouse.manager.location_manager')->getLocations();
+		$locationDropdownList = LocationManager::toArray($locations);
+		$newScannedForm = $this->createNewScannedForm($incoming);
 		return $this->render('incoming/products_scanned.html.twig', [
 			'incoming' => $incoming,
-			'incomingProducts' => $queryBuilder->getQuery()->getResult(),
-			'form_scan' => $form_scan->createView(),
-			'form_new' => $this->createNewScannedForm($incoming)->createView(),
+			'scannedProducts' => $scannedProducts,
+			'locationDropdownList' => $locationDropdownList,
 		]);
 	}
 
@@ -166,179 +152,68 @@ class IncomingProductController extends Controller
 		return $form;
 	}
 
-	/**
-	 * Submits incoming products scanned form (ajax).
-	 *
-	 * @Route("/{id}/ajax/products_scanned", name="incoming_products_scanned_ajax")
-	 */
-	public function incomingProductsScannedAjaxAction(Request $request, Incoming $incoming)
-	{
-		//todo test this function
-		if (!$request->isXmlHttpRequest()) {
-			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
-			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
-		}
-
-		$em = $this->getDoctrine()->getManager();
-		$form_scan = $this->createModifyScannedForm($incoming);
-		$form_scan->handleRequest($request);
-
-		# Submissions will be by ajax
-		if (!$form_scan->isSubmitted() || !$form_scan->isValid()) {
-			$this->get('session')->getFlashBag()->add('error', "Form not valid");
-			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
-		}
-
-		// Ensure it isn't already completed.
-		if (IncomingManager::isComplete($incoming)) {
-			$this->get('session')->getFlashBag()->add('error', "Incoming is already set to complete.");
-			return new JsonResponse([], JsonResponse::HTTP_OK);
-		}
-		try {
-			if ($form_scan->get('load_data')->isClicked()) {
-				$this->get('warehouse.workflow.incoming_workflow')->loadScannedProducts($incoming);
-				$incomingProductScan = $this->get('warehouse.manager.incoming_product_scan_manager')
-					->getByIncoming($incoming);
-				$incoming->setIncomingScannedProducts($incomingProductScan);
-				$form_scan = $this->createModifyScannedForm($incoming);
-				$this->get('session')->getFlashBag()
-					->add('success', "Packing list pre-loaded.");
-			} else {
-				$items = $form_scan->getData();
-				$em->persist($items);
-				$em->flush();
-				if ($form_scan->get('complete')->isClicked()) {
-					$this->get('warehouse.workflow.incoming_workflow')->setIncomingComplete($incoming);
-					$this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete.");
-				}
-			}
-			$response = [];
-			$response['ajaxCommand'][] = [
-				'selector' => '#scanned_form_wrap',
-				'op' => 'html',
-				'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
-					'form_scan' => $form_scan->createView(),
-					'form_new' => $this->createNewScannedForm($incoming)->createView(),
-					'incoming' => $incoming,
-				]),
-			];
-			return new JsonResponse($response, 200);
-		} catch (\Exception $exception) {
-			$msg = "An error occurred. " . $exception->getMessage();
-			$this->get('session')->getFlashBag()->add('error', $msg);
-			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
-		}
-	}
-
-	/**
-	 * Lists all Incoming entity products.
-	 *
-	 * @Route("/{id}/ajax/products_scanned_new", name="incoming_products_scanned_new_ajax")
-	 */
-	public function incomingProductsScannedNewAjaxAction(Request $request, Incoming $incoming)
-	{
-		if (!$request->isXmlHttpRequest()) {
-			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
-			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
-		}
-
-		$em = $this->getDoctrine()->getManager();
-		$form_new = $this->createNewScannedForm($incoming);
-		$form_new->handleRequest($request);
-
-		# Submissions will be by ajax
-		if ($form_new->isSubmitted() && $form_new->isValid()) {
-			$model = trim($request->request->get('form')['new']);
-
-			# Check if it exists?
-			$incomingProduct = $em->getRepository('WarehouseBundle:IncomingProduct')->findOneByModel($incoming, $model);
-			$item = $em->getRepository('WarehouseBundle:IncomingProductScan')->findOneByModel($incoming, $model, FALSE); # Non assigned only
-			$product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
-			#
-			if (!$item) {
-				# make a new scan item
-				if (!$product) { # Product does not exist
-					# Create new product
-					$product = (new Product())->setUser($this->getUser())
-						->setModel($model)
-						->setStatus(1)
-						->setDescription('No product description')
-						->setQtyPerCarton(1)
-						->setDimUnits('in')
-						->setWeightUnits('lbs')
-						->setCreated(new \DateTime('now'));
-					$em->persist($product);
-					$this->get('session')->getFlashBag()->add('warning', "<strong>" . $model . "</strong> was created as a new product.");
-				}
-				$item = (new IncomingProductScan())
-					->setIncoming($incoming)
-					->setIncomingProduct($incomingProduct)
-					->setQtyOnScan(1)
-					->setProduct($product)
-					->setCreated(new \DateTime('now'));
-
-				if (!$incomingProduct)
-					$this->get('session')->getFlashBag()->add('success', "<strong>" . $model . "</strong> was not identified in the Incoming container however it was added to this list.");
-				else
-					$this->get('session')->getFlashBag()->add('success', "Successfully added <strong>$model</strong>.");
-			} else {
-				# Update the scan item
-				$item->setModified(new \DateTime('now'));
-				$item->setQtyOnScan($item->getQtyOnScan() + 1);
-				$this->get('session')->getFlashBag()->add('success', "Increased unassigned quantity to <strong>$model</strong>.");
-			}
-			$item->setUser($this->getUser());
-			$em->persist($item);
-			$em->flush();
-			$formView = $this->createModifyScannedForm($incoming)->createView();
-
-			$response['ajaxCommand'][] = [
-				'selector' => '#scanned_form_wrap',
-				'op' => 'html',
-				'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
-					'form_scan' => $formView,
-					'form_new' => $form_new->createView(),
-					'incoming' => $incoming,
-				]),
-			];
-
-			return new JsonResponse($response, 200);
-		}
-	}
-
-	/**
-	 * Ajax deletion of an IncomingProductScan item.
-	 *
-	 * @Route("/incoming-delete/ajax/{id}", name="incoming_products_scanned_delete_ajax")
-	 */
-	public function incomingProductsScannedDeleteAjaxAction(Request $request, IncomingProductScan $incomingProductScan)
-	{
-		$em = $this->getDoctrine()->getManager();
-		$response = [];
-		$incoming = $incomingProductScan->getIncoming();
-		if (IncomingStatusManager::haveStatus($incoming, [IncomingStatus::INBOUND, IncomingStatus::ARRIVED])) {
-			$em->remove($incomingProductScan);
-			$em->flush();
-		} else {
-			$this->get('session')->getFlashBag()->add('error', "Incoming container is no longer in active/arrived status.");
-		}
-
-		$response['ajaxCommand'][] = [
-			'selector' => '.loading',
-			'op' => 'hide',
-			'value' => '',
-		];
-		$response['ajaxCommand'][] = [
-			'selector' => '#scanned_form_wrap',
-			'op' => 'html',
-			'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
-				'form_scan' => $this->createModifyScannedForm($incoming)->createView(),
-				'form_new' => $this->createNewScannedForm($incoming)->createView(),
-				'incoming' => $incoming,
-			]),
-		];
-		return new JsonResponse($response, 200);
-	}
+//	/**
+//	 * Submits incoming products scanned form (ajax).
+//	 *
+//	 * @Route("/{id}/ajax/products_scanned", name="incoming_products_scanned_ajax")
+//	 */
+//	public function incomingProductsScannedAjaxAction(Request $request, Incoming $incoming)
+//	{
+//		if (!$request->isXmlHttpRequest()) {
+//			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
+//			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
+//		}
+//
+//		$em = $this->getDoctrine()->getManager();
+//		$form_scan = $this->createModifyScannedForm($incoming);
+//		$form_scan->handleRequest($request);
+//
+//		# Submissions will be by ajax
+//		if (!$form_scan->isSubmitted() || !$form_scan->isValid()) {
+//			$this->get('session')->getFlashBag()->add('error', "Form not valid");
+//			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
+//		}
+//
+//		// Ensure it isn't already completed.
+//		if (IncomingManager::isComplete($incoming)) {
+//			$this->get('session')->getFlashBag()->add('error', "Incoming is already set to complete.");
+//			return new JsonResponse([], JsonResponse::HTTP_OK);
+//		}
+//		try {
+//			if ($form_scan->get('load_data')->isClicked()) {
+//				$this->get('warehouse.workflow.incoming_workflow')->loadScannedProducts($incoming);
+//				$incomingProductScan = $this->get('warehouse.manager.incoming_product_scan_manager')
+//					->getByIncoming($incoming);
+//				$incoming->setIncomingScannedProducts($incomingProductScan);
+//				$form_scan = $this->createModifyScannedForm($incoming);
+//				$this->get('session')->getFlashBag()
+//					->add('success', "Packing list pre-loaded.");
+//			} else {
+//				$items = $form_scan->getData();
+//				$em->persist($items);
+//				$em->flush();
+//				if ($form_scan->get('complete')->isClicked()) {
+//					$this->get('warehouse.workflow.incoming_workflow')->setIncomingComplete($incoming);
+//					$this->get('session')->getFlashBag()->add('success', "Incoming container scanned list was saved and Incoming container is now complete.");
+//				}
+//			}
+//			$response = [];
+//			$response['ajaxCommand'][] = [
+//				'selector' => '#scanned_form_wrap',
+//				'op' => 'html',
+//				'value' => $this->renderView('incoming/products_scanned_form.html.twig', [
+//					'form_scan' => $form_scan->createView(),
+//					'form_new' => $this->createNewScannedForm($incoming)->createView(),
+//					'incoming' => $incoming,
+//				]),
+//			];
+//			return new JsonResponse($response, 200);
+//		} catch (\Exception $exception) {
+//			$msg = "An error occurred. " . $exception->getMessage();
+//			$this->get('session')->getFlashBag()->add('error', $msg);
+//			return $this->redirect($this->generateUrl('incoming_products_scanned', ['id' => $incoming->getId()]));
+//		}
+//	}
 
 	/**
 	 * Displays a form to create a new Incoming entity.

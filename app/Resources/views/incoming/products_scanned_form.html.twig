@@ -1,16 +1,6 @@
 <!-- Response messages -->
-<div class="row">
-    <div class="col-md-12">
-        {% for type, flashMessages in app.session.flashbag.all() %}
-            {% for flashMessage in flashMessages %}
-                <div class="alert alert-{{ type }} alert-dismissible fade in">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                aria-hidden="true">×</span></button>
-                    {{ flashMessage|raw }}
-                </div>
-            {% endfor %}
-        {% endfor %}
-    </div>
+<div class="row" id="products_scanned_form_message_bag">
+    {{ render(controller('WarehouseBundle:IncomingProductScan:renderProductScannedFormMessageBag')) }}
 </div>
 
 <div class="row">
@@ -24,14 +14,14 @@
                     {% if not incomingManager.isComplete(incoming) %}
                         <form name="new-form" id="scan-incoming-product-new-form" method="post" class="ajaxForm"
                               action="{{ path('incoming_products_scanned_new_ajax',{'id':incoming.id}) }}">
-                            <a href="{{ path('incoming_products_scanned', {'id':incoming.id}) }}" class="btn btn-warning pull-left">Refresh total count</a>
+                            <a href="{{ path('incoming_products_scanned', {'id':incoming.id}) }}"
+                               class="btn btn-warning pull-left">Refresh total count</a>
                             <div class="input-group" style="max-width:200px;">
-                                {{ form_widget(form_new.new, {'attr': {'autofocus':true}}) }}
+                                <input name="sku" type="text" autofocus placeholder="SKU" class="form-control">
                                 <span class="input-group-btn">
-			                    {{ form_widget(form_new.add) }}
-			                </span>
+                                <input type="submit" title="Add" class="btn btn-success">
+                                </span>
                             </div>
-                            {{ form_rest(form_new) }}
                         </form>
                     {% endif %}
                 </div>
@@ -40,7 +30,7 @@
             <div class="x_content">
                 {% set iscomplete = incomingManager.isComplete(incoming) %}
                 <form name="modify-form" id="incoming-product-page-form" method="post" class="ajaxForm"
-                      action="{{ path('incoming_products_scanned_ajax',{'id':incoming.id}) }}">
+                      action="{{ path('incoming_products_scan_complete',{'id':incoming.id}) }}">
                     <div class="error_zone"></div>
                     <table id="datatable-keytable" class="table table-striped table-bordered">
                         <thead>
@@ -54,7 +44,10 @@
                         </tr>
                         </thead>
                         <tbody class="incomingScannedProductsPage">
-                        {% include 'incoming/products_scanned_rows.html.twig' with {'form': form_scan,'incoming': incoming,'iscomplete':iscomplete} %}
+
+
+                        {{ render(controller('WarehouseBundle:IncomingProductScan:renderProductScannedRows',{'id':incoming.id})) }}
+
                         <tr class="remove">
                             <td colspan="7">Scan items to build this list.</td>
                         </tr>
@@ -65,13 +58,15 @@
 
                     <div class="actionBar">
                         {% if not iscomplete %}
-                            {{ form_widget(form_scan.complete) }}
-                            {{ form_widget(form_scan.load_data, { 'attr': {'class': 'pull-left'} }) }}
+                            <button type="submit" class="btn btn-dark btn-large"
+                                    data-confirm="This will mark the container are closed. It will also assign all items to active inventory. Are you sure you are complete?"
+                            >COMPLETE SCAN</button>
+                            <a data-confirm="Are you sure you want to pre-load from packing list!"
+                               class="btn btn-danger ajaxLink pull-left"
+                               href="{{ path('incoming_products_scan_load',{'id':incoming.id}) }}">LOAD FROM PACKING
+                                LIST</a>
                         {% endif %}
                     </div>
-
-                    {#{ form_rest(form_scan) }#}
-
                 </form>
             </div>
         </div>

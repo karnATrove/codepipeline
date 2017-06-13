@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><i class="fa fa-bars"></i> Container
+                    <small>{{ incoming.name }}</small>
+                </h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Container Name</label>
+                            <div>
+                                {{ incoming.name }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Container Status</label>
+                            <div>
+                                {{ incoming.status.detail }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Container Type</label>
+                            <div>
+                                {{ incoming.type.detail }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="form-group">
+                            <label>ETA</label>
+                            <div>
+                                {{ incoming.eta|date('Y-m-d') }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Scheduled</label>
+                            <div>
+                                {% if incoming.scheduled %}{{ incoming.scheduled|date('Y-m-d H:i A') }}{% else %}-{% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Arrived</label>
+                            <div>
+                                {% if incoming.arrived %}{{ incoming.arrived|date('Y-m-d') }}{% else %}-{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -2,21 +2,24 @@
  * Incoming Scanned/List Products functions.
  */
 $(function () {
+	var scanned_form_wrap = $('#scanned_form_wrap');
 	// Only run on products scanned page.
-	if ($('#scanned_form_wrap').length) {
-		$('#scanned_form_wrap').on('change', 'select', function () {
+	if (scanned_form_wrap.length) {
+
+		//if location gets update
+		scanned_form_wrap.on('change', 'select', function () {
+			ajaxUpdateIncomingScan($(this));
+		});
+		//if qty gets update
+		scanned_form_wrap.on('change', 'input[type="number"]', function () {
 			ajaxUpdateIncomingScan($(this));
 		});
 
-		$('#scanned_form_wrap').on('change', 'input[type="number"]', function () {
-			ajaxUpdateIncomingScan($(this));
-		});
-
-		$('#scanned_form_wrap').on('focus', 'input#form_new', function() {
+		scanned_form_wrap.on('focus', 'input#form_new', function() {
 			$(this).data('lastvalue',$(this).val());
 			$(this).val('');
 		});
-		$('#scanned_form_wrap').on('blur', 'input#form_new', function() {
+		scanned_form_wrap.on('blur', 'input#form_new', function() {
 			if ($(this).val() == '' && $(this).data('lastvalue') && $(this).data('lastvalue').length > 0) {
 				$(this).val($(this).data('lastvalue'));
 			}
@@ -25,8 +28,8 @@ $(function () {
 		destroyScanner(); // Unbind previous listener
 		active_scanner = $(window).scannerListener({'element_val':'#scanned_form_wrap input#form_new','trigger':'keypress.incomingscanner','delay':300});
 
-		$('#scanned_form_wrap').unbind('change.scanincoming');
-		$('#scanned_form_wrap').on('change.scanincoming', 'input#form_new', function() {
+		scanned_form_wrap.unbind('change.scanincoming');
+		scanned_form_wrap.on('change.scanincoming', 'input#form_new', function() {
 			if ($(this).val().length >= 2) {
 				delay(function() {
 					//$('#quick-scan .loading').show();

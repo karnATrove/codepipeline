@@ -9,11 +9,13 @@
 namespace WarehouseBundle\Workflow;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BaseWorkflow
 {
 	protected $container;
+	/** @var EntityManagerInterface $entityManager  */
 	protected $entityManager;
 
 	/**

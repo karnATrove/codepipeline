@@ -20,3 +20,4 @@ parameters:
 
     firewall_host: localhost
     api_host: api.roveconcepts.com
+    business.name: rlogistic

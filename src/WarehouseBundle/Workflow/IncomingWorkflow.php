@@ -9,6 +9,7 @@
 namespace WarehouseBundle\Workflow;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
@@ -24,9 +25,12 @@ class IncomingWorkflow extends BaseWorkflow
 	private $incomingManager;
 	private $incomingProductScanManager;
 
-	public function __construct(ContainerInterface $container)
+	public function __construct(ContainerInterface $container, $entityManager = null)
 	{
 		parent::__construct($container);
+		if ($entityManager != null) {
+			$this->entityManager = $entityManager;
+		}
 		$this->locationProductManager = $container->get('warehouse.manager.location_product_manager');
 		$this->incomingStatusManager = $container->get('warehouse.manager.incoming_status_manager');
 		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
@@ -66,35 +70,6 @@ class IncomingWorkflow extends BaseWorkflow
 		# Change the Incoming status to completed.
 		$incoming->setStatus($this->incomingStatusManager->find(IncomingStatus::COMPLETED));
 		$this->incomingManager->updateIncoming($incoming, $this->entityManager);
-		$this->entityManager->flush();
-	}
-
-	/**
-	 * @param Incoming $incoming
-	 *
-	 * @throws WorkflowException
-	 */
-	public function loadScannedProducts(Incoming $incoming)
-	{
-		$incomingProducts = $incoming->getIncomingProducts();
-		$incomeScannedProducts = $incoming->getIncomingScannedProducts();
-		$productIds = IncomingProductManager::getIncomingProductIdsByIncomingProductScan($incomeScannedProducts);
-		$currentUser = $this->container->get('security.token_storage')->getToken()->getUser();
-		if (!$currentUser) {
-			throw new WorkflowException('Can not identify user');
-		}
-		foreach ($incomingProducts as $incomingProduct) {
-			if (!in_array($incomingProduct->getProduct()->getId(), $productIds)) {
-				$incomingProductScan = new IncomingProductScan();
-				$incomingProductScan->setIncoming($incoming);
-				$incomingProductScan->setIncomingProduct($incomingProduct);
-				$incomingProductScan->setQtyOnScan(0);
-				$incomingProductScan->setProduct($incomingProduct->getProduct());
-				$incomingProductScan->setCreated(new \DateTime('now'));
-				$incomingProductScan->setUser($currentUser);
-				$this->incomingProductScanManager->update($incomingProductScan, $this->entityManager);
-			}
-		}
 		$this->entityManager->flush();
 	}
 }

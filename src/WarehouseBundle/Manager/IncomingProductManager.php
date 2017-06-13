@@ -10,6 +10,7 @@ namespace WarehouseBundle\Manager;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingProductScan;
 
@@ -55,6 +56,16 @@ class IncomingProductManager extends BaseManager
 		if ($flush) {
 			$entityManager->flush();
 		}
+	}
+
+	/**
+	 * @param Incoming $incoming
+	 * @param string   $sku
+	 *
+	 * @return mixed
+	 */
+	public function getOneByIncomingAndSku(Incoming $incoming, string $sku){
+		return $this->incomingProductRepository->findOneByModel($incoming,$sku);
 	}
 
 }

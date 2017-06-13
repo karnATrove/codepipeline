@@ -48,6 +48,9 @@ services:
     warehouse.manager.incoming_product_manager:
         class: WarehouseBundle\Manager\IncomingProductManager
         arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.location_manager:
+        class: WarehouseBundle\Manager\LocationManager
+        arguments: ['@doctrine.orm.entity_manager']
 
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
@@ -57,4 +60,11 @@ services:
         arguments: ['@service_container']
     warehouse.workflow.incoming_workflow:
         class: WarehouseBundle\Workflow\IncomingWorkflow
+        arguments: ['@service_container']
+    warehouse.workflow.incoming_product_scan_workflow:
+        class: WarehouseBundle\Workflow\IncomingProductScanWorkflow
+        arguments: ['@service_container']
+
+    warehouse.utils.message_printer:
+        class: WarehouseBundle\Utils\MessagePrinter
         arguments: ['@service_container']
