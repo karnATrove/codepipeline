@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
+use WarehouseBundle\Manager\LocationManager;
 use WarehouseBundle\Utils\AjaxCommandParser;
 
 /**
@@ -19,6 +21,25 @@ use WarehouseBundle\Utils\AjaxCommandParser;
  */
 class IncomingProductScanController extends Controller
 {
+	/**
+	 * Lists all Incoming entity products.
+	 *
+	 * @Route("/{id}/products_scanned", name="incoming_products_scanned")
+	 * @Method("GET")
+	 */
+	public function incomingProductsScannedAction(Incoming $incoming)
+	{
+		$scannedProducts = $this->get('warehouse.manager.incoming_product_scan_manager')
+			->getByIncoming($incoming);
+		$locations = $this->get('warehouse.manager.location_manager')->getLocations();
+		$locationDropdownList = LocationManager::toArray($locations);
+		return $this->render('incoming/products_scanned.html.twig', [
+			'incoming' => $incoming,
+			'scannedProducts' => $scannedProducts,
+			'locationDropdownList' => $locationDropdownList,
+		]);
+	}
+
 	/**
 	 * Lists all Incoming entity products.
 	 *
