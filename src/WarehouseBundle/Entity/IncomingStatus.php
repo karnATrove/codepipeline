@@ -41,7 +41,7 @@ class IncomingStatus
 	private $detail;
 
 	/**
-	 * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Incoming", mappedBy="incomingStatus")
+	 * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Incoming", mappedBy="status")
 	 */
 	private $incoming;
 

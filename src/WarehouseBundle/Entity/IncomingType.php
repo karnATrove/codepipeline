@@ -38,7 +38,7 @@ class IncomingType
     private $detail;
 
 	/**
-	 * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Incoming", mappedBy="incomingType")
+	 * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Incoming", mappedBy="type")
 	 */
 	private $incoming;
 
