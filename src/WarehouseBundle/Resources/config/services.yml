@@ -51,6 +51,9 @@ services:
     warehouse.manager.location_manager:
         class: WarehouseBundle\Manager\LocationManager
         arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.booking_comment_manager:
+        class: WarehouseBundle\Manager\BookingCommentManager
+        arguments: ['@doctrine.orm.entity_manager']
 
     warehouse.work_flow.booking_work_flow:
       class: WarehouseBundle\Workflow\BookingWorkflow
@@ -63,6 +66,9 @@ services:
         arguments: ['@service_container']
     warehouse.workflow.incoming_product_scan_workflow:
         class: WarehouseBundle\Workflow\IncomingProductScanWorkflow
+        arguments: ['@service_container']
+    warehouse.workflow.booking_comment_workflow:
+        class: WarehouseBundle\Workflow\BookingCommentWorkflow
         arguments: ['@service_container']
 
     warehouse.utils.message_printer:

@@ -20,8 +20,11 @@
             {% endif %}
         </ul>
         <hr/>
+        <div class="booking-comment-message-bag-container">
+            {% include 'booking_comment/_message_bag.html.twig' %}
+        </div>
         {{ form_start(comment_form, {'method':'POST','attr': {'class': 'ajaxForm','data-appendto':'.messages'}}) }}
-        {% include 'WarehouseBundle:BookingComment:ajax_comment.html.twig' with {'form': comment_form, 'booking': booking} %}
+        {% include 'booking_comment/ajax_comment.html.twig' with {'form': comment_form, 'booking': booking} %}
         <p>
             <button type="submit" class="btn btn-success">Create</button>
         </p>

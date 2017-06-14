@@ -1,3 +1,8 @@
+rove_site_rest_api:
+    resource: "@RoveSiteRestApiBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 report:
     resource: "@ReportBundle/Controller/"
     type:     annotation

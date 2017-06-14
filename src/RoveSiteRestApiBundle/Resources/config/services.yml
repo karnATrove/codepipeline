@@ -1,0 +1,7 @@
+services:
+#    rove_site_rest_api.example:
+#        class: RoveSiteRestApiBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]
+    rove_site_rest_api.manager.order_comment_manager:
+        class: RoveSiteRestApiBundle\Manager\OrderCommentManager
+        arguments: ['@service_container']

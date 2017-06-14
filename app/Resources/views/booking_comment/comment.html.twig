@@ -1,0 +1,18 @@
+<div class="block">
+    <div class="block_content">
+        <div class="byline title"><span>{{ comment.created|date('Y-m-d h:i A') }}</span>
+            {% if comment.user %}
+                by <a>
+                {% if comment.user.name %}
+                    {{ comment.user.name }}
+                {% else %}
+                    {{ comment.user.email }}
+                {% endif %}
+            </a>
+            {% else %}
+                by <a>Internal System</a>
+            {% endif %}
+        </div>
+        <p class="excerpt">{{ comment.comment }}</p>
+    </div>
+</div>

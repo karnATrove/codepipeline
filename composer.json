@@ -46,7 +46,8 @@
     "petkopara/crud-generator-bundle": "^3.0",
     "symfony/monolog-bundle": "^3.1",
     "symfony/serializer": "^3.2",
-    "rove/canonical-dto": "^1.0"
+    "rove/canonical-dto": "^1.0",
+    "leaseweb/api-caller-bundle": "^1.2"
   },
   "require-dev": {
     "sensio/generator-bundle": "~3.0",

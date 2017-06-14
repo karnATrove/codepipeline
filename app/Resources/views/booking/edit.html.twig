@@ -84,7 +84,7 @@
             <!-- end x_panel -->
 
             <!-- Booking comments -->
-            {{ render(controller('WarehouseBundle:BookingComment:create',{'id':booking.id})) }}
+            {{ render(controller('WarehouseBundle:BookingComment:view',{'id':booking.id})) }}
 
             <!-- Booking Files -->
             {{ render(controller('WarehouseBundle:BookingFile:create',{'id':booking.id})) }}

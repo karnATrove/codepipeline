@@ -8,6 +8,8 @@ class AjaxCommandDTO
 	const OP_MODAL = "modal";
 	const OP_HIDE = "hide";
 	const OP_HTML = "html";
+	const OP_APPEND = "append";
+	const OP_REMOVE = "remove";
 
 	private $selector;
 	private $op;

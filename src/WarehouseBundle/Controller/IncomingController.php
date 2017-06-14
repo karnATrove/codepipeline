@@ -3,6 +3,7 @@
 namespace WarehouseBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -118,7 +119,7 @@ class IncomingController extends Controller
 
         try {
             $pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-        } catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
+        } catch (OutOfRangeCurrentPageException $ex) {
             $pagerfanta->setCurrentPage(1);
         }
 
@@ -318,26 +319,6 @@ class IncomingController extends Controller
 
 
     /**
-     * Finds and displays a Booking entity.
-     *
-     * @Route("/{id}", name="incoming_show")
-     * @Method("GET")
-     */
-    public function showAction(Incoming $incoming)
-    {
-        $deleteForm = $this->createDeleteForm($incoming);
-        $commentForm = $this->createCommentForm($incoming);
-        $fileForm = $this->createFileForm($incoming);
-        return $this->render('incoming/show.html.twig', array(
-            'incoming' => $incoming,
-            'delete_form' => $deleteForm->createView(),
-            'comment_form' => $commentForm->createView(),
-            'file_form' => $fileForm->createView(),
-        ));
-    }
-
-
-    /**
      * Displays a form to edit an existing Incoming entity.
      *
      * @Route("/{id}/edit", name="incoming_edit")
@@ -459,7 +440,7 @@ class IncomingController extends Controller
             $em->remove($incoming);
             $em->flush();
             $this->get('session')->getFlashBag()->add('success', 'The Incoming was deleted successfully');
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Incoming');
         }
 
@@ -514,34 +495,11 @@ class IncomingController extends Controller
 
                 $this->get('session')->getFlashBag()->add('success', $cnt_changes. ' incoming containers were deleted successfully!');
 
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the incoming containers ');
             }
         }
 
         return $this->redirect($this->generateUrl('incoming'));
-    }
-
-    /**
-     * Creates a form to add a comment to a Booking entity.
-     *
-     * @param Incoming $incoming The Incoming entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createCommentForm(Incoming $incoming)
-    {
-
-        $incomingComment = new \WarehouseBundle\Entity\IncomingComment();
-        $incomingComment->setBooking($incoming);
-
-        $form = $this->createForm('WarehouseBundle\Form\IncomingCommentType', $incomingComment,
-            array(
-                'action' => $this->generateUrl('comment_new',array('incoming_id'=>$incoming->getId())),
-                'method' => 'POST',
-            )
-        );
-
-        return $form;
     }
 }

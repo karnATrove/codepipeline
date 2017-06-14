@@ -56,6 +56,7 @@ class LocationProductManager extends BaseManager
 		$locationProduct->setLocation($incomingProductScan->getLocation());
 		$locationProduct->setOnHand($incomingProductScan->getQtyOnScan());
 		$locationProduct->setCreated(new \DateTime('now'));
+		$locationProduct->setModified(new \DateTime());
 		if ($user) {
 			$locationProduct->setUser($user);
 		}

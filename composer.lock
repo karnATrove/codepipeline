@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9618650b0f1eae032a8545e21e56553",
+    "content-hash": "e3d2af9b1eb39b49deb37f3280df031a",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2712,6 +2712,65 @@
             "time": "2016-11-11T18:43:20+00:00"
         },
         {
+            "name": "leaseweb/api-caller-bundle",
+            "version": "v1.2.6",
+            "target-dir": "Lsw/ApiCallerBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LeaseWeb/LswApiCallerBundle.git",
+                "reference": "93fd01b981d25940dadd9302a9e75373b9e1bb0f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LeaseWeb/LswApiCallerBundle/zipball/93fd01b981d25940dadd9302a9e75373b9e1bb0f",
+                "reference": "93fd01b981d25940dadd9302a9e75373b9e1bb0f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": ">=2.1",
+                "symfony/security-bundle": ">=2.1"
+            },
+            "require-dev": {
+                "doctrine/doctrine-bundle": "*",
+                "swiftmailer/swiftmailer": "*",
+                "symfony/validator": "2.1.*",
+                "symfony/yaml": "2.1.*",
+                "twig/twig": "*",
+                "willdurand/propel-typehintable-behavior": "dev-master"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Lsw\\ApiCallerBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maurits van der Schee",
+                    "email": "m.vanderschee@leaseweb.com"
+                }
+            ],
+            "description": "cURL API call functionality with full Web Debug Toolbar integration",
+            "homepage": "http://www.leaseweblabs.com",
+            "keywords": [
+                "Symfony2",
+                "api",
+                "curl"
+            ],
+            "time": "2016-06-12T12:39:01+00:00"
+        },
+        {
             "name": "lexik/form-filter-bundle",
             "version": "v5.0.4",
             "source": {
@@ -3900,17 +3959,17 @@
         },
         {
             "name": "rove/canonical-dto",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://yhnehc:d7e2a019ff9d63d00dc5b4e1cb27895a8cee9c79@github.com/roveconcepts/dto.git",
-                "reference": "2e53ea09082fa9e6607d133e8e4994c05454854e"
+                "reference": "6ae1954d7ebb0a31f13e3f903b5da4032145e7b3"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.1-75c07a.tar",
-                "reference": "2e53ea09082fa9e6607d133e8e4994c05454854e",
-                "shasum": "1288f9897acd3aaabb871c33d67598046afa4b7d"
+                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.2-45bf37.tar",
+                "reference": "6ae1954d7ebb0a31f13e3f903b5da4032145e7b3",
+                "shasum": "f5dff42f0d64d7a80b72e547c4cc2e5790273b96"
             },
             "type": "library",
             "autoload": {
@@ -3924,7 +3983,7 @@
                     "email": "leoc@roveconcepts.com"
                 }
             ],
-            "time": "2017-06-13T20:58:27+00:00"
+            "time": "2017-06-14T19:36:47+00:00"
         },
         {
             "name": "sensio/distribution-bundle",

@@ -40,6 +40,8 @@ class AppKernel extends Kernel
             new Petkopara\MultiSearchBundle\PetkoparaMultiSearchBundle(),
             new Petkopara\CrudGeneratorBundle\PetkoparaCrudGeneratorBundle(),
             new ReportBundle\ReportBundle(),
+            new RoveSiteRestApiBundle\RoveSiteRestApiBundle(),
+	        new Lsw\ApiCallerBundle\LswApiCallerBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
