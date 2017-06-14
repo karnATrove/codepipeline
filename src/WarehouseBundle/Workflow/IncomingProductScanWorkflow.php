@@ -48,6 +48,43 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 
 	/**
 	 * @param IncomingProductScan $incomingProductScan
+	 * @param                     $qty
+	 * @param                     $locationId
+	 *
+	 * @return array
+	 * @throws WorkflowException
+	 */
+	public function edit(IncomingProductScan $incomingProductScan,$qty,$locationId)
+	{
+		if ($qty !== null) {
+			$incomingProductScan->setQtyOnScan($qty);
+		}
+		$locationTitle = $incomingProductScan->getLocation() ?
+			$incomingProductScan->getLocation()->printLocation() : "NULL";
+
+		if ($locationId !== null) {
+			if (empty($locationId)) {
+				$incomingProductScan->setLocation(null);
+				$locationTitle = "NULL";
+			} else {
+				$location = $this->locationManager->findById($locationId);
+				if (!$location) {
+					throw new WorkflowException("Location no longer exist.");
+				}
+				$incomingProductScan->setLocation($location);
+				$locationTitle = $location->printLocation();
+			}
+		}
+		$incomingProductScan->setModified(new \DateTime());
+		$this->incomingProductScanManager->update($incomingProductScan);
+		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: " .
+			$locationTitle . " Quantity: {$incomingProductScan->getQtyOnScan()}";
+		$ajaxCommands[] = new AjaxCommandDTO(null, AjaxCommandDTO::OP_NOTY, $message, ['type' => 'success']);
+		return $ajaxCommands;
+	}
+
+	/**
+	 * @param IncomingProductScan $incomingProductScan
 	 *
 	 * @return AjaxCommandDTO[]
 	 * @throws ManagerException

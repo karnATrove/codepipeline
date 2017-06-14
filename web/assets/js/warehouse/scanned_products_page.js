@@ -59,29 +59,8 @@ function ajaxUpdateIncomingScan(currentElement) {
 		data: data,
 		type: 'POST',
 		dataType: 'json',
-		success: function (data) {
-			if (data.error) {
-				if (data.error !== null) {
-					new Noty({
-						theme: 'relax',
-						type: 'error',
-						layout: 'topLeft',
-						text: data.error,
-						timeout: 2000
-					}).show();
-				} else {
-					alert("Unknown error");
-				}
-				location.reload();
-			} else {
-				new Noty({
-					theme: 'relax',
-					type: 'success',
-					layout: 'topLeft',
-					text: data.message,
-					timeout: 2000
-				}).show();
-			}
+		success: function (response) {
+			handleAjaxResponse(response);
 		},
 		error: function (response, desc, err) {
 			if (response.responseJSON && response.responseJSON.message) {

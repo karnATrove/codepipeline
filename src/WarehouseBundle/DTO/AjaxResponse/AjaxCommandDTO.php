@@ -10,16 +10,19 @@ class AjaxCommandDTO
 	const OP_HTML = "html";
 	const OP_APPEND = "append";
 	const OP_REMOVE = "remove";
+	const OP_NOTY = "noty";
 
 	private $selector;
 	private $op;
 	private $value;
+	private $params;
 
-	public function __construct($selector = null, $operator = null, $value = null)
+	public function __construct($selector = null, $operator = null, $value = null, $params = [])
 	{
 		$this->selector = $selector;
 		$this->op = $operator;
 		$this->value = $value;
+		$this->params = $params;
 	}
 
 	/**
@@ -68,6 +71,22 @@ class AjaxCommandDTO
 	public function setValue($value)
 	{
 		$this->value = $value;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getParams(): array
+	{
+		return $this->params;
+	}
+
+	/**
+	 * @param array $params
+	 */
+	public function setParams(array $params)
+	{
+		$this->params = $params;
 	}
 
 }

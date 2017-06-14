@@ -157,6 +157,20 @@ function handleAjaxResponse(response) {
 			case 'redirect':
 				window.location = response.ajaxCommand[i].value;
 				break;
+			case 'noty':
+				var params = response.ajaxCommand[i].params;
+				var type = 'success';
+				if (params.type !== null) {
+					type = params.type;
+				}
+				new Noty({
+					theme: 'relax',
+					type: type,
+					layout: 'topLeft',
+					text: response.ajaxCommand[i].value,
+					timeout: 2000
+				}).show();
+				break;
 		}
 	});
 }

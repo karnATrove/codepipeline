@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Acl\Exception\Exception;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
@@ -52,37 +53,22 @@ class IncomingProductScanController extends Controller
 			return $this->redirect($this->generateUrl('incoming_products_scanned',
 				['id' => $incomingProductScan->getIncoming()]));
 		}
-		$qty = $request->get('quantity');
-		$locationId = $request->get('location');
-		if ($qty !== null) {
-			$incomingProductScan->setQtyOnScan($qty);
-		}
-		$locationTitle = $incomingProductScan->getLocation() ?
-			$incomingProductScan->getLocation()->printLocation() : "NULL";
 
-		$em = $this->getDoctrine()->getManager();
-		if ($locationId !== null) {
-			if (empty($locationId)) {
-				$incomingProductScan->setLocation(null);
-				$locationTitle = "NULL";
-			} else {
-				$location = $this->get('warehouse.manager.location_manager')->findById($locationId);
-				if (!$location) {
-					return new JsonResponse(['status' => 'error', 'error' => "", 'message' => "Location not found"],
-						JsonResponse::HTTP_OK);
-				}
-				$incomingProductScan->setLocation($location);
-				$locationTitle = $location->printLocation();
-			}
+		try {
+			$qty = $request->get('quantity');
+			$locationId = $request->get('location');
+			$ajaxCommands = $this->container->get('warehouse.workflow.incoming_product_scan_workflow')
+				->edit($incomingProductScan, $qty, $locationId);
+		} catch (\Exception $exception) {
+			$messages['error'][] = "Update failed. Please refresh page and try again. 
+			Error detail: {$exception->getMessage()}";
+			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
+				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+					->getMessageBagView());
 		}
-		$incomingProductScan->setModified(new \DateTime());
-		//persist data
-		$em->persist($incomingProductScan);
-		$em->flush();
 
-		$message = "Model {$incomingProductScan->getProduct()->getModel()} updated with location: " .
-			$locationTitle . " Quantity: {$incomingProductScan->getQtyOnScan()}";
-		$response = ['status' => 'success', 'error' => "", 'message' => $message];
+		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
 		return new JsonResponse($response, JsonResponse::HTTP_OK);
 	}
 
@@ -106,14 +92,6 @@ class IncomingProductScanController extends Controller
 	{
 		return new Response($this->get('warehouse.workflow.incoming_product_scan_workflow')
 			->getScannedProductTableView($incoming));
-	}
-
-	/**
-	 * @Route("/render-product-scanned-form-message-bag", name="product_scanned_form_message_bag")
-	 */
-	public function renderProductScannedFormMessageBagAction()
-	{
-		return new Response($this->get('warehouse.workflow.incoming_product_scan_workflow')->getMessageBagView());
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <!-- Response messages -->
 <div class="row" id="products_scanned_form_message_bag">
-    {{ render(controller('WarehouseBundle:IncomingProductScan:renderProductScannedFormMessageBag')) }}
+    {% include 'incoming/products_scanned_form_message_bag.html.twig' %}
 </div>
 
 <div class="row">
@@ -44,7 +44,6 @@
                         </tr>
                         </thead>
                         <tbody class="incomingScannedProductsPage">
-
 
                         {{ render(controller('WarehouseBundle:IncomingProductScan:renderProductScannedRows',{'id':incoming.id})) }}
 
