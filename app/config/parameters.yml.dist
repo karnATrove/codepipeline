@@ -23,6 +23,6 @@ parameters:
     business.name: rlogistic
 
     rove_site.api.key : d21zIGxpbmsgdG8gcm92ZSBhd2Vzb21l
-    rove_site.api.url.base: http://roveconcepts.com/api
+    rove_site.api.url.base: https://roveconcepts.com/api
     rove_site.api.url.comment: /order-comment
     rove_site.api.url.container: /container
