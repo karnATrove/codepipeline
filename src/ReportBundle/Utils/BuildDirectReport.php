@@ -4,11 +4,9 @@ namespace ReportBundle\Utils;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Component\DependencyInjection\Container;
 use WarehouseBundle\Entity\Booking;
-use WarehouseBundle\Entity\Incoming;
-use WarehouseBundle\Form\IncomingType;
+use WarehouseBundle\Entity\IncomingType;
 
 class BuildDirectReport
 {
@@ -30,6 +28,7 @@ class BuildDirectReport
 	/**
 	 * @param $start
 	 * @param $end
+	 *
 	 * @return mixed
 	 */
 	public function getOceanFrightContainerCount($start, $end)
@@ -97,7 +96,7 @@ class BuildDirectReport
 		$em = $this->container->get("doctrine")->getManager();
 //		$query = $queryBuilder->getQuery();
 		$connection = $em->getConnection();
-		$statement = $connection->prepare("SELECT FORMAT(bp.qty/p.qty_per_carton,0) as qty
+		$statement = $connection->prepare("SELECT FORMAT(bp.qty/p.qty_per_carton,0) AS qty
 				FROM warehouse_shipment s INNER JOIN warehouse_booking b ON s.booking_id = b.id
 				  INNER JOIN warehouse_booking_product bp ON bp.booking_id = b.id
 				  INNER JOIN warehouse_product p ON bp.product_id = p.id
