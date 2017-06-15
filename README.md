@@ -2,6 +2,10 @@ Update log
 =
 v1.0.3
 -
+Add new feature: Staging Queue service that operates auto picking from locations into a staging location.
+
+v1.0.3
+-
 Update container status in rove site
 
 v1.0.2

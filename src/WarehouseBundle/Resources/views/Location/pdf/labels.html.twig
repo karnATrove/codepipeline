@@ -1,0 +1,22 @@
+{% extends 'WarehouseBundle::pdf_layout.html.twig' %}
+
+{% block body %}
+        {% block content %}
+        	<div class="row">
+            {% for location in locations %}
+                <div class="col-xs-6" style="{% if location.location.level == 1 or location.location.level == 2 %}padding-top: 275px;{% else %}padding-top: 500px;{% endif %}">
+                    <div style="">
+                        <div style="font-size:700%;line-height:140px;font-weight:bold;">
+                        <span style="position:relative;">{{ location.location.aisle  }}<span style="position: absolute; top:40px; width:100%;text-align:center;font-size:10px;left:0;">Aisle</span></span> - <span style="position:relative;">{{ location.location.row }}<span style="position: absolute; top:40px; width:100%;text-align:center;font-size:10px;left:0;">Row</span></span> - <span style="position:relative;">{{ location.location.level }}<span style="position: absolute; top:40px; width:100%;text-align:center;font-size:10px;left:0;">Level</span></span></div>
+                    </div>
+                    <div style="margin-right:80px;">
+                        {#<img src="{{ location.locationBarCode }}" alt="Barcode for {{ location.location.id }}" title="Barcode for {{ location.location.id }}" class="img-responsive" />#}
+                        {{ location.raw|raw }}
+                    </div>
+                </div>
+                {% if loop.index is divisible by(4) %}<div style="clear:both; page-break-after: always;"></div>{% endif %}
+            {% endfor %}
+            </div>
+
+		{% endblock %}
+{% endblock %}

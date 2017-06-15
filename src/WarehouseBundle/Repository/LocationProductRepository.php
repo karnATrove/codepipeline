@@ -31,4 +31,21 @@ class LocationProductRepository extends EntityRepository
 			->getQuery()
 			->getOneOrNullResult();
 	}
+
+	/**
+	 * Find one staging area by product (existing).
+	 * @param  Product $product [description]
+	 * @return [type]           [description]
+	 */
+	public function findOneStagingByProduct(Product $product) {
+		return $this->createQueryBuilder('pl')
+			->innerJoin('pl.location','l')
+			->andWhere('pl.product = :product')
+			->andWhere('l.staging = :staging')
+			->setParameter('product', $product)
+			->setParameter('staging', 1)
+			->setMaxResults(1)
+			->getQuery()
+			->getOneOrNullResult();
+	}
 }

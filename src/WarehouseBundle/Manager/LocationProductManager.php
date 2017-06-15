@@ -55,8 +55,36 @@ class LocationProductManager extends BaseManager
 		$locationProduct->setProduct($incomingProductScan->getProduct());
 		$locationProduct->setLocation($incomingProductScan->getLocation());
 		$locationProduct->setOnHand($incomingProductScan->getQtyOnScan());
+		$locationProduct->setStaged(0);
 		$locationProduct->setCreated(new \DateTime('now'));
 		$locationProduct->setModified(new \DateTime());
+		if ($user) {
+			$locationProduct->setUser($user);
+		}
+		$entityManager->persist($locationProduct);
+		if ($flush) {
+			$entityManager->flush();
+		}
+	}
+
+	/**
+	 * Create a LocationProduct
+	 * @param  Location $location      [description]
+	 * @param  Product  $product       [description]
+	 * @param  integer  $onHand        [description]
+	 * @param  integer  $staged        [description]
+	 * @param  [type]   $entityManager [description]
+	 * @param  [type]   $user          [description]
+	 * @return [type]                  [description]
+	 */
+	public function create(Location $location, Product $product, $onHand = 0, $staged = 0, $entityManager = null, $user = null) {
+		$flush = $entityManager ? false : true;
+		$locationProduct = (new LocationProduct())
+			->setLocation($location)
+			->setProduct($product)
+			->setOnHand($onHand)
+			->setStaged($staged)
+			->setCreated(new \DateTime());
 		if ($user) {
 			$locationProduct->setUser($user);
 		}
@@ -75,6 +103,7 @@ class LocationProductManager extends BaseManager
 	{
 		$flush = $entityManager ? false : true;
 		$entityManager = $entityManager ? $entityManager : $this->entityManager;
+		$locationProduct->setModified(new \DateTime());
 		if ($user) {
 			$locationProduct->setUser($user);
 		}

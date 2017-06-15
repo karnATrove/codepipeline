@@ -1,0 +1,19 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block body %}
+    {% block content_header %}
+        <div class="content_heading">Pick Queue - As of <span class="asof">{{ "now"|date('Y-m-d H:i:s A') }}</span></div>
+    {% endblock %}
+
+    {% block content %}
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Picking/Staging Queue</h2>
+                {{ form_start(form,{ attr: { id: "pickingStagingQueue", class:"ajaxForm", 'data-autorefresh':'on', 'data-autoselector':'#pickingStagingQueue', 'data-autourl':path('booking_pick_queue_refresh_ajax') }}) }}
+                    {% include '@warehouse/Booking/pick_queue_form.html.twig' with {'form': form} %}
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+    {% endblock %}
+{% endblock %}

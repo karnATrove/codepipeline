@@ -156,6 +156,7 @@ class Booking
 			Carrier::CARRIER_AMAZON_CARRIER => 'Amazon Carrier',
 			Carrier::CARRIER_BUILDDIRECT_CARRIER => 'BuildDirect Carrier',
 			Carrier::CARRIER_HAYNEEDLE_CARRIER => 'HayNeedle Carrier',
+			Carrier::CARRIER_LOCAL_CARRIER => 'Local Carrier',
 		];
 	}
 

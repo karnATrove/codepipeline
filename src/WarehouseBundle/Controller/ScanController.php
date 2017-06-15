@@ -91,6 +91,9 @@ class ScanController extends Controller
                 case 'pick':
                     $response = $this->scanModePick($search_string);
                     break;
+                case 'inventory':
+                    $response = $this->scanModeInventory($search_string);
+                    break;
                 case 'order':
                     $response = $this->scanModeOrder($search_string);
                     break;
@@ -234,6 +237,63 @@ class ScanController extends Controller
         return $response;
     }
 
+    public function scanModeInventory($search_string) {
+        $html = $notice = ''; # html output
+
+        $form = $this->createInventoryStockForm(Request::createFromGlobals());
+        $html = $this->renderView('WarehouseBundle::Scan/inventory/location.html.twig', array(
+            'form' => $form->createView(),
+            'search' => $search_string,
+            'notice' => $notice,
+        ));
+        $response = array();
+        $response['ajaxCommand'][] = array(
+            'selector' => '#scan-result',
+            'op' => 'html',
+            'value' => $html,
+        );
+
+        return $response;
+
+        $em = $this->getDoctrine()->getManager();
+        $orderNumber = preg_replace('/^BO[0]+/','',$search_string);
+        $html = $notice = ''; # html output
+        $qb = $em->createQueryBuilder();
+        $qb->select('b')
+           ->from('WarehouseBundle:Booking','b')
+           ->where('b.orderNumber = :orderNumber AND b.status > :status')
+           ->setParameter('orderNumber', $orderNumber)
+           ->setParameter('status',0)
+           ->setMaxResults(1);
+        try {
+            $booking = $qb->getQuery()->getSingleResult();
+            if (!$booking->getPickingFlag()) {
+                # This shouldnt be available as it isnt flagged.
+                //$notice = 'This Booking Order should be flagged for picking.';
+            }
+
+            # Create form for generating picking quantities
+            $form = $this->createBookingProductPickForm(Request::createFromGlobals(),$booking);
+
+            $html = $this->renderView('WarehouseBundle::Scan/booking/pick.html.twig', array(
+                'form' => $form->createView(),
+                'search' => $search_string,
+                'booking' => $booking,
+                'notice' => $notice,
+            ));
+        } catch (\Exception $e) {
+            $html = $this->renderView('WarehouseBundle::Scan/booking/error.html.twig', array('search' => $search_string,'error' => $e->getMessage()));
+        }
+        $response = array();
+        $response['ajaxCommand'][] = array(
+            'selector' => '#scan-result',
+            'op' => 'html',
+            'value' => 'dsfs'.$html,
+        );
+
+        return $response;
+    }
+
     public function scanModeOrder($search_string) {
         $em = $this->getDoctrine()->getManager();
 
@@ -344,6 +404,88 @@ class ScanController extends Controller
      * @Template()
      */
     public function formAjaxStockIncomingForm(Request $request, Incoming $incoming) {
+        $em = $this->getDoctrine()->getManager();
+
+        # Create the original form from the scan so we can handle its submit...
+        $form = $this->createIncomingItemStockForm($request,$incoming);
+
+        # Adjust the Incoming object
+        $form->handleRequest($request);
+
+        $response = array();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $model = trim($request->request->get('form')['scanIncoming']);
+
+            # Check if it exists?
+            $incomingProduct = $em->getRepository('WarehouseBundle:IncomingProduct')->findOneByModel($incoming, $model);
+            $item = $em->getRepository('WarehouseBundle:IncomingProductScan')->findOneByModel($incoming,$model,FALSE); # Non assigned only
+            $product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
+            #
+            if (!$item) {
+                # make a new scan item
+                if (!$product) { # Product does not exist
+                    # Create new product
+                    $product = (new Product())->setUser($this->getUser())
+                        ->setModel($model)
+                        ->setStatus(1)
+                        ->setDescription('No product description')
+                        ->setQtyPerCarton(1)
+                        ->setDimUnits('in')
+                        ->setWeightUnits('lbs')
+                        ->setCreated(new \DateTime('now'));
+                    $em->persist($product);
+                    $this->get('session')->getFlashBag()->add('warning', "<strong>".$model. "</strong> was created as a new product." );
+                }
+                $item = (new IncomingProductScan())
+                    ->setIncoming($incoming)
+                    ->setIncomingProduct($incomingProduct)
+                    ->setQtyOnScan(1)
+                    ->setProduct($product)
+                    ->setCreated(new \DateTime('now'));
+
+                if (!$incomingProduct)
+                    $this->get('session')->getFlashBag()->add('success', "<strong>".$model. "</strong> was not identified in the Incoming container however it was added to this list." );
+                else
+                    $this->get('session')->getFlashBag()->add('success', "Successfully added <strong>$model</strong>." );
+            } else {
+                # Update the scan item
+                $item->setModified(new \DateTime('now'));
+                $item->setQtyOnScan($item->getQtyOnScan() + 1);
+                $this->get('session')->getFlashBag()->add('success', "Increased unassigned quantity to <strong>$model</strong>." );
+            }
+            $item->setUser($this->getUser());
+            $item->setModified(new \DateTime('now'));
+            $em->persist($item);
+            $em->flush();
+
+
+            $response['success'] = true;
+            $response['ajaxCommand'][] = array(
+                'selector' => '.incomingScannedProducts',
+                'op' => 'html',
+                'value' => $this->renderView('WarehouseBundle::Scan/stock/product_scans.html.twig', array(
+                    'form' => $this->createModifyForm($incoming)->createView(),
+                    'incoming' => $incoming,
+                )),
+            );
+            $response['ajaxCommand'][] = array(
+                'selector' => '#quick-scan .loading',
+                'op' => 'hide',
+                'value' => '',
+            );
+        } elseif ($form->isSubmitted()) {
+            $response['success'] = false;
+        }
+        return new JsonResponse($response,200);
+    }
+
+    /**
+     * Lists all Incoming Scanned entities.
+     *
+     * @Route("/inventory/ajax", name="scan_inventory_ajax")
+     * @Template()
+     */
+    public function formAjaxInventoryForm(Request $request) {
         $em = $this->getDoctrine()->getManager();
 
         # Create the original form from the scan so we can handle its submit...
@@ -620,6 +762,33 @@ class ScanController extends Controller
                     'class' => 'form-control col-xs-12',
                     'id' => 'scan-incoming',
                 ),
+            ))->getForm();
+    }
+
+    /**
+     * [createInventoryStockForm description]
+     * @param  Request $request [description]
+     * @return [type]           [description]
+     *
+     * @return     <type>                                     ( description_of_the_return_value )
+     */
+    public function createInventoryStockForm(Request $request) {
+        return $this->createFormBuilder()
+            ->setMethod('POST')
+            ->setAction($this->generateUrl('scan_inventory_ajax'))
+            ->add('scanInventory', TextType::class, array(
+                'attr' => array(
+                    'placeholder' => 'Scan an item.',
+                    'class' => 'form-control col-xs-12',
+                    'id' => 'scan-inventory',
+                )
+            ))
+            ->add('scanLocation', TextType::class, array(
+                'attr' => array(
+                    'placeholder' => 'Select location',
+                    'class' => 'form-control col-xs-12',
+                    'id' => 'scan-location',
+                )
             ))->getForm();
     }
 

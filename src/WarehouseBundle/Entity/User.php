@@ -42,7 +42,7 @@ class User extends BaseUser
 	protected $company;
 
 	/**
-	 * @ORM\ManyToMany(targetEntity="WarehouseBundle\Entity\UserGroup")
+	 * @ORM\ManyToMany(targetEntity="WarehouseBundle\Entity\UserGroup", inversedBy="users")
 	 * @ORM\JoinTable(name="user_group_mapper",
 	 *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
 	 *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}

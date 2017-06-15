@@ -63,6 +63,7 @@
                                 <ul class="nav child_menu">
                                     <li><a href="{{ path('booking') }}">View Orders</a></li>
                                     <li><a href="{{ path('booking_new', {'page': 'form'}) }}">Add Order</a></li>
+                                    <li><a href="{{ path('booking_pick_queue') }}">Staging Queue</a></li>
                                 </ul>
                             </li>
                             <li><a><i class="fa fa-sitemap"></i> Inventory <span class="fa fa-chevron-down"></span></a>
@@ -156,17 +157,18 @@
                             <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
                                 <li>
                                     <a>
-                        <span>
-                          <span>Rove Concepts</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
+                                        <span>
+                                          <span>Rove Concepts</span>
+                                          <span class="time">3 mins ago</span>
+                                        </span>
                                         <span class="message">
-                          We are continually updating this app. Please inform us of any issues.
-                        </span>
+                                          We are continually updating this app. Please inform us of any issues.
+                                        </span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                        <li id="refresher"></li>
                     </ul>
                 </nav>
             </div>

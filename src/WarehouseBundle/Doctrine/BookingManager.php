@@ -165,6 +165,7 @@ class BookingManager extends BaseBookingManager
         } else {
             # Update location product
             $locationProduct->setOnHand($locationProduct->getOnHand() - $qty_picked);
+            $locationProduct->setStaged($locationProduct->getStaged());
             $em->persist($locationProduct);
         }
         $em->flush();

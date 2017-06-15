@@ -4354,7 +4354,8 @@ ul.notifications {
 .btn-danger.form-control[disabled], .btn-danger.form-control[readonly], fieldset[disabled] .btn-danger.form-control { background-color:#d9534f; }
 
 
-
+table tr.border-sub-top td.sub { border-top:2px solid #000; }
+table tr.border-sub-bottom td.sub { border-bottom:2px solid #000; }
 
 
 
