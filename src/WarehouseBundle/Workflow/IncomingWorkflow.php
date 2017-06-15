@@ -25,12 +25,9 @@ class IncomingWorkflow extends BaseWorkflow
 	private $incomingManager;
 	private $incomingProductScanManager;
 
-	public function __construct(ContainerInterface $container, $entityManager = null)
+	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		if ($entityManager != null) {
-			$this->entityManager = $entityManager;
-		}
 		$this->locationProductManager = $container->get('warehouse.manager.location_product_manager');
 		$this->incomingStatusManager = $container->get('warehouse.manager.incoming_status_manager');
 		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
@@ -44,8 +41,10 @@ class IncomingWorkflow extends BaseWorkflow
 	 *
 	 * @throws WorkflowException
 	 */
-	public function setIncomingComplete(Incoming $incoming)
+	public function setIncomingComplete(Incoming $incoming, $entityManager = null)
 	{
+		$flush = $entityManager ? false : true;
+		$entityManager = $entityManager ? $entityManager : $this->entityManager;
 		if (!IncomingManager::isActive($incoming)) {
 			$msg = "Unable to mark the container as completed because it is not in an active status";
 			throw new WorkflowException($msg);
@@ -58,18 +57,20 @@ class IncomingWorkflow extends BaseWorkflow
 			$currentUser = $this->container->get('security.token_storage')->getToken()->getUser();
 			if (!$locationProduct) {
 				$this->locationProductManager
-					->createLocationProductByIncomingProductScan($incomingScannedProduct, $this->entityManager, $currentUser);
+					->createLocationProductByIncomingProductScan($incomingScannedProduct, $entityManager, $currentUser);
 			} else {
 				$locationProduct->setModified(new \DateTime('now'));
 				$quantity = $locationProduct->getOnHand() + $incomingScannedProduct->getQtyOnScan();
 				$locationProduct->setOnHand($quantity);
-				$this->locationProductManager->updateLocationProduct($locationProduct, $this->entityManager, $currentUser);
+				$this->locationProductManager->updateLocationProduct($locationProduct, $entityManager, $currentUser);
 			}
 		}
 
 		# Change the Incoming status to completed.
 		$incoming->setStatus($this->incomingStatusManager->find(IncomingStatus::COMPLETED));
-		$this->incomingManager->updateIncoming($incoming, $this->entityManager);
-		$this->entityManager->flush();
+		$this->incomingManager->updateIncoming($incoming, $entityManager);
+		if ($flush) {
+			$entityManager->flush();
+		}
 	}
 }

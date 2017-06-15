@@ -9,6 +9,7 @@
 namespace WarehouseBundle\Workflow;
 
 
+use Rove\CanonicalDto\Container\ContainerUpdateDto;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
@@ -54,7 +55,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 	 * @return array
 	 * @throws WorkflowException
 	 */
-	public function edit(IncomingProductScan $incomingProductScan,$qty,$locationId)
+	public function edit(IncomingProductScan $incomingProductScan, $qty, $locationId)
 	{
 		if ($qty !== null) {
 			$incomingProductScan->setQtyOnScan($qty);
@@ -262,8 +263,17 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			$this->incomingProductScanManager->update($incomingProductScan, $this->entityManager);
 		}
 
-		$incomingWorkflow = new IncomingWorkflow($this->container, $this->entityManager);
-		$incomingWorkflow->setIncomingComplete($incoming);
+		$incomingWorkflow = new IncomingWorkflow($this->container);
+		$incomingWorkflow->setIncomingComplete($incoming, $this->entityManager);
+
+		//update container in rove site first, it throw RoveSiteApiException.
+		$containerUpdateDto = new ContainerUpdateDto();
+		$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
+		$containerUpdateDto->setName($incoming->getName());
+		$this->container->get('rove_site_rest_api.manager.container_manager')
+			->update($containerUpdateDto, $incoming->getName());
+
+		//save to db
 		$this->entityManager->flush();
 
 		$messages['success'][] = "Incoming container scanned list was saved and Incoming container is now complete.";

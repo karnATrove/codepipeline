@@ -15,24 +15,19 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class OrderCommentManager
+class OrderCommentManager extends BaseManager
 {
-	private $roveSiteUrl;
-	private $roveSiteApiKey;
 	private $roveSiteUrlComment;
-	private $roveClient;
 
 	/**
-	 * OrderCommentManager constructor.
+	 * ContainerManager constructor.
 	 *
 	 * @param ContainerInterface $container
 	 */
 	public function __construct(ContainerInterface $container)
 	{
-		$this->roveSiteUrl = $container->getParameter('rove_site.api.url.base');
+		parent::__construct($container);
 		$this->roveSiteUrlComment = $container->getParameter('rove_site.api.url.comment');
-		$this->roveSiteApiKey = $container->getParameter('rove_site.api.key');
-		$this->roveClient = new Client();
 	}
 
 	/**
@@ -50,13 +45,7 @@ class OrderCommentManager
 		$postData = $serializer->serialize($commentCreateDto, 'json');
 		$url = $this->roveSiteUrl . $this->roveSiteUrlComment;
 		$timestamp = time();
-		$signature = ApiSignatureGenerator::generateSignature($this->roveSiteApiKey, $url, 'POST', $timestamp);
-		$headers = [
-			'Content-Type' => 'application/json',
-			'X-Rove-Requested' => $timestamp,
-			'X-Rove-Signature' => $signature,
-			'Authorization'=>'Basic cm92ZXRlYW06cm92ZXJvY2tz'
-		];
+		$headers = parent::generateAuthHeaders($url, $timestamp,'POST');
 		$request = $this->roveClient->post($url, $headers, $postData);
 		try {
 			$request->send();
@@ -64,12 +53,14 @@ class OrderCommentManager
 			$response = $clientErrorResponseException->getResponse();
 			$body = $response->getBody();
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
-			throw new RoveSiteApiException("Failed to notify customer service. Detail: ".$responseErrorDto->getMessage());
-		}catch (ServerErrorResponseException $serverErrorResponseException){
+			throw new RoveSiteApiException("Failed to notify customer service. Detail: " .
+				$responseErrorDto->getMessage());
+		} catch (ServerErrorResponseException $serverErrorResponseException) {
 			$response = $serverErrorResponseException->getResponse();
 			$body = $response->getBody();
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
-			throw new RoveSiteApiException("Failed to notify customer service. Detail: ".$responseErrorDto->getMessage());
+			throw new RoveSiteApiException("Failed to notify customer service. Detail: " .
+				$responseErrorDto->getMessage());
 		}
 	}
 }

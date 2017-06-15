@@ -5,3 +5,6 @@ services:
     rove_site_rest_api.manager.order_comment_manager:
         class: RoveSiteRestApiBundle\Manager\OrderCommentManager
         arguments: ['@service_container']
+    rove_site_rest_api.manager.container_manager:
+        class: RoveSiteRestApiBundle\Manager\ContainerManager
+        arguments: ['@service_container']
