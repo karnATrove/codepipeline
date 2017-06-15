@@ -84,7 +84,7 @@ class BookingRepository extends EntityRepository
 	 */
 	public function getPickableProducts()
 	{
-		$pickableStatuses = array(Booking::STATUS_ACCEPTED,Booking::STATUS_PICKED);
+		$pickableStatuses = array(Booking::STATUS_ACCEPTED);
 		$query = $this->getEntityManager()->createQuery(
 			'SELECT
 				  bp.id      	AS bookingProductId,
@@ -118,7 +118,7 @@ class BookingRepository extends EntityRepository
 	 */
 	public function getBookingQuantityAskedByProduct(Product $product)
 	{
-		$pickableStatuses = array(Booking::STATUS_ACCEPTED,Booking::STATUS_PICKED);
+		$pickableStatuses = array(Booking::STATUS_ACCEPTED);
 		$query = $this->getEntityManager()->createQuery(
 			'SELECT
 				  SUM(DISTINCT bp.qty) as asked
