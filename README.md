@@ -1,10 +1,14 @@
 Update log
 =
+v1.0.3
+-
+Update container status in rove site
+
 v1.0.2
 -
 Add new feature: Notify customer service once user add comment to booking
 Need to run composer update to install new packages.
-Need to update config file for rovecomcept.com api data.
+Need to update config file for roveconcepts.com api data.
 
 v1.0.1
 -
