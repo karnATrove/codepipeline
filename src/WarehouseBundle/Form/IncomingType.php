@@ -3,6 +3,8 @@
 namespace WarehouseBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -16,43 +18,42 @@ use WarehouseBundle\Form\IncomingFileType;
 
 class IncomingType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            //->add('type', ChoiceType::class, array(
-            //    'choices' => array_flip(\WarehouseBundle\Utils\Incoming::incomingTypeList()),
-            //    'choices_as_values' => true,
-            //))
-            ->add('type', EntityType::class, array(
-                'class' => EntityIncomingType::class,
-                'choice_label' => 'detail',
-            ))
-            ->add('name')
-            ->add('eta')
-            ->add('scheduled')
-            ->add('arrived')
-            //->add('status', ChoiceType::class, array(
-            //    'choices' => array(''=>'') + array_flip(\WarehouseBundle\Utils\Incoming::incomingStatusList()),
-            //    'choices_as_values' => true,
-            //))
-            ->add('status', EntityType::class, array(
-                'class' => IncomingStatus::class,
-                'choice_label' => 'detail',
-            ))
-        ;
-    }
-    
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'WarehouseBundle\Entity\Incoming',
-        ));
-    }
+	/**
+	 * @param FormBuilderInterface $builder
+	 * @param array                $options
+	 */
+	public function buildForm(FormBuilderInterface $builder, array $options)
+	{
+		$builder
+			->add('type', EntityType::class, [
+				'class' => EntityIncomingType::class,
+				'choice_label' => 'detail',
+			])
+			->add('name')
+			->add('eta', DateTimeType::class,
+				array(
+					'widget' => 'single_text',
+					'format' => 'yyyy-MM-dd'
+				))
+			->add('scheduled', DateTimeType::class,
+				array(
+					'widget' => 'single_text',
+					'format' => 'yyyy-MM-dd h:mm:ss a'
+				))
+//			->add('arrived', TextType::class)
+			->add('status', EntityType::class, [
+				'class' => IncomingStatus::class,
+				'choice_label' => 'detail',
+			]);
+	}
+
+	/**
+	 * @param OptionsResolver $resolver
+	 */
+	public function configureOptions(OptionsResolver $resolver)
+	{
+		$resolver->setDefaults([
+			'data_class' => 'WarehouseBundle\Entity\Incoming',
+		]);
+	}
 }

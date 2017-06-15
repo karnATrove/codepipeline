@@ -45,8 +45,8 @@
                     </td>
                     <td>{{ bookingUtil.bookingProductQuantityTotal(booking) }}</td>
                     <td>{% if booking.futureship %}{{ booking.futureship|date('Y-m-d') }}{% endif %}</td>
-                    <td>{% if booking.shipped %}{{ booking.shipped|date('Y-m-d H:i:s') }}{% endif %}</td>
-                    <td>{% if booking.created %}{{ booking.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                    <td>{% if booking.shipped %}{{ booking.shipped|date('Y-m-d h:i:s A') }}{% endif %}</td>
+                    <td>{% if booking.created %}{{ booking.created|date('Y-m-d h:i:s A') }}{% endif %}</td>
 
                     <td class="actions">
                         <a onclick="return confirm('Are you sure!');" title="Delete"
