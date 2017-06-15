@@ -77,6 +77,7 @@ class IncomingProductScanType extends AbstractType
 		foreach ($locations as $location) {
 			$selection[$location->printLocation()] = $location->getId();
 		}
+		ksort($selection);
 		$this->locationSelection = $selection;
 		return $selection;
 	}

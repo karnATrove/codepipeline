@@ -231,10 +231,12 @@ class LocationProductController extends Controller
             $location = $em->getRepository('WarehouseBundle:Location')->find($request->get('location_product')['location']);
             $location->setModified(new \DateTime('now'));
             $locationProduct->setLocation($location);
+            $locationProduct->setStaged(0);
             $locationProductCheck = $em->getRepository('WarehouseBundle:LocationProduct')->findOneByProductAndLocation($product,$locationProduct->getLocation());
             if ($locationProductCheck) {
                 # Already exists in this location (add)
                 $locationProductCheck->setOnHand($locationProduct->getOnHand()+$locationProductCheck->getOnHand());
+                $locationProductCheck->setStaged($locationProduct->getStaged());
                 $locationProductCheck->setModified(new \DateTime("now"));
                 $locationProduct = $locationProductCheck;
                 unset($locationProductCheck);

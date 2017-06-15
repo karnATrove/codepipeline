@@ -51,6 +51,13 @@ class LocationProduct
     private $onHand;
 
     /**
+     * @var int
+     * @Gedmo\Versioned
+     * @ORM\Column(name="staged", type="integer")
+     */
+    private $staged;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
@@ -97,6 +104,30 @@ class LocationProduct
     public function getOnHand()
     {
         return $this->onHand;
+    }
+
+    /**
+     * Set staged
+     *
+     * @param integer $staged
+     *
+     * @return LocationProduct
+     */
+    public function setStaged($staged)
+    {
+        $this->staged = $staged;
+
+        return $this;
+    }
+
+    /**
+     * Get staged
+     *
+     * @return int
+     */
+    public function getStaged()
+    {
+        return $this->staged;
     }
 
     /**

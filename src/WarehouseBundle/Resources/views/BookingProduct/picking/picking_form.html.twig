@@ -53,7 +53,7 @@
                         <tbody>
                           {% for location in form.location %}
                             {% set booking_location = bookingProduct.product.locations[loop.index0] %}
-                            <tr>
+                            <tr {% if booking_location.location.staging %}class="info"{% endif %}>
                               <td>{{ booking_location.location.aisle }} - {{ booking_location.location.row }} - {{ booking_location.location.level }}</td>
                               <td>{{ booking_location.onHand }}</td>
                               <td width="100">{{ form_widget(location, {'attr': {'min':0,'max':min(booking_location.onHand,bookingProduct.qty-picked_qty)}|merge(readonly)}) }}</td>

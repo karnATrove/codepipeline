@@ -11,11 +11,16 @@ use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemLocationDTO;
 use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemOrder;
+use WarehouseBundle\DTO\Booking\PickQueue\PickQueueDTO;
+use WarehouseBundle\DTO\Booking\PickQueue\PickQueueItemDTO;
+use WarehouseBundle\DTO\Booking\PickQueue\PickQueueItemLocationDTO;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Exception\Utils\UrlFileNotFoundException;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryItemModel;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryModel;
+use WarehouseBundle\Model\Booking\PickQueue\PickQueueItemModel;
+use WarehouseBundle\Model\Booking\PickQueue\PickQueueModel;
 use WarehouseBundle\Utils\DownloadUtility;
 use WarehouseBundle\Utils\FileUtility;
 
@@ -37,6 +42,11 @@ class BookingManager
 		$this->bookingRepository = $this->em->getRepository('WarehouseBundle:Booking');
 	}
 
+	/**
+	 * [formatPickSummaryForView description]
+	 * @param  PickSummaryDTO $pickSummaryDTO [description]
+	 * @return [type]                         [description]
+	 */
 	public static function formatPickSummaryForView(PickSummaryDTO $pickSummaryDTO)
 	{
 		$resp = [];
@@ -270,6 +280,127 @@ class BookingManager
 		}
 		$pickSummaryDTO = new PickSummaryDTO($pickSummaryItems);
 		return $pickSummaryDTO;
+	}
+
+	/**
+	 * 
+	 *
+	 * @return PickQueueModel
+	 */
+	public function getPickQueueModel(): PickQueueModel
+	{
+		$data = $this->bookingRepository->getPickableProducts();
+		$pickQueue = $this->denormalizePickQueueModel($data);
+		return $pickQueue;
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return PickQueueModel
+	 */
+	private function denormalizePickQueueModel(array $data): PickQueueModel
+	{
+		$serializer = new Serializer([new ObjectNormalizer(), new ArrayDenormalizer()]);
+		/** @var PickSummaryItemModel[] $pickSummaryItems */
+		$pickQueueItems = $serializer->denormalize($data, PickQueueItemModel::class . "[]");
+		$pickQueue = new PickQueueModel($pickQueueItems);
+		return $pickQueue;
+	}
+
+	/**
+     * @param PickQueueModel $pickQueueModel
+     *
+     * @return null|PickQueueDTO
+     */
+    public function getPickQueueDTO(PickQueueModel $pickQueueModel)
+    {
+        $pickQueueItems = [];
+        $processedLog = $skuLog = [];
+        foreach ($pickQueueModel->getItems() as $pickQueueItemModel) {
+
+        	# If staging location, ignore
+        	//if ($pickQueueItemModel->getStaging())
+        	//	continue;
+
+        	# Loop through once to assignments per BookingProduct
+            $bookingProductId = $pickQueueItemModel->getBookingProductId();
+            $sku = $pickQueueItemModel->getSku();
+            $skuLocation = $sku.'|'.$pickQueueItemModel->getLocationId();
+            if (!in_array($bookingProductId, $processedLog)) {
+                $processedLog[] = $bookingProductId;
+                $orderedQuantity = $pickQueueItemModel->getOrderedQuantity();
+                if ($orderedQuantity <= 0) {
+                    continue;
+                }
+                $boxNeeded = ceil($pickQueueItemModel->getQuantityPerCarton() / $orderedQuantity);
+                if (key_exists($sku, $pickQueueItems)) {
+                    $pickQueueItems[$sku]['orderedQuantity'] += $orderedQuantity;
+                    $pickQueueItems[$sku]['boxCount'] += $boxNeeded;
+                    //$pickQueueItems[$sku]['quantityStaged'] += $pickQueueItemModel->getQuantityStaged();
+                } else {
+                    $pickQueueItems[$sku]['orderedQuantity'] = $orderedQuantity;
+                    $pickQueueItems[$sku]['boxCount'] = $boxNeeded;
+                    $pickQueueItems[$sku]['sku'] = $sku;
+                    //$pickQueueItems[$sku]['quantityStaged'] = $pickQueueItemModel->getQuantityStaged();
+                }
+            }
+
+            # Loop through each sku once to get the aggregated staged quantity.
+            if (!in_array($skuLocation, $skuLog)) {
+            	if (!isset($pickQueueItems[$sku]['quantityStaged']))
+            		$pickQueueItems[$sku]['quantityStaged'] =  $pickQueueItemModel->getQuantityStaged();
+            	else
+            		$pickQueueItems[$sku]['quantityStaged'] +=  $pickQueueItemModel->getQuantityStaged();
+            	$skuLog[] = $skuLocation;
+            }
+
+            # Continue to assign locations of available skus
+            if (!isset($pickQueueItems[$sku]['itemLocations'])) {
+                $pickQueueItems[$sku]['itemLocations'] = [];
+            }
+
+            # Location consolidation
+            $locationId = $pickQueueItemModel->getLocationId();
+            if (!key_exists($locationId, $pickQueueItems[$sku]['itemLocations'])) {
+                $pickQueueItems[$sku]['itemLocations'][$locationId] = [
+                	'id' => $pickQueueItemModel->getId(),
+                    'locationId' => $pickQueueItemModel->getLocationId(),
+                    'aisle' => $pickQueueItemModel->getAisle(),
+                    'row' => $pickQueueItemModel->getRow(),
+                    'level' => $pickQueueItemModel->getLevel(),
+                    'quantity' => $pickQueueItemModel->getQuantityLevel(),
+                    'quantityStaged' => $pickQueueItemModel->getQuantityStaged(),
+                    'modified' => $pickQueueItemModel->getModified(),
+                    'staging' => $pickQueueItemModel->getStaging(),
+                ];
+            }
+        }
+        return $this->denormalizePickQueueDTO($pickQueueItems);
+    }
+
+    /**
+	 * @param array $pickQueueItemsArray
+	 *
+	 * @return PickQueueDTO
+	 */
+	private function denormalizePickQueueDTO(array $pickQueueItemsArray): PickQueueDTO
+	{
+		$serializer = new Serializer([new ObjectNormalizer(), new ArrayDenormalizer()]);
+		$pickQueueItems = [];
+		foreach ($pickQueueItemsArray as $sku => $itemArray) {
+			/** @var PickQueueItemLocationDTO[] $itemLocations */
+			$itemLocations = $serializer->denormalize($itemArray['itemLocations'], PickQueueItemLocationDTO::class . "[]");
+			/** @var PickQueueItemOrder[] $itemOrders */
+			//$itemOrders = $serializer->denormalize($itemArray['orders'], PickQueueItemOrder::class . "[]");
+			/** @var PickQueueItemDTO $pickQueueItem */
+			$pickQueueItem = $serializer->denormalize($itemArray, PickQueueItemDTO::class);
+			$pickQueueItem->setItemLocations($itemLocations);
+			//$pickQueueItem->setOrders($itemOrders);
+			$pickQueueItems[] = $pickQueueItem;
+		}
+		$pickQueueDTO = new PickQueueDTO($pickQueueItems);
+		return $pickQueueDTO;
 	}
 
 	/**

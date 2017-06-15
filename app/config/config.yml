@@ -21,7 +21,7 @@ framework:
     translator:      
         fallbacks: ["%locale%"]
         paths: []
-        enabled: false
+        enabled: true
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -57,6 +57,8 @@ twig:
         fileUtil: "@app.document_uploader"
         documents_directory: '%documents_directory%'
         site_name: "%business.name%"
+    paths:
+        '%kernel.project_dir%/src/WarehouseBundle/Resources/views': warehouse
 
 # Doctrine Configuration
 doctrine:

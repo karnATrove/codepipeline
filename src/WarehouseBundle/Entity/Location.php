@@ -49,6 +49,13 @@ class Location
     private $row;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="staging", type="boolean", options={"default":0})
+     */
+    private $staging;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="level", type="string", length=10)
@@ -154,6 +161,30 @@ class Location
     public function getLevel()
     {
         return $this->level;
+    }
+
+    /**
+     * Set staging
+     *
+     * @param boolean $staging
+     *
+     * @return boolean
+     */
+    public function setStaging($staging)
+    {
+        $this->staging = $staging;
+
+        return $this;
+    }
+
+    /**
+     * Get staging
+     *
+     * @return boolean
+     */
+    public function getStaging()
+    {
+        return $this->staging;
     }
 
     /**

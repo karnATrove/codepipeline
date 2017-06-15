@@ -62,6 +62,7 @@ class IncomingWorkflow extends BaseWorkflow
 				$locationProduct->setModified(new \DateTime('now'));
 				$quantity = $locationProduct->getOnHand() + $incomingScannedProduct->getQtyOnScan();
 				$locationProduct->setOnHand($quantity);
+				$locationProduct->setStaged($locationProduct->getStaged());
 				$this->locationProductManager->updateLocationProduct($locationProduct, $entityManager, $currentUser);
 			}
 		}
@@ -73,4 +74,4 @@ class IncomingWorkflow extends BaseWorkflow
 			$entityManager->flush();
 		}
 	}
-}
+}	

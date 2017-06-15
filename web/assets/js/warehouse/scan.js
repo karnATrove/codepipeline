@@ -17,6 +17,7 @@ $(function () {
      */
     $('#scan').unbind('change.defaultscan');
     $('#scan').on('change.defaultscan', function () {
+        $(this).val($(this).val().trim());
         if ($(this).val().length >= 2) {
             delay(function () {
                 $('#quick-scan .loading').show();

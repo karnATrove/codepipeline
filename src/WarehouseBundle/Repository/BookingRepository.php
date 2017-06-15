@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\Product;
 
 class BookingRepository extends EntityRepository
 {
@@ -74,5 +75,62 @@ class BookingRepository extends EntityRepository
 		)->setParameter('ids', $bookingIds, Connection::PARAM_STR_ARRAY);
 		$results = $query->getResult();
 		return $results;
+	}
+
+	/**
+	 * We group within the ProductManager. (Most efficient way?)
+	 *
+	 * @return array
+	 */
+	public function getPickableProducts()
+	{
+		$pickableStatuses = array(Booking::STATUS_ACCEPTED,Booking::STATUS_PICKED);
+		$query = $this->getEntityManager()->createQuery(
+			'SELECT
+				  bp.id      	AS bookingProductId,
+				  bp.qty 		AS orderedQuantity,
+				  p.id       	AS productId,
+				  p.model    	AS sku,
+				  l.id       	AS locationId,
+				  l.aisle    	AS aisle,
+				  l.row      	AS row,
+				  l.level    	AS level,
+				  l.staging 	AS staging,
+				  lp.id 		AS id,
+				  lp.staged 	AS quantityStaged,
+				  lp.onHand 	AS quantityLevel,
+				  lp.modified 	AS modified,
+				  p.qtyPerCarton AS quantityPerCarton
+				FROM WarehouseBundle:Booking b INNER JOIN WarehouseBundle:BookingProduct bp WITH bp.booking=b AND b.status IN (:bookingStatus)
+				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
+				  INNER JOIN WarehouseBundle:LocationProduct lp WITH lp.product=p
+				  INNER JOIN WarehouseBundle:Location l WITH lp.location = l AND l.staging = 0
+				ORDER BY p.model'
+		)->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY);
+		$results = $query->getResult();
+		return $results;
+	}
+
+	/**
+	 * We group within the ProductManager. (Most efficient way?)
+	 *
+	 * @return array
+	 */
+	public function getBookingQuantityAskedByProduct(Product $product)
+	{
+		$pickableStatuses = array(Booking::STATUS_ACCEPTED,Booking::STATUS_PICKED);
+		$query = $this->getEntityManager()->createQuery(
+			'SELECT
+				  SUM(DISTINCT bp.qty) as asked
+				FROM WarehouseBundle:Booking b INNER JOIN WarehouseBundle:BookingProduct bp WITH bp.booking=b AND b.status IN (:bookingStatus)
+				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
+				  INNER JOIN WarehouseBundle:LocationProduct lp WITH lp.product=p
+				  INNER JOIN WarehouseBundle:Location l WITH lp.location = l AND l.staging = 0
+				WHERE bp.product = :product
+				GROUP BY bp.product
+				ORDER BY p.model'
+		)->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
+		->setParameter('product',$product);
+		return $query->getSingleScalarResult();
 	}
 }

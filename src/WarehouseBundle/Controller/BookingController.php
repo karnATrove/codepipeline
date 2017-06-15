@@ -13,12 +13,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormError;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingStatusLog;
+use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Enum\SessionEnum;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
@@ -27,6 +33,7 @@ use WarehouseBundle\Manager\BookingManager;
 use WarehouseBundle\Utils\Booking as BookingUtility;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Workflow\BookingWorkflow;
+use WarehouseBundle\Form\PickQueue\BookingPickQueueDTOType;
 
 /**
  * Booking controller.
@@ -522,5 +529,358 @@ class BookingController extends Controller
 		$bookingIdList = explode(',', $ids);
 		$response = $this->get('warehouse.work_flow.booking_work_flow')->downloadDocuments($bookingIdList);
 		return $response;
+	}
+
+	public function createPickQueueForm() {
+		$pickQueueModel = $this->get('warehouse.manager.booking_manager')->getPickQueueModel();
+        $pickQueueDTO = $this->get('warehouse.manager.booking_manager')->getPickQueueDTO($pickQueueModel);
+
+		return $this->createFormBuilder($pickQueueDTO)
+        	->setAction($this->generateUrl('booking_pick_queue'))
+        	//->setAction($this->generateUrl('booking_pick_queue_ajax'))
+			->setMethod('POST')
+			->add('items', CollectionType::class, array(
+	        	'entry_type' => BookingPickQueueDTOType::class,
+	            'entry_options' => array(
+	                'attr' => array('class'=>'form-control'),
+	            ),
+	        )
+	    )->getForm();
+	}
+
+	/**
+     * @param $ids
+     * @Route("/pick-queue", name="booking_pick_queue")
+     */
+    public function pickQueueAction(Request $request)
+    {
+        $form = $this->createPickQueueForm();
+		$form->handleRequest($request);
+		
+		if ($form->isSubmitted()) {
+			if ($request->isXmlHttpRequest()) {
+				# AJAX POST
+				$response = [];
+				if ($form->isValid()) {
+
+				}
+			}
+		}
+		
+		if ($form->isSubmitted()) {
+			if ($request->isXmlHttpRequest()) {
+				# AJAX POST
+				$response = [];
+				if ($form->isValid()) {
+					$em = $this->getDoctrine()->getManager();
+					foreach($pickQueueDTO->getItems() as $itemDTO) {
+						foreach($itemDTO->getItemLocations() as $locationDTO) {
+							$locationProduct = $em->getRepository('WarehouseBundle:LocationProduct')->findOneById($locationDTO->getId());
+							$difference = $locationDTO->getQuantityStaged() - $locationProduct->getStaged();
+							if ($locationDTO->getQuantityStaged() !== $locationProduct->getStaged()) {
+								//$form->get('items')->addError(new FormError('error message'));
+								if ($locationProduct->getModified() > $locationDTO->getModified()) {
+									$response['ajaxCommand'][] = [
+										'op' => 'notice', # noty
+										'type' => 'error',
+										'value' => 'Another user has modified this value at '. $locationProduct->getModified()->format('Y-m-d H:i:s').' when now is '.(new \DateTime())->format('Y-m-d H:i:s').'.',
+									];
+
+									$response['ajaxCommand'][] = [
+										'selector' => "td[data-location='".$locationProduct->getId()."']",
+										'op' => 'addClass', # noty
+										'value' => 'has-error',
+									];
+								} else {
+									$itemDTO->setQuantityStaged($itemDTO->getQuantityStaged() + ($locationDTO->getQuantityStaged() - $locationProduct->getStaged()));
+									
+									$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
+									$locationDTO->setModified(new \DateTime()); # Keep modified synced
+									# Use the workflow managers for update.
+									$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct,$locationDTO->getQuantityStaged());
+
+									$message = "Staged location updated at: " .
+										$locationTitle . " Quantity: {$locationProduct->getStaged()}";
+
+									$response['ajaxCommand'][] = [
+										'op' => 'notice', # noty
+										'type' => 'success',
+										'value' => $message,
+									];
+								}
+							}
+						}
+					}
+					
+					$response['ajaxCommand'][] = [
+						'selector' => '#pickingStagingQueue',
+						'op' => 'html',
+						'value' => $this->renderView('WarehouseBundle::Booking/pick_queue_form.html.twig', ['form' => $form->createView()]),
+					];
+				} else {
+					//dump($form->getErrorsAsString());
+					$response['ajaxCommand'][] = [
+						'op' => 'notice', # noty
+						'type' => 'error',
+						'value' => 'Form has not be validily submitted.',
+					];
+					foreach($form->getErrors(true) as $error) {
+						$locationId = $error->getCause()->getConstraint()->current->getId();
+						$response['ajaxCommand'][] = [
+							'op' => 'notice', # noty
+							'type' => 'error',
+							'value' => $error->getMessage(),
+						];
+						$response['ajaxCommand'][] = [
+							'op' => 'addClass', # noty
+							'selector' => "td[data-location='".$locationId."']",
+							'value' => 'has-error',
+						];
+					}
+					$response['ajaxCommand'][] = [
+						'selector' => '#pickingStagingQueue',
+						'op' => 'html',
+						'value' => $this->renderView('WarehouseBundle::Booking/pick_queue_form.html.twig', ['form' => $form->createView()]),
+					];
+					
+				}
+				return new JsonResponse($response, 200);
+			} else {
+				# HTTP POST
+				if ($form->isValid()) {
+					$this->get('session')->getFlashBag()->add('success', "Did nothing.");
+				} else {
+					$this->get('session')->getFlashBag()->add('error', "Form has not be validily submitted.");
+				}
+			}
+		}
+
+		$html = $this->renderView('WarehouseBundle::Booking/pick_queue.html.twig', ['form' => $form->createView()]);
+        return new Response($html, 200);
+    }
+
+    /**
+	 * Lists all Incoming entity products.
+	 * TODO: Move this to LocationProductController().
+	 * TODO: This is actually not used....
+	 *
+	 * @Route("/pick-queue/{id}/ajax/edit", name="booking_pick_queue_edit_ajax")
+	 */
+	public function pickQueueEditAjaxAction(Request $request, LocationProduct $locationProduct)
+	{
+		if (!$request->isXmlHttpRequest()) {
+			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
+			return $this->redirect($this->generateUrl('booking_pick_queue', array()));
+		}
+
+		# Modify the LocationProduct.staged quantity.
+		$qty = $request->get('quantity');
+		$original = $request->get('original');
+		$response = $errors = [];
+		if ($original == $locationProduct->getStaged()) {
+			# Validate number entry to be within our desired range
+			# Update if quantity is valid
+			$available = $locationProduct->getStaged() + $locationProduct->getOnHand();
+			$stagingLocationProduct = $this->getDoctrine()->getManager()->getRepository('WarehouseBundle:LocationProduct')->findOneStagingByProduct($locationProduct->getProduct());
+			$currently_staged = is_null($stagingLocationProduct) ? 0 : $stagingLocationProduct->getOnHand();
+			$quantity_asked = $this->getDoctrine()->getManager()->getRepository('WarehouseBundle:Booking')->getBookingQuantityAskedByProduct($locationProduct->getProduct());
+			if ($currently_staged + ($qty - $locationProduct->getStaged()) > $quantity_asked) {
+				$errors[] = 'That will be over the threshold of asked quantity of '. $quantity_asked;
+			} elseif ($qty !== null && $qty <= $available && $qty >= 0) {
+				# Use the workflow managers for update.
+				$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct,$qty);
+
+				$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
+				$message = "Staged location updated at: " .
+				$locationTitle . " Quantity: {$locationProduct->getStaged()}";
+
+				# Build the form to use
+				$form = $this->createPickQueueForm();;
+
+				$response['ajaxCommand'][] = [
+					'op' => 'notice', # noty
+					'type' => 'success',
+					'value' => $message,
+				];
+				$response['ajaxCommand'][] = [
+					'op' => 'attribute', # noty
+					'selector' => "td[data-location='".$locationProduct->getId()."']",
+					'value' => (object)array('data-original'=>$locationProduct->getStaged()),
+				];
+				$response['ajaxCommand'][] = [
+					'selector' => '#pickingStagingQueue',
+					'op' => 'html',
+					'value' => $this->renderView('WarehouseBundle::Booking/pick_queue_form.html.twig', ['form' => $form->createView()]),
+				];
+			} else {
+				$errors[] = 'You can not request to stage '. $qty. ' quantity. '. $available. ' are available.';
+			}
+		} else {
+			# Error, entity has changed
+			$errors[] = 'The entity "LocationProduct" was modified by another user ('.$locationProduct->getUser()->getName().') on "'.$locationProduct->getModified()->format('Y-m-d H:i:s').'".';
+		}
+
+		# Handle errors
+		if (count($errors)) {
+			foreach($errors as $error) {
+				$response['ajaxCommand'][] = [
+					'op' => 'notice', # noty
+					'type' => 'error',
+					'value' => $error,
+				];
+			}
+			$response['ajaxCommand'][] = [
+				'op' => 'addClass', # noty
+				'selector' => "td[data-location='".$locationProduct->getId()."']",
+				'value' => 'has-error',
+			];
+			$response['ajaxCommand'][] = [
+				'op' => 'attr', # noty
+				'selector' => "td[data-location='".$locationProduct->getId()."'] input",
+				'value' => array('data-original'=>$locationProduct->getStaged()),
+			];
+		}
+
+		return new JsonResponse($response, 200);
+	}
+
+	/**
+	 * Lists all Incoming entity products.
+	 * TODO: Move this to LocationProductController().
+	 * TODO: This is actually not used....
+	 * TODO: TO MAKE THIS WORK, WE NEED TO EDIT pick_queue.js post vars
+	 *
+	 * @Route("/pick-queue/{id}/ajax/edit/test", name="booking_pick_queue_edit_ajax_test")
+	 */
+	public function pickQueueEditAjaxPROPERFORMVALIDATIONTESTAction(Request $request, LocationProduct $locationProduct)
+	{
+		if (!$request->isXmlHttpRequest()) {
+			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
+			return $this->redirect($this->generateUrl('booking_pick_queue', array()));
+		}
+
+		$response = [];
+		$form = $this->createPickQueueForm();
+
+		# Identify the original
+		$original = null;
+		$queueItemDTO = $form->getData();
+		foreach($queueItemDTO->getItems() as $i => $item) {
+			foreach($item->getItemLocations() as $k => $location) {
+				if ($location->getId() == $locationProduct->getId()) {
+					$original  = clone($location);
+				}
+			}
+		}
+
+		# Modify the LocationProduct.staged quantity.
+		$qty = $request->get('quantity');
+		//$original = $request->get('original');
+		if ($original->getQuantityStaged() == $locationProduct->getStaged()) {
+
+			# Update
+			$newEntity = null;
+			$form->handleRequest($request);
+			if ($form->isSubmitted()) {
+				if ($form->isValid()) {
+					$queueItemDTO = $form->getData();
+					foreach($queueItemDTO->getItems() as $i => $item) {
+						foreach($item->getItemLocations() as $k => $location) {
+							if ($location->getId() == $locationProduct->getId()) {
+								$newEntity = clone($location);
+								$quantity = $location->getQuantityStaged();
+							}
+						}
+					}
+				}
+			}
+
+			# Update if quantity is valid
+			if ($newEntity !== null) {
+				# Use the workflow managers for update.
+				$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct,$newEntity->getQuantityStaged());
+			}
+			$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
+			$message = "Staged location updated at: " .
+			$locationTitle . " Quantity: {$locationProduct->getStaged()}";
+			$response['ajaxCommand'][] = [
+				'op' => 'notice', # noty
+				'type' => 'success',
+				'value' => 'found'. $locationProduct->getStaged().'-'.$newEntity->getQuantityStaged(),
+			];
+
+			$response['ajaxCommand'][] = [
+				'op' => 'notice', # noty
+				'type' => 'success',
+				'value' => $message,
+			];
+			$response['ajaxCommand'][] = [
+				'op' => 'attribute', # noty
+				'selector' => "td[data-location='".$locationProduct->getId()."']",
+				'value' => (object)array('data-original'=>$locationProduct->getStaged()),
+			];
+			
+			$response['ajaxCommand'][] = [
+				'selector' => '#pickingStagingQueue',
+				'op' => 'html',
+				'value' => $this->renderView('WarehouseBundle::Booking/pick_queue_form.html.twig', ['form' => $form->createView()]),
+			];
+		} else {
+			# Error, entity has changed
+			$response['ajaxCommand'][] = [
+				'op' => 'notice', # noty
+				'type' => 'error',
+				'value' => 'The entity "LocationProduct" was modified by another user ('.$locationProduct->getUser()->getName().') on "'.$locationProduct->getModified()->format('Y-m-d H:i:s').'".',
+			];
+			$response['ajaxCommand'][] = [
+				'op' => 'addClass', # noty
+				'selector' => "td[data-location='".$locationProduct->getId()."']",
+				'value' => 'has-error',
+			];
+			$response['ajaxCommand'][] = [
+				'op' => 'attr', # noty
+				'selector' => "td[data-location='".$locationProduct->getId()."'] input",
+				'value' => array('data-original',$locationProduct->getStaged()),
+			];
+		}
+
+		return new JsonResponse($response, 200);
+	}
+
+	/**
+	 * Lists all Incoming entity products.
+	 * TODO: Move this to LocationProductController().
+	 * TODO: This is actually not used....
+	 *
+	 * @Route("/pick-queue/ajax/refresh", name="booking_pick_queue_refresh_ajax")
+	 */
+	public function pickQueueRefreshAjaxAction(Request $request)
+	{
+		if (!$request->isXmlHttpRequest()) {
+			$this->get('session')->getFlashBag()->add('error', "Form should have been submitted via AJAX.");
+			return $this->redirect($this->generateUrl('booking_pick_queue', array()));
+		}
+
+		# Modify the LocationProduct.staged quantity.
+		$selector = $request->get('selector');
+
+		$response = [];
+		$form = $form = $this->createPickQueueForm();
+		$response['ajaxCommand'][] = [
+			'selector' => $selector,
+			'op' => 'html',
+			'value' => $this->renderView('WarehouseBundle::Booking/pick_queue_form.html.twig', ['form' => $form->createView()]),
+		];
+		$response['ajaxCommand'][] = [
+			'op' => 'html',
+			'selector' => '.asof',
+			'value' => (new \DateTime())->format('Y-m-d H:i:s A'),
+		];
+		$response['ajaxCommand'][] = [
+			'op' => 'blink',
+			'selector' => $selector,
+			'value' => '',
+		];
+		return new JsonResponse($response, 200);
 	}
 }

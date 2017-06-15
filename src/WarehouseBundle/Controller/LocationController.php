@@ -14,6 +14,8 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
+use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
+
 use WarehouseBundle\Entity\Location;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Entity\ProductLog;
@@ -60,27 +62,142 @@ class LocationController extends Controller
 	public function batchInsertAction(Request $request)
 	{
 		$em = $this->getDoctrine()->getManager();
-		$queryBuilder = $em->getRepository('WarehouseBundle:Location')->createQueryBuilder('e');
 
-		$aisles = ['A','B','C','D','E','F','G','H','I'];
-		$aisles = ['J','K'];
-		$num_rows = TRUE ? 21 : 27;
+		$aisles = ['E','F','G','H','I','J','K'];
+		#$aisles = ['A','B','C'];
+		#$aisles = ['D'];
+		$num_rows = 24;
+		$abc = 18;
+		$d = 21;
+		$num_rows = 24;
 		foreach($aisles as $a) {
-			for($x=1;$x<=$num_rows;$x++) {
-				$ent = (new Location())
-					->setAisle($a)
-					->setRow($x)
-					->setLevel(1)
-					->setUser($this->getUser())
-					->setCreated(new \DateTime('now'));
-				$em->persist($ent);
-				$em->flush();
+			for($x=22;$x<=$num_rows;$x++) {
+				//for($xx=1;$xx<=1;$xx++) {
+					$ent = (new Location())
+						->setAisle($a)
+						->setRow($x)
+						->setLevel(1)
+						->setStaging(FALSE)
+						->setUser($this->getUser())
+						->setCreated(new \DateTime('now'));
+					$em->persist($ent);
+				//}
 			}
 		}
+		$em->flush();
 
 		$this->get('session')->getFlashBag()->add('success', "Successfully added batch locations." );
 
+		return $this->render('WarehouseBundle:Default:dashboard.html.twig');
 		return $this->redirect($this->generateUrl('location'));
+	}
+
+	/**
+	 * Lists all Location entities.
+	 *
+	 * @Route("/batchlabels", name="batchlabel")
+	 * @Method("GET")
+	 */
+	public function batchLabelAction(Request $request)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$repository = $em->getRepository('WarehouseBundle:Location');
+		//$locations = $repository->findBy(array('level'=>1),array('aisle'=>'ASC','row'=>'ASC'));
+		$locations = $repository->findBy(['aisle'=>'A'], array('aisle'=>'ASC','row'=>'ASC','level'=>'asc'));
+
+		$sorted = array();
+		usort($locations,function($a,$b) {
+			if (intval($a->getRow()) == intval($b->getRow())) {
+				if ($a->getLevel() == $b->getLevel()) {
+					return 0;
+				}
+				return ($a->getLevel() < $b->getLevel()) ? -1 : 1;
+			}
+			return (intval($a->getRow()) < intval($b->getRow())) ? -1 : 1;
+		});
+		
+
+		//$my2dBarcode = new matrixCode();
+		$cnt = 0;
+		$runlocations = array();
+
+		/*
+		foreach($locations as $location) {
+			$barCode = new barCode();
+			$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
+			$string = $location->getAisle(). '-'.$location->getRow().'-'.$location->getLevel().'-'.$location->getId();
+			$locationBarCode = $barCode->getBarcodePNGPath($string, 'C128', 1.75, 45);
+ 			$bcHTMLRaw = $barCode->getBarcodeHTML($string, 'C128', 3, 140);
+			$runlocations[] = (object)array(
+				'location' => $location,
+				'locationBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $locationBarCode),
+				'raw' => $bcHTMLRaw,
+			);
+			$cnt++;
+		}
+		*/
+
+
+		$aisles = ['E','F','G','H','I','J','K','L'];
+		#$aisles = ['B','C'];
+		#$aisles = ['D'];
+		$num_rows = 24;
+		$abc = 18;
+		$d = 21;
+		foreach($aisles as $a) {
+			for($x=1;$x<=$num_rows;$x++) {
+				for($xx=1;$xx<=4;$xx++) {
+					$location = (object)array(
+						'aisle' => $a,
+						'row' => $x,
+						'level' => $xx
+					);
+
+					$barCode = new barCode();
+					$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
+					$string = $location->aisle.'-'.$location->row.'-'.$location->level;
+					//$locationBarCode = $barCode->getBarcodePNGPath($string, 'C128', 1.75, 45);
+		 			$bcHTMLRaw = $barCode->getBarcodeHTML($string, 'C128', 3.5, 140);
+					$runlocations[] = (object)array(
+						'location' => $location,
+						//'locationBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $locationBarCode),
+						'raw' => $bcHTMLRaw,
+					);
+				}
+			}
+		}
+
+
+
+		$html = $this->renderView('@warehouse/Location/pdf/labels.html.twig', [
+			'locations' => $runlocations,
+			//'locationBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $locationBarCode),
+		]);
+		//return new Response($html,200);
+
+		$filename = 'locations.pdf';
+		return new Response(
+			$this->get('knp_snappy.pdf')->getOutputFromHtml($html),
+			200,
+			[
+				'Content-Type' => 'application/pdf',
+				'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+			]
+		);
+	}
+
+	/**
+	 * simple cache path returning method (sample cache path: "upload/barcode/cache" )
+	 *
+	 * @param bool $public
+	 *
+	 * @return string
+	 *
+	 */
+	protected function getBarcodeCachePath($public = false)
+	{
+
+		return (!$public) ? $this->get('kernel')->getRootDir() . '/../web/uploads/barcode/cache' : '/uploads/barcode/cache';
 	}
 
 	/**
@@ -186,6 +303,7 @@ class LocationController extends Controller
 	{
 		$location = (new Location())->setUser($this->getUser());
 		$location->setCreated(new \DateTime('now')); # Default created date
+		$location->setStaging(FALSE);
 		$form   = $this->createForm('WarehouseBundle\Form\LocationType', $location);
 		$form->handleRequest($request);
 

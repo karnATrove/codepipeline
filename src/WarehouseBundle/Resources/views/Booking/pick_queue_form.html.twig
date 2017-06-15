@@ -1,0 +1,44 @@
+    <div class="row">
+        <div class="col-md-12">
+            {% for type, flashMessages in app.session.flashbag.all() %} 
+            {% for flashMessage in flashMessages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                {{ flashMessage|raw }}
+            </div>
+             {% endfor %} 
+             {% endfor %} 
+        </div>
+    </div>
+
+
+    {{ form_widget(form._token) }}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>SKU</th>
+            <th>Qty Asked</th>
+            <th>Qty Staged</th>
+            <th>Locations</th>
+            <th>Available</th>
+            <th>Staged</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for itemDTO in form.items %}
+            {% for itemLocationDTO in itemDTO.itemLocations %}
+                <tr class="{% if loop.last %}border-sub-bottom{% endif %}">
+                    <td>{% if loop.first %}{{ itemDTO.vars.value.sku }}{% endif %}</td>
+                    <td>{% if loop.first %}{{ itemDTO.vars.value.orderedQuantity }}{% endif %}</td>
+                    <td>{% if loop.first %}{{ itemDTO.vars.value.quantityStaged }}{% endif %}</td>
+                    <td class="sub sub-first">{{ itemLocationDTO.vars.value.printLocation }}</td>
+                    <td class="sub">{{ itemLocationDTO.vars.value.quantity }}</td>
+                    <td class="sub sub-last" data-url="{{ path('booking_pick_queue_edit_ajax',{'id':itemLocationDTO.vars.value.id}) }}" data-location="{{ itemLocationDTO.vars.value.id }}" data-original="{{ itemLocationDTO.vars.value.quantityStaged }}">
+                        {{ form_widget(itemLocationDTO) }}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    {{ form_rest(form) }}

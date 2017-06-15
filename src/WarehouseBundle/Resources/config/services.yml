@@ -56,8 +56,8 @@ services:
         arguments: ['@doctrine.orm.entity_manager']
 
     warehouse.work_flow.booking_work_flow:
-      class: WarehouseBundle\Workflow\BookingWorkflow
-      arguments: ['@service_container']
+        class: WarehouseBundle\Workflow\BookingWorkflow
+        arguments: ['@service_container']
     warehouse.workflow.user_workflow:
         class: WarehouseBundle\Workflow\UserWorkflow
         arguments: ['@service_container']
@@ -67,6 +67,9 @@ services:
     warehouse.workflow.incoming_product_scan_workflow:
         class: WarehouseBundle\Workflow\IncomingProductScanWorkflow
         arguments: ['@service_container']
+    warehouse.workflow.staging_queue_workflow:
+        class: WarehouseBundle\Workflow\StagingQueueWorkflow
+        arguments: ['@service_container']
     warehouse.workflow.booking_comment_workflow:
         class: WarehouseBundle\Workflow\BookingCommentWorkflow
         arguments: ['@service_container']
@@ -74,3 +77,18 @@ services:
     warehouse.utils.message_printer:
         class: WarehouseBundle\Utils\MessagePrinter
         arguments: ['@service_container']
+
+    warehouse.hidden_datetime.form.type:
+        class: WarehouseBundle\Form\Type\HiddenDateTimeType
+        tags:
+            - { name: form.type, alias: hidden_datetime } 
+    warehouse.type.pick_queue_location:
+        class: WarehouseBundle\Form\PickQueue\BookingPickQueueItemLocationDTOType
+        tags:
+            - { name: form.type, alias: form_booking_pick_queue_item_location_dto }
+        arguments: ['@doctrine.orm.entity_manager']
+    warehouse.validator.not_modified:
+        class: WarehouseBundle\Validator\Constraints\NotModifiedValidator
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - {name: validator.constraint_validator, alias: not_modified}
