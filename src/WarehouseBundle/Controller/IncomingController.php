@@ -2,23 +2,11 @@
 
 namespace WarehouseBundle\Controller;
 
-use Doctrine\ORM\QueryBuilder;
-use Pagerfanta\Exception\OutOfRangeCurrentPageException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-
-use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
-use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
-
-use WarehouseBundle\Form\IncomingFileType;
-
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
 use WarehouseBundle\Entity\IncomingProduct;
@@ -40,110 +28,10 @@ class IncomingController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
-		$queryBuilder = $em->getRepository('WarehouseBundle:Incoming')->createQueryBuilder('i');
-
-		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
-		list($incoming, $pagerHtml) = $this->paginator($queryBuilder, $request);
-
+		$incoming = $this->get('warehouse.manager.incoming_manager')->findBy([], ['id' => 'desc']);
 		return $this->render('incoming/index.html.twig', [
-			'incoming' => $incoming,
-			'pagerHtml' => $pagerHtml,
-			'filterForm' => $filterForm->createView(),
-
+			'incoming' => $incoming
 		]);
-	}
-
-
-	/**
-	 * Create filter form and process filter request.
-	 *
-	 * @param QueryBuilder $queryBuilder
-	 * @param Request      $request
-	 *
-	 * @return array
-	 */
-	protected function filter($queryBuilder, Request $request)
-	{
-		$session = $request->getSession();
-		$filterForm = $this->createForm('WarehouseBundle\Form\IncomingFilterType');
-
-		// Reset filter
-		if ($request->get('filter_action') == 'reset') {
-			$session->remove('IncomingControllerFilter');
-		}
-
-		// Filter action
-		if ($request->get('filter_action') == 'filter') {
-			// Bind values from the request
-			$filterForm->handleRequest($request);
-
-			if ($filterForm->isValid()) {
-				// Build the query from the given form object
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-				// Save filter to session
-				$filterData = $filterForm->getData();
-				$session->set('IncomingControllerFilter', $filterData);
-			}
-		} else {
-			// Get filter from session
-			if ($session->has('IncomingControllerFilter')) {
-				$filterData = $session->get('IncomingControllerFilter');
-
-				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
-					if (is_object($filter)) {
-						$filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
-					}
-				}
-
-				$filterForm = $this->createForm('WarehouseBundle\Form\IncomingFilterType', $filterData);
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-			}
-		}
-
-		return [$filterForm, $queryBuilder];
-	}
-
-
-	/**
-	 * Get results from paginator and get paginator view.
-	 *
-	 */
-	protected function paginator(QueryBuilder $queryBuilder, Request $request)
-	{
-		//sorting
-		$sortCol = $queryBuilder->getRootAlias() . '.' . $request->get('pcg_sort_col', 'id');
-		$queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
-		// Paginator
-		$adapter = new DoctrineORMAdapter($queryBuilder);
-		$pagerfanta = new Pagerfanta($adapter);
-		$pagerfanta->setMaxPerPage($request->get('pcg_show', 20));
-
-		try {
-			$pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-		} catch (OutOfRangeCurrentPageException $ex) {
-			$pagerfanta->setCurrentPage(1);
-		}
-
-		$entities = $pagerfanta->getCurrentPageResults();
-
-		// Paginator - route generator
-		$me = $this;
-		$routeGenerator = function ($page) use ($me, $request) {
-			$requestParams = $request->query->all();
-			$requestParams['pcg_page'] = $page;
-			return $me->generateUrl('incoming', $requestParams);
-		};
-
-		// Paginator - view
-		$view = new TwitterBootstrap3View();
-		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
-			'proximity' => 3,
-			'prev_message' => 'previous',
-			'next_message' => 'next',
-		]);
-
-		return [$entities, $pagerHtml];
 	}
 
 
@@ -426,7 +314,6 @@ class IncomingController extends Controller
 	public function deleteByIdAction(Incoming $incoming)
 	{
 		$em = $this->getDoctrine()->getManager();
-
 		try {
 			# Remove incoming products scans before being able to delete incoming container
 			foreach ($incoming->getIncomingScannedProducts() as $scannedProduct) {
@@ -454,9 +341,7 @@ class IncomingController extends Controller
 		} catch (\Exception $ex) {
 			$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Incoming');
 		}
-
 		return $this->redirect($this->generateUrl('incoming'));
-
 	}
 
 

@@ -84,8 +84,31 @@ class IncomingManager extends BaseManager
 	/**
 	 * @param Incoming $incoming
 	 */
-	public function refresh(Incoming $incoming){
+	public function refresh(Incoming $incoming)
+	{
 		$this->entityManager->refresh($incoming);
 	}
 
+	/**
+	 * Finds entities by a set of criteria.
+	 *
+	 * @param array      $criteria
+	 * @param array|null $orderBy
+	 * @param int|null   $limit
+	 * @param int|null   $offset
+	 *
+	 * @return Incoming[]
+	 */
+	public function findBy($criteria, $orderBy = null, $limit = null, $offset = null)
+	{
+		return $this->incomingRepository->findBy($criteria, $orderBy, $limit, $offset);
+	}
+
+	/**
+	 * @return array|Incoming[]
+	 */
+	public function findAll()
+	{
+		return $this->incomingRepository->findAll();
+	}
 }
