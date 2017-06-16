@@ -7,6 +7,7 @@ class AjaxCommandDTO
 	const OP_REDIRECT = "redirect";
 	const OP_MODAL = "modal";
 	const OP_HIDE = "hide";
+	const OP_SHOW = "show";
 	const OP_HTML = "html";
 	const OP_APPEND = "append";
 	const OP_REMOVE = "remove";

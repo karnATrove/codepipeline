@@ -12,6 +12,7 @@ use Symfony\Component\Security\Acl\Exception\Exception;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
+use WarehouseBundle\Exception\WorkflowException\WorkflowAPIException;
 use WarehouseBundle\Manager\LocationManager;
 use WarehouseBundle\Utils\AjaxCommandParser;
 
@@ -159,10 +160,27 @@ class IncomingProductScanController extends Controller
 		}
 		try {
 			$form = $request->get('scannedProduct');
+
+			//if receive force submit, we don't want update roveconcepts
+			$forceSubmit = $request->get('forceSubmit');
+			$updateRove = $forceSubmit ? false : true;
+
 			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
-				->completeProductScan($incoming, $form);
+				->completeProductScan($incoming, $form, $updateRove);
+		} catch (WorkflowAPIException $workflowAPIException) {
+			$messages['error'][] = "Complete Container Scan Failed! You can try to complete scan without notify" .
+				" Roveconcepts by using [FORCE COMPLETE BUTTON].".
+				" Please notify them that this container is complete if you do this.<br>" .
+				$workflowAPIException->getMessage();
+			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
+				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+					->getMessageBagView());
+			$ajaxCommands[] = new AjaxCommandDTO('#product_scan_form_force_submit',
+				AjaxCommandDTO::OP_SHOW);
 		} catch (\Exception $exception) {
-			$messages['error'][] = "Complete Container Scan Failed!<br>{$exception->getMessage()}";
+			$messages['error'][] = "Complete Container Scan Failed! Please contact Rove dev team with detailed error message.<br>"
+				. $exception->getMessage();
 			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
 				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
