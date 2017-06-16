@@ -47,10 +47,25 @@ class ContainerManager extends BaseManager
 		$timestamp = time();
 		$url = $this->containerUpdateUrl."/{$containerName}";
 		$headers = parent::generateAuthHeaders($url, $timestamp,'PUT');
-		$request = $this->roveClient->put($url, $headers, $data);
+		$request = $this->roveClient->put($url, $headers, $data,['allow_redirects'=>true]);
 
 		try {
-			$request->send();
+//			$request->send();
+
+//			$ch = curl_init($url);
+//			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+//			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+//			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+//			$headers[]='Content-Type: application/json';
+//			$headers[]='Content-Length: ' . strlen($data);
+//
+//			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//
+//			$result = curl_exec($ch);
+//			$test="test";
+
+
 		} catch (ClientErrorResponseException $clientErrorResponseException) {
 			$response = $clientErrorResponseException->getResponse();
 			$body = $response->getBody(true);
