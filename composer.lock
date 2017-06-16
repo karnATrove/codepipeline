@@ -2514,20 +2514,20 @@
         },
         {
             "name": "knplabs/knp-snappy",
-            "version": "0.4.3",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/snappy.git",
-                "reference": "44f7a9b37d5686fd7db4c1e9569a802a5d16923f"
+                "reference": "370da31fa92a8e583e34558c589e630647617a38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/snappy/zipball/44f7a9b37d5686fd7db4c1e9569a802a5d16923f",
-                "reference": "44f7a9b37d5686fd7db4c1e9569a802a5d16923f",
+                "url": "https://api.github.com/repos/KnpLabs/snappy/zipball/370da31fa92a8e583e34558c589e630647617a38",
+                "reference": "370da31fa92a8e583e34558c589e630647617a38",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
+                "php": ">=5.6",
                 "symfony/process": "~2.3|~3.0"
             },
             "require-dev": {
@@ -2547,8 +2547,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Knp\\Snappy": "src/"
+                "psr-4": {
+                    "Knp\\Snappy\\": "src/Knp/Snappy"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2557,7 +2557,7 @@
             ],
             "authors": [
                 {
-                    "name": "KNPLabs Team",
+                    "name": "KnpLabs Team",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -2575,7 +2575,7 @@
                 "thumbnail",
                 "wkhtmltopdf"
             ],
-            "time": "2015-11-17T13:16:27+00:00"
+            "time": "2017-06-16T07:50:40+00:00"
         },
         {
             "name": "knplabs/knp-snappy-bundle",
@@ -3900,17 +3900,17 @@
         },
         {
             "name": "rove/canonical-dto",
-            "version": "1.0.2",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://yhnehc:d7e2a019ff9d63d00dc5b4e1cb27895a8cee9c79@github.com/roveconcepts/dto.git",
-                "reference": "6ae1954d7ebb0a31f13e3f903b5da4032145e7b3"
+                "reference": "ec2ebfd922cd57d519b6031e670313991ee4d5f0"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.2-45bf37.tar",
-                "reference": "6ae1954d7ebb0a31f13e3f903b5da4032145e7b3",
-                "shasum": "f5dff42f0d64d7a80b72e547c4cc2e5790273b96"
+                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.4-6e8084.tar",
+                "reference": "ec2ebfd922cd57d519b6031e670313991ee4d5f0",
+                "shasum": "e1a928fa64054f4b6317649e3921a1ed64a6600c"
             },
             "type": "library",
             "autoload": {
@@ -3924,7 +3924,7 @@
                     "email": "leoc@roveconcepts.com"
                 }
             ],
-            "time": "2017-06-14T19:36:47+00:00"
+            "time": "2017-06-16T22:19:06+00:00"
         },
         {
             "name": "sensio/distribution-bundle",

@@ -59,7 +59,7 @@ class BookingCommentWorkflow extends BaseWorkflow
 		}
 
 		if ($commentForm->get('notifyCustomerCare')->getData()==1){
-			$this->sendCommentToRove($bookingComment->getComment(),$booking->getOrderReference());
+			$this->sendCommentToRove($bookingComment->getComment(),$booking->getOrderNumber());
 		}
 
 		$bookingComment->setCreated(new \DateTime());
@@ -87,11 +87,11 @@ class BookingCommentWorkflow extends BaseWorkflow
 
 	/**
 	 * @param $comment
-	 * @param $orderReference
+	 * @param $orderNumber
 	 */
-	private function sendCommentToRove($comment,$orderReference){
+	private function sendCommentToRove($comment, $orderNumber){
 		$orderCommentCreateDto = new OrderCommentCreateDto();
-		$orderCommentCreateDto->setOrderReference($orderReference);
+		$orderCommentCreateDto->setOrderNumber($orderNumber);
 		$orderCommentCreateDto->setNotifyCustomerCare(true);
 		$orderCommentCreateDto->setComment($comment);
 		$orderCommentCreateDto->setCreatedBy($this->user->getEmail());

@@ -51,13 +51,13 @@ class OrderCommentManager extends BaseManager
 			$request->send();
 		} catch (ClientErrorResponseException $clientErrorResponseException) {
 			$response = $clientErrorResponseException->getResponse();
-			$body = $response->getBody();
+			$body = $response->getBody(true);
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
 			throw new RoveSiteApiException("Failed to notify customer service. Detail: " .
 				$responseErrorDto->getMessage());
 		} catch (ServerErrorResponseException $serverErrorResponseException) {
 			$response = $serverErrorResponseException->getResponse();
-			$body = $response->getBody();
+			$body = $response->getBody(true);
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
 			throw new RoveSiteApiException("Failed to notify customer service. Detail: " .
 				$responseErrorDto->getMessage());
