@@ -17,6 +17,7 @@ use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Exception\Manager\ManagerException;
+use WarehouseBundle\Exception\WorkflowException\WorkflowAPIException;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Manager\IncomingProductManager;
@@ -277,7 +278,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 					->update($containerUpdateDto, $incoming->getName());
 
 			} catch (RoveSiteApiException $roveSiteApiException) {
-				throw new WorkflowException("Error from roveconcepts.com:<br>"
+				throw new WorkflowAPIException("Error from roveconcepts.com:<br>"
 					. $roveSiteApiException->getMessage());
 			}
 		}

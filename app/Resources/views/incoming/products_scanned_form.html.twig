@@ -57,11 +57,14 @@
 
                     <div class="actionBar">
                         {% if not iscomplete %}
+                            <button id="product_scan_form_force_submit" class="btn btn-danger btn-large" style="display: none;">
+                                Force COMPLETE SCAN</button>
                             <button type="submit" class="btn btn-dark btn-large"
-                                    data-confirm="This will mark the container are closed. It will also assign all items to active inventory. Are you sure you are complete?"
+                                    data-confirm="This will mark the container are closed and notify roveconcepts.
+                                     It will also assign all items to active inventory. Are you sure you are complete?"
                             >COMPLETE SCAN</button>
                             <a data-confirm="Are you sure you want to pre-load from packing list!"
-                               class="btn btn-danger ajaxLink pull-left"
+                               class="btn btn-warning ajaxLink pull-left"
                                href="{{ path('incoming_products_scan_load',{'id':incoming.id}) }}">LOAD FROM PACKING
                                 LIST</a>
                         {% endif %}
