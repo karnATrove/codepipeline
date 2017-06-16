@@ -46,7 +46,7 @@ class IncomingProductManager extends BaseManager
 
 	/**
 	 * @param IncomingProduct $incomingProduct
-	 * @param null     $entityManager
+	 * @param null            $entityManager
 	 */
 	public function update(IncomingProduct $incomingProduct, $entityManager = null)
 	{
@@ -62,10 +62,22 @@ class IncomingProductManager extends BaseManager
 	 * @param Incoming $incoming
 	 * @param string   $sku
 	 *
-	 * @return mixed
+	 * @return IncomingProduct
 	 */
-	public function getOneByIncomingAndSku(Incoming $incoming, string $sku){
-		return $this->incomingProductRepository->findOneByModel($incoming,$sku);
+	public function getOneByIncomingAndSku(Incoming $incoming, string $sku)
+	{
+		return $this->incomingProductRepository->findOneByModel($incoming, $sku);
+	}
+
+	/**
+	 * @param array      $criteria
+	 * @param array|null $orderBy
+	 *
+	 * @return null|object|IncomingProduct
+	 */
+	public function findOneBy(array $criteria, array $orderBy = null)
+	{
+		return $this->incomingProductRepository->findOneBy($criteria, $orderBy);
 	}
 
 }
