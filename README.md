@@ -22,10 +22,10 @@ clean up code
 ALTER TABLE warehouse_incoming CHANGE type type_id INT NOT NULL;
 ALTER TABLE warehouse_incoming CHANGE status status_id INT NOT NULL;
 
-ALTER TABLE wms_production.warehouse_incoming MODIFY type_id INT(11) NOT NULL;
-ALTER TABLE wms_production.warehouse_incoming MODIFY status_id INT(11) NOT NULL;
+ALTER TABLE warehouse_incoming MODIFY type_id INT(11) NOT NULL;
+ALTER TABLE warehouse_incoming MODIFY status_id INT(11) NOT NULL;
 
-ALTER TABLE wms_production.warehouse_incoming_status MODIFY id INT(11) NOT NULL;
+ALTER TABLE warehouse_incoming_status MODIFY id INT(11) NOT NULL;
 
 ```
 
@@ -69,8 +69,8 @@ php bin/console doctrine:schema:update --force
 
 Execute mysql query:
 ````
-INSERT INTO wms_production.user_group (name, roles) VALUES ('admin', 'a:1:{i:0;s:10:"ROLE_ADMIN";}');
-INSERT INTO wms_production.user_group (name, roles) VALUES ('User', 'a:0:{}');
+INSERT INTO user_group (name, roles) VALUES ('admin', 'a:1:{i:0;s:10:"ROLE_ADMIN";}');
+INSERT INTO user_group (name, roles) VALUES ('User', 'a:0:{}');
 UPDATE app_user
 SET roles = 'a:0:{}';
 ````
