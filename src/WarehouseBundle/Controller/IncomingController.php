@@ -237,29 +237,38 @@ class IncomingController extends Controller
 			}
 		}
 		$em->flush();
-
+		
+		$savedIncomingProducts=[];
 		# Second loop to create incomingProduct
 		foreach ($sheetData as $row => $data) {
 			if (is_numeric($data['A'])) { # Indicates the entry row number
 				$model = strtoupper(trim($data['B']));
-				$name = trim($data['C']);
 				$qty = intval(trim($data['D']));
 
-				$incomingProduct = (new IncomingProduct())->setUser($this->getUser())
-					->setIncoming($incoming)
-					->setQty($qty)
-					->setModel($model)
-					->setCreated(new \DateTime('now'));
+				if (key_exists($model,$savedIncomingProducts)){
+					$incomingProduct = $savedIncomingProducts[$model];
+					$incomingProduct->setQty($qty + $incomingProduct->getQty())
+						->setModified(new \DateTime())
+						->setUser($this->getUser());
+				} else {
+					$incomingProduct = new IncomingProduct();
+					$incomingProduct->setUser($this->getUser())
+						->setIncoming($incoming)
+						->setQty($qty)
+						->setModel($model)
+						->setModified(new \DateTime())
+						->setCreated(new \DateTime());
 
-				# Find the product
-				$product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
-				if (!$product) {
-					throw new \Exception('Product model failed to import and could not be identified for incomingProduct');
+					# Find the product
+					$product = $em->getRepository('WarehouseBundle:Product')->findOneByModel($model);
+					if (!$product) {
+						throw new \Exception('Product model failed to import and could not be identified for incomingProduct');
+					}
+
+					$incomingProduct->setProduct($product);
 				}
-
-				$incomingProduct->setProduct($product);
 				$em->persist($incomingProduct);
-
+				$savedIncomingProducts[$model]=$incomingProduct;
 				$imports++;
 			}
 		}
