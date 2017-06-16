@@ -162,7 +162,7 @@ class IncomingProductScanController extends Controller
 			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
 				->completeProductScan($incoming, $form);
 		} catch (\Exception $exception) {
-			$messages['error'][] = "Error: {$exception->getMessage()}";
+			$messages['error'][] = "Complete Container Scan Failed!<br>{$exception->getMessage()}";
 			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
 				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
