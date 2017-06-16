@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\Product;
 
 class BookingRepository extends EntityRepository
@@ -84,8 +85,9 @@ class BookingRepository extends EntityRepository
 	 */
 	public function getPickableProducts()
 	{
-		$pickableStatuses = array(Booking::STATUS_ACCEPTED);
-		$query = $this->getEntityManager()->createQuery(
+		$pickableStatuses = $this->getBookingPickableStatuses();
+		$productStatuses = $this->getBookingProductPickableStatuses();
+		return $this->getEntityManager()->createQuery(
 			'SELECT
 				  bp.id      	AS bookingProductId,
 				  bp.qty 		AS orderedQuantity,
@@ -105,10 +107,12 @@ class BookingRepository extends EntityRepository
 				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
 				  INNER JOIN WarehouseBundle:LocationProduct lp WITH lp.product=p
 				  INNER JOIN WarehouseBundle:Location l WITH lp.location = l AND l.staging = 0
+				WHERE bp.status IN (:productStatus)
 				ORDER BY p.model'
-		)->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY);
-		$results = $query->getResult();
-		return $results;
+		)
+		->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
+		->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
+		->getResult();
 	}
 
 	/**
@@ -118,19 +122,30 @@ class BookingRepository extends EntityRepository
 	 */
 	public function getBookingQuantityAskedByProduct(Product $product)
 	{
-		$pickableStatuses = array(Booking::STATUS_ACCEPTED);
-		$query = $this->getEntityManager()->createQuery(
+		$pickableStatuses = $this->getBookingPickableStatuses();
+		$productStatuses = $this->getBookingProductPickableStatuses();
+		return $this->getEntityManager()->createQuery(
 			'SELECT
-				  SUM(DISTINCT bp.qty) as asked
-				FROM WarehouseBundle:Booking b INNER JOIN WarehouseBundle:BookingProduct bp WITH bp.booking=b AND b.status IN (:bookingStatus)
+				  SUM(bp.qty) as asked
+				FROM WarehouseBundle:Booking b 
+				  INNER JOIN WarehouseBundle:BookingProduct bp WITH bp.booking=b AND b.status IN (:bookingStatus)
 				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
-				  INNER JOIN WarehouseBundle:LocationProduct lp WITH lp.product=p
-				  INNER JOIN WarehouseBundle:Location l WITH lp.location = l AND l.staging = 0
-				WHERE bp.product = :product
+				WHERE bp.product = :product 
+					AND bp.status IN (:productStatus)
 				GROUP BY bp.product
 				ORDER BY p.model'
-		)->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
-		->setParameter('product',$product);
-		return $query->getSingleScalarResult();
+		)
+		->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
+		->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
+		->setParameter('product',$product)
+		->getSingleScalarResult();
+	}
+
+	public function getBookingPickableStatuses() {
+		return array(Booking::STATUS_ACCEPTED, Booking::STATUS_PICKED);
+	}
+
+	public function getBookingProductPickableStatuses() {
+		return array(BookingProduct::STATUS_PENDING, BookingProduct::STATUS_PICKED);
 	}
 }

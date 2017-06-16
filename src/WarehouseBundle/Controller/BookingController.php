@@ -685,7 +685,7 @@ class BookingController extends Controller
 			$currently_staged = is_null($stagingLocationProduct) ? 0 : $stagingLocationProduct->getOnHand();
 			$quantity_asked = $this->getDoctrine()->getManager()->getRepository('WarehouseBundle:Booking')->getBookingQuantityAskedByProduct($locationProduct->getProduct());
 			if ($currently_staged + ($qty - $locationProduct->getStaged()) > $quantity_asked) {
-				$errors[] = 'That will be over the threshold of asked quantity of '. $quantity_asked;
+				$errors[] = 'That will be over the threshold of "asked quantity" of '. $quantity_asked;
 			} elseif ($qty !== null && $qty <= $available && $qty >= 0) {
 				# Use the workflow managers for update.
 				$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct,$qty);
