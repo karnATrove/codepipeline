@@ -34,6 +34,17 @@ class IncomingController extends Controller
 		]);
 	}
 
+	/**
+	 * Lists all Incoming entities.
+	 *
+	 * @Route("/index-content", name="incoming_index_content")
+	 * @Method("GET")
+	 */
+	public function indexContentAction(Request $request)
+	{
+
+	}
+
 
 	/**
 	 * Displays a form to create a new Incoming entity.

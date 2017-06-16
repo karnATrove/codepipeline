@@ -3,7 +3,8 @@
         <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();'
                    class="check-all" value="{{ inbound.id }}" title="ids"/></td>
         <td>
-            <a href="{{ path('incoming_products_scanned', app.request.query.all|merge({'id':inbound.id})) }}">{{ inbound.name }}</a>
+            <a href="{{ path('incoming_products_scanned',
+            app.request.query.all|merge({'id':inbound.id})) }}">{{ inbound.name }}</a>
         </td>
         <td>{{ inbound.type.detail }}</td>
         <td>{{ inbound.status.detail }}</td>
@@ -19,7 +20,8 @@
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
             </a>
             <a title='Incoming Products' class="btn btn-primary btn-sm"
-               href="{{ path('incoming_products', app.request.query.all|merge({'incoming_id':inbound.id})) }}">
+               href="{{ path('incoming_products',
+               app.request.query.all|merge({'incoming_id':inbound.id})) }}">
                                                     <span class="glyphicon glyphicon-list-alt"
                                                           aria-hidden="true"></span>
             </a>
@@ -30,7 +32,8 @@
                                                           aria-hidden="true"></span>
             </a>
             <a title='Scanned List' class="btn btn-primary btn-sm"
-               href="{{ path('incoming_products_scanned', app.request.query.all|merge({'id':inbound.id})) }}">
+               href="{{ path('incoming_products_scanned',
+               app.request.query.all|merge({'id':inbound.id})) }}">
                 <span class="glyphicon glyphicon-barcode" aria-hidden="true"></span>
             </a>
             <a title='Edit' class="btn btn-primary btn-sm"

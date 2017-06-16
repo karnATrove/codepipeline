@@ -9,22 +9,26 @@
 namespace WarehouseBundle\Workflow;
 
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
-use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Manager\IncomingManager;
-use WarehouseBundle\Manager\IncomingProductManager;
 
 class IncomingWorkflow extends BaseWorkflow
 {
 	private $locationProductManager;
 	private $incomingStatusManager;
 	private $incomingManager;
+	private $templating;
 	private $incomingProductScanManager;
 
+	/**
+	 * IncomingWorkflow constructor.
+	 *
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
@@ -32,6 +36,7 @@ class IncomingWorkflow extends BaseWorkflow
 		$this->incomingStatusManager = $container->get('warehouse.manager.incoming_status_manager');
 		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
 		$this->incomingProductScanManager = $container->get('warehouse.manager.incoming_product_scan_manager');
+		$this->templating = $container->get('templating');
 	}
 
 	/**
@@ -73,5 +78,16 @@ class IncomingWorkflow extends BaseWorkflow
 		if ($flush) {
 			$entityManager->flush();
 		}
+	}
+
+	public function getIndexContent()
+	{
+		$incoming = $this->incomingManager->findBy([], ['id' => 'desc']);
+		$content = $this->templating->render('incoming/_index_incoming_detail.html.twig', [
+			'incoming' => $incoming
+		]);
+		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
+			AjaxCommandDTO::OP_HTML, $content);
+		return $ajaxCommands;
 	}
 }	
