@@ -52,13 +52,13 @@ class ContainerManager extends BaseManager
 			$request->send();
 		} catch (ClientErrorResponseException $clientErrorResponseException) {
 			$response = $clientErrorResponseException->getResponse();
-			$body = $response->getBody();
+			$body = $response->getBody(true);
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
 			throw new RoveSiteApiException("Failed to update container. Detail: "
 				. $responseErrorDto->getMessage());
 		} catch (ServerErrorResponseException $serverErrorResponseException) {
 			$response = $serverErrorResponseException->getResponse();
-			$body = $response->getBody();
+			$body = $response->getBody(true);
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
 			throw new RoveSiteApiException("Failed to update container. Detail: "
 				. $responseErrorDto->getMessage());
