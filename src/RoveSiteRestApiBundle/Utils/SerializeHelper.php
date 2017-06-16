@@ -31,6 +31,7 @@ class SerializeHelper
 			[new JsonEncoder()]);
 		/** @var ResponseErrorDto $responseErrorDto */
 		$responseErrorDto = $serializer->deserialize($responseErrorDto, ResponseErrorDto::class, 'json');
+		/** @var ResponseErrorItemDto[] $errorItems */
 		$errorItems = $serializer->denormalize($responseErrorDto->getErrorItems(),
 			ResponseErrorItemDto::class . '[]');
 		$responseErrorDto->setErrorItems($errorItems);

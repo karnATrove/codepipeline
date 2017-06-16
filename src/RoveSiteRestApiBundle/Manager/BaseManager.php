@@ -43,8 +43,7 @@ class BaseManager
 		$headers = [
 			'Content-Type' => 'application/json',
 			'X-Rove-Requested' => $timestamp,
-			'X-Rove-Signature' => $signature,
-			'Authorization' => 'Basic cm92ZXRlYW06cm92ZXJvY2tz'
+			'X-Rove-Signature' => $signature
 		];
 		return $headers;
 	}

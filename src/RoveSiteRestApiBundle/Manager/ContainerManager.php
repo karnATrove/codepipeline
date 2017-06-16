@@ -48,6 +48,7 @@ class ContainerManager extends BaseManager
 		$url = $this->containerUpdateUrl."/{$containerName}";
 		$headers = parent::generateAuthHeaders($url, $timestamp,'PUT');
 		$request = $this->roveClient->put($url, $headers, $data);
+
 		try {
 			$request->send();
 		} catch (ClientErrorResponseException $clientErrorResponseException) {
