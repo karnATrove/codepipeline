@@ -142,10 +142,10 @@ class BookingRepository extends EntityRepository
 	}
 
 	public function getBookingPickableStatuses() {
-		return array(Booking::STATUS_ACCEPTED, Booking::STATUS_PICKED);
+		return array(Booking::STATUS_ACCEPTED);
 	}
 
 	public function getBookingProductPickableStatuses() {
-		return array(BookingProduct::STATUS_PENDING, BookingProduct::STATUS_PICKED);
+		return array(BookingProduct::STATUS_PENDING);
 	}
 }
