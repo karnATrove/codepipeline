@@ -71,6 +71,7 @@ class BookingWorkflow
 			case BulkAction::ACTION_PRINT_WITH_DOCUMENTS:
 				$responseData = $this->downloadDocuments($bookingIds);
 				$action = self::BULK_ACTION_TYPE_RETURN;
+				$this->em->flush();
 				break;
 			default:
 				throw new \Exception('Not implemented');
@@ -175,6 +176,7 @@ class BookingWorkflow
 		$response->setContent($content);
 		FileUtility::recursiveRemoveDirectory($dir);
 		unlink($zipDir);
+		$this->handleBulkPicking($bookingIdList, true, $this->em);
 		return $response;
 	}
 

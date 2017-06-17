@@ -383,7 +383,7 @@ class BookingController extends Controller
 			$response = $this->get('warehouse.work_flow.booking_work_flow')->bulkAction($bulkAction, $responseData);
 			switch ($response) {
 				case BookingWorkflow::BULK_ACTION_TYPE_RENDER_PDF:
-					return new Response($responseData, 200);
+					return new Response($responseData, Response::HTTP_OK);
 					break;
 				case BookingWorkflow::BULK_ACTION_TYPE_RETURN:
 					return $responseData;
