@@ -296,8 +296,12 @@ class BookingProductController extends Controller
                     break;
                 }
             }
+            
+            # Automatically change the entire Booking status?
             if ($valid && $booking->getStatus() == Booking::STATUS_ACCEPTED) {
                 $booking->setStatus(Booking::STATUS_PICKED);
+                $bookingManager->logEntry($booking,'Booking status changed from Accepted to Picked.',FALSE);
+                $this->get('session')->getFlashBag()->add('success', "Updated Booking status from Accepted to Picked.");
             }
 
             # Update the booking
@@ -311,6 +315,12 @@ class BookingProductController extends Controller
             $response['ajaxCommand'][] = array('selector'=>'#picking-modal','op'=>'modal','value'=>'hide');
             $response['ajaxCommand'][] = array('selector'=>'#booking_status','op'=>'value','value'=>$booking->getStatus());
             $response['ajaxCommand'][] = array('selector'=>'#date-modified .text-success','op'=>'html','value'=>$booking->getModified()->format('Y-m-d h:i A'));
+            $response['ajaxCommand'][] = array('selector'=>'#flash-messaging','op'=>'replaceWith','value'=>$this->renderView('default/flash_messaging.html.twig'));
+
+            # Replace logs as there are new ones
+            $bookingLogs = $this->getDoctrine()->getManager()->getRepository('WarehouseBundle:BookingLog')->getLogByBooking($booking);
+            $response['ajaxCommand'][] = array('selector'=>'.log_booking','op'=>'replaceWith','value'=>
+                $this->renderView('WarehouseBundle:BookingProductLog:log_table.html.twig', array('bookingLogs'=>$bookingLogs)));
         } elseif ($form->isSubmitted()) {
             $response['success'] = false;
             $response['ajaxCommand'][] = array(

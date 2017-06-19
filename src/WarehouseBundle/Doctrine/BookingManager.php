@@ -8,6 +8,7 @@ use WarehouseBundle\Model\BookingInterface;
 use WarehouseBundle\Model\BookingManager as BaseBookingManager;
 
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\BookingComment;
 use WarehouseBundle\Entity\BookingFile;
@@ -49,7 +50,16 @@ class BookingManager extends BaseBookingManager
     /**
      * {@inheritdoc}
      */
-    public function logEntry($note) {
+    public function logEntry($booking,$note,$andFlush=true) {
+        //save booking log
+        $bookingLog = new BookingLog();
+        $bookingLog->setBooking($booking);
+        $bookingLog->setNote($note);
+        $bookingLog->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+        $bookingLog->setCreated(new \DateTime());
+        $this->objectManager->persist($bookingLog);
+        if ($andFlush)
+            $this->objectManager->flush();
         return TRUE;
     }
 
@@ -179,6 +189,9 @@ class BookingManager extends BaseBookingManager
             $locationProduct->setStaged($locationProduct->getStaged());
         }
 
+        # Build log string (Before entity flush)
+        $logString = 'Pick for '. $qty_picked. ' at '. $locationProduct->getLocation()->printLocation(). ' for '. $bookingProduct->getProduct()->getModel();
+
         # Reduce the location quantity
         if ($locationProduct->getOnHand() - $qty_picked <= 0 && !$locationProduct->getLocation()->getStaging()) {
             # Remove empty location product
@@ -190,6 +203,9 @@ class BookingManager extends BaseBookingManager
             $em->persist($locationProduct);
         }
         $em->flush();
+
+        # Log
+        $this->logEntry($bookingProduct->getBooking(),$logString,FALSE);
         
         return $bookingProductLocation;
     }
