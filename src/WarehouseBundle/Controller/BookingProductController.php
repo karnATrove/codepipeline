@@ -16,6 +16,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\View\TwitterBootstrap3View;
 
+use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Form\BookingProductType;
 
@@ -287,6 +288,19 @@ class BookingProductController extends Controller
 
             # Note Booking status is updated by a hidden field and jQuery
             $bookingManager->updateBookingProduct($bookingProduct,TRUE);
+
+            $valid = TRUE;
+            foreach($booking->getProducts() as $product) {
+                if (!in_array($product->getStatus(),array(BookingProduct::STATUS_PICKED))) {
+                    $valid = FALSE;
+                    break;
+                }
+            }
+            if ($valid && $booking->getStatus() == Booking::STATUS_ACCEPTED) {
+                $booking->setStatus(Booking::STATUS_PICKED);
+            }
+
+            # Update the booking
             $bookingManager->updateBooking($booking,TRUE);
 
             # Ajax response
@@ -295,6 +309,7 @@ class BookingProductController extends Controller
             $response['ajaxCommand'][] = array('selector'=>'[data-id="'.$bookingProduct->getId().'"] .bp-picked','op'=>'html','value'=>$this->get('app.booking')->bookingProductPickedQty($bookingProduct));
             $response['ajaxCommand'][] = array('selector'=>'[data-id="'.$bookingProduct->getId().'"] .bp-available','op'=>'html','value'=>$this->get('app.product')->getAvailableInternal($bookingProduct->getProduct()));
             $response['ajaxCommand'][] = array('selector'=>'#picking-modal','op'=>'modal','value'=>'hide');
+            $response['ajaxCommand'][] = array('selector'=>'#booking_status','op'=>'value','value'=>$booking->getStatus());
             $response['ajaxCommand'][] = array('selector'=>'#date-modified .text-success','op'=>'html','value'=>$booking->getModified()->format('Y-m-d h:i A'));
         } elseif ($form->isSubmitted()) {
             $response['success'] = false;
