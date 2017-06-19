@@ -3,26 +3,20 @@
 namespace WarehouseBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\View\TwitterBootstrap3View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\View\TwitterBootstrap3View;
-
-use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
-use BG\BarcodeBundle\Util\Base2DBarcode as matrixCode;
-
-use WarehouseBundle\Form\IncomingFileType;
-
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Form\IncomingFilterType;
 use WarehouseBundle\Form\IncomingType;
 
 /**
@@ -66,7 +60,7 @@ class IncomingController extends Controller
 	protected function filter($queryBuilder, Request $request)
 	{
 		$session = $request->getSession();
-		$filterForm = $this->createForm('WarehouseBundle\Form\IncomingFilterType');
+		$filterForm = $this->createForm(IncomingFilterType::class);
 
 		// Reset filter
 		if ($request->get('filter_action') == 'reset') {
@@ -96,7 +90,7 @@ class IncomingController extends Controller
 					}
 				}
 
-				$filterForm = $this->createForm('WarehouseBundle\Form\IncomingFilterType', $filterData);
+				$filterForm = $this->createForm(IncomingFilterType::class, $filterData);
 				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 			}
 		}
@@ -237,15 +231,15 @@ class IncomingController extends Controller
 			}
 		}
 		$em->flush();
-		
-		$savedIncomingProducts=[];
+
+		$savedIncomingProducts = [];
 		# Second loop to create incomingProduct
 		foreach ($sheetData as $row => $data) {
 			if (is_numeric($data['A'])) { # Indicates the entry row number
 				$model = strtoupper(trim($data['B']));
 				$qty = intval(trim($data['D']));
 
-				if (key_exists($model,$savedIncomingProducts)){
+				if (key_exists($model, $savedIncomingProducts)) {
 					$incomingProduct = $savedIncomingProducts[$model];
 					$incomingProduct->setQty($qty + $incomingProduct->getQty())
 						->setModified(new \DateTime())
@@ -268,7 +262,7 @@ class IncomingController extends Controller
 					$incomingProduct->setProduct($product);
 				}
 				$em->persist($incomingProduct);
-				$savedIncomingProducts[$model]=$incomingProduct;
+				$savedIncomingProducts[$model] = $incomingProduct;
 				$imports++;
 			}
 		}

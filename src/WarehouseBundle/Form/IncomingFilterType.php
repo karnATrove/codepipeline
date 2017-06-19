@@ -2,12 +2,11 @@
 
 namespace WarehouseBundle\Form;
 
+use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
 use WarehouseBundle\Manager\IncomingStatusManager;
 use WarehouseBundle\Manager\IncomingTypeManager;
 
@@ -17,18 +16,19 @@ class IncomingFilterType extends AbstractType
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder
-			->add('id', Filters\NumberFilterType::class)
+			->add('name', Filters\TextFilterType::class,
+				['required' => false,
+					'attr' => ['placeholder' => 'Name']
+				])
 			->add('type', ChoiceType::class, [
 				'choices' => ['' => ''] + array_flip(IncomingTypeManager::incomingTypeList()),
 				'choices_as_values' => true,
+				'required' => false
 			])
-			->add('name', Filters\TextFilterType::class)
-			->add('eta', Filters\DateFilterType::class)
-			->add('scheduled', Filters\DateFilterType::class)
-			->add('arrived', Filters\DateFilterType::class)
 			->add('status', ChoiceType::class, [
 				'choices' => ['' => ''] + array_flip(IncomingStatusManager::incomingStatusList()),
 				'choices_as_values' => true,
+				'required' => false
 			]);
 		$builder->setMethod("GET");
 	}
