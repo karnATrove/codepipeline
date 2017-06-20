@@ -8,6 +8,7 @@ use WarehouseBundle\Model\BookingInterface;
 use WarehouseBundle\Model\BookingManager as BaseBookingManager;
 
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\BookingComment;
 use WarehouseBundle\Entity\BookingFile;
@@ -49,7 +50,16 @@ class BookingManager extends BaseBookingManager
     /**
      * {@inheritdoc}
      */
-    public function logEntry($note) {
+    public function logEntry($booking,$note,$andFlush=true) {
+        //save booking log
+        $bookingLog = new BookingLog();
+        $bookingLog->setBooking($booking);
+        $bookingLog->setNote($note);
+        $bookingLog->setUser($this->container->get('security.token_storage')->getToken()->getUser());
+        $bookingLog->setCreated(new \DateTime());
+        $this->objectManager->persist($bookingLog);
+        if ($andFlush)
+            $this->objectManager->flush();
         return TRUE;
     }
 
@@ -149,26 +159,53 @@ class BookingManager extends BaseBookingManager
      * @return     <type>                                   ( description_of_the_return_value )
      */
     public function createPick(BookingProduct $bookingProduct, LocationProduct $locationProduct, $qty_picked=0) {
+        $em = $this->container->get('doctrine.orm.entity_manager');
+
         $bookingProductLocation = (new \WarehouseBundle\Entity\BookingProductLocation())
             ->setLocation($locationProduct->getLocation())
             ->setBookingProduct($bookingProduct)
             ->setQty($qty_picked)
             ->setUser($this->container->get('security.token_storage')->getToken()->getUser());
-        $this->objectManager->persist($bookingProductLocation);
-        $this->objectManager->flush();
+        $em->persist($bookingProductLocation);
+
+         # If this is a staging location, we want to deduct 'staged' from other locations
+        if ($locationProduct->getLocation()->getStaging()) {
+            # Reduce staged from product location
+            # TODO: Redo the staging storage with a new table and remove 'staged' field
+            // Find a location product of same product with staging > 0
+            // This is a hack and should be replaced
+            // This will loop through each location product (rack) and deduct as many picked as required
+            $qty = $qty_picked;
+            $pickLocations = $em->getRepository('WarehouseBundle:LocationProduct')->findByStagedProduct($locationProduct->getProduct());
+            foreach($pickLocations as $l) {
+                $qty_reduce = min($l->getStaged(),$qty);
+                $l->setStaged($l->getStaged() - $qty_reduce);
+                $l->setModified(new \DateTime());
+                $em->persist($l);
+                $qty -= $qty_reduce;
+                if ($qty <= 0) break;
+            }
+        } else {
+            $locationProduct->setStaged($locationProduct->getStaged());
+        }
+
+        # Build log string (Before entity flush)
+        $logString = 'Pick for '. $qty_picked. ' at '. $locationProduct->getLocation()->printLocation(). ' for '. $bookingProduct->getProduct()->getModel();
 
         # Reduce the location quantity
-        $em = $this->container->get('doctrine.orm.entity_manager');
-        if ($locationProduct->getOnHand() - $qty_picked <= 0) {
+        if ($locationProduct->getOnHand() - $qty_picked <= 0 && !$locationProduct->getLocation()->getStaging()) {
             # Remove empty location product
             $em->remove($locationProduct);
         } else {
             # Update location product
             $locationProduct->setOnHand($locationProduct->getOnHand() - $qty_picked);
-            $locationProduct->setStaged($locationProduct->getStaged());
+            
             $em->persist($locationProduct);
         }
         $em->flush();
+
+        # Log
+        $this->logEntry($bookingProduct->getBooking(),$logString,FALSE);
         
         return $bookingProductLocation;
     }

@@ -16,19 +16,8 @@
 
     <div class="clearfix"></div>
 
-    <div class="row">
-        <div class="col-md-12">
-            {% for type, flashMessages in app.session.flashbag.all() %}
-                {% for flashMessage in flashMessages %}
-                    <div class="alert alert-{{ type }} alert-dismissible fade in">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                    aria-hidden="true">×</span></button>
-                        {{ flashMessage|raw }}
-                    </div>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    </div>
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
 
     <div class="row">
         <div class="col-md-6 col-sm-6 col-xs-12">
@@ -240,25 +229,7 @@
                     <div class="row">
 
                         <div class="table-responsive col-xs-12">
-                            <table class="table table-striped jambo_table log_booking" cellspacing="0" cellpadding="0">
-                                <thead>
-                                <tr>
-                                    <th>{{ 'Date' }}</th>
-                                    <th>{{ 'Who' }}</th>
-                                    <th>{{ 'Note' }}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for log_entry in bookingLogs %}
-                                    {% include 'WarehouseBundle:ProductLog:log_row.html.twig' with {'log': log_entry} %}
-                                {% endfor %}
-                                {% if bookingLogs|length == 0 %}
-                                    <tr class="remove">
-                                        <td colspan="3">There are no log entries.</td>
-                                    </tr>
-                                {% endif %}
-                                </tbody>
-                            </table>
+                            {% include 'WarehouseBundle:BookingProductLog:log_table.html.twig' with {'bookingLogs': bookingLogs} %}
                             <a href="{{ path('log_booking',{'id':booking.id}) }}">View entire log</a>
                         </div>
                     </div>

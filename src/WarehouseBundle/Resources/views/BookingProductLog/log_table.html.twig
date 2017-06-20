@@ -1,0 +1,19 @@
+<table class="table table-striped jambo_table log_booking" cellspacing="0" cellpadding="0">
+    <thead>
+    <tr>
+        <th>{{ 'Date' }}</th>
+        <th>{{ 'Who' }}</th>
+        <th>{{ 'Note' }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for log_entry in bookingLogs %}
+        {% include 'WarehouseBundle:BookingProductLog:log_row.html.twig' with {'log': log_entry} %}
+    {% endfor %}
+    {% if bookingLogs|length == 0 %}
+        <tr class="remove">
+            <td colspan="3">There are no log entries.</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

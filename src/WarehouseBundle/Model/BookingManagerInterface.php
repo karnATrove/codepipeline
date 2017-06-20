@@ -17,11 +17,13 @@ use WarehouseBundle\Entity\BookingProduct;
 interface BookingManagerInterface
 {
     /**
-     * Creates an empty booking instance.
-     *
-     * @param string $note
+     * [logEntry description]
+     * @param  [type] $booking  [description]
+     * @param  [type] $note     [description]
+     * @param  [type] $andFLush [description]
+     * @return [type]           [description]
      */
-    public function logEntry($note);
+    public function logEntry($booking,$note,$andFLush);
 
     /**
      * Creates an empty booking instance.

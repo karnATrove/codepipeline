@@ -30,8 +30,9 @@ $(document).ready(function() {
 
 	/**
 	 * Picking Order
-	 */	
-	 $('.location_pick_qty').on('change',function() {
+	 */
+	$(document).on('change','.location_pick_qty',function() {
+	 //$('.location_pick_qty').on('change',function() {
 	 	var remaining = $(this).parents('[data-pick-remaining]');
 		var remaining_qty = parseInt($(remaining).data('pick-remaining'));
 		var picked_qty = parseInt($(remaining).data('picked-qty'));

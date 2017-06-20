@@ -108,6 +108,7 @@ class BookingRepository extends EntityRepository
 				  INNER JOIN WarehouseBundle:LocationProduct lp WITH lp.product=p
 				  INNER JOIN WarehouseBundle:Location l WITH lp.location = l AND l.staging = 0
 				WHERE bp.status IN (:productStatus)
+				  AND b.pickingFlag = 1
 				ORDER BY p.model'
 		)
 		->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
@@ -132,6 +133,7 @@ class BookingRepository extends EntityRepository
 				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
 				WHERE bp.product = :product 
 					AND bp.status IN (:productStatus)
+					AND b.pickingFlag = 1
 				GROUP BY bp.product
 				ORDER BY p.model'
 		)
@@ -142,10 +144,10 @@ class BookingRepository extends EntityRepository
 	}
 
 	public function getBookingPickableStatuses() {
-		return array(Booking::STATUS_ACCEPTED, Booking::STATUS_PICKED);
+		return array(Booking::STATUS_ACCEPTED);
 	}
 
 	public function getBookingProductPickableStatuses() {
-		return array(BookingProduct::STATUS_PENDING, BookingProduct::STATUS_PICKED);
+		return array(BookingProduct::STATUS_PENDING);
 	}
 }

@@ -109,7 +109,6 @@ function ajaxUpdateRefresh(selector,url) {
 	});
 }
 
-
 /**
  * Physically post the form to web service
  *
@@ -212,6 +211,7 @@ function ajaxLink(link, ajaxOptions, callback) {
 function handleAjaxResponse(response) {
 	$(response.ajaxCommand).each(function (i, e) {
 		switch (response.ajaxCommand[i].op) {
+			case 'replace':
 			case 'replaceWith':
 				$(response.ajaxCommand[i].selector).replaceWith(response.ajaxCommand[i].value);
 				break;
