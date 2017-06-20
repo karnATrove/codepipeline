@@ -2,12 +2,10 @@
 
 namespace RoveSiteRestApiBundle\Manager;
 
-use Guzzle\Http\Client;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Http\Exception\ServerErrorResponseException;
 use Rove\CanonicalDto\Order\OrderCommentCreateDto;
 use RoveSiteRestApiBundle\Exception\RoveSiteApiException;
-use RoveSiteRestApiBundle\Utils\ApiSignatureGenerator;
 use RoveSiteRestApiBundle\Utils\SerializeHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -45,7 +43,7 @@ class OrderCommentManager extends BaseManager
 		$postData = $serializer->serialize($commentCreateDto, 'json');
 		$url = $this->roveSiteUrl . $this->roveSiteUrlComment;
 		$timestamp = time();
-		$headers = parent::generateAuthHeaders($url, $timestamp,'POST');
+		$headers = parent::generateAuthHeaders($url, $timestamp, 'POST');
 		$request = $this->roveClient->post($url, $headers, $postData);
 		try {
 			$request->send();
@@ -61,6 +59,8 @@ class OrderCommentManager extends BaseManager
 			$responseErrorDto = SerializeHelper::deserializeResponseErrorDto($body);
 			throw new RoveSiteApiException("Failed to notify customer service. Detail: " .
 				$responseErrorDto->getMessage());
+		} catch (\Exception $exception) {
+			throw new RoveSiteApiException($exception->getMessage());
 		}
 	}
 }

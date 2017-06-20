@@ -30,7 +30,7 @@ class LocationManager
 	{
 		$resp = [];
 		foreach ($locations as $location) {
-			$resp[$location->getId()] = $location->printLocation();
+			$resp[] = ['id' => $location->getId(), 'value' => $location->printLocation()];
 		}
 		return $resp;
 	}
@@ -48,7 +48,8 @@ class LocationManager
 	 *
 	 * @return null|object|Location
 	 */
-	public function findById($id){
+	public function findById($id)
+	{
 		return $this->locationRepository->find($id);
 	}
 

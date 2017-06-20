@@ -44,10 +44,10 @@
                     <option value>select location</option>
                 {% endif %}
                 {% for locationDropdown in locationDropdownList %}
-                    {% if scannedProduct.locationId ==  loop.index %}
-                        <option value="{{ loop.index }}" selected>{{ locationDropdown }}</option>
+                    {% if scannedProduct.locationId ==  locationDropdown.id %}
+                        <option value="{{ locationDropdown.id }}" selected>{{ locationDropdown.value }}</option>
                     {% else %}
-                        <option value="{{ loop.index }}">{{ locationDropdown }}</option>
+                        <option value="{{ locationDropdown.id }}">{{ locationDropdown.value }}</option>
                     {% endif %}
 
                 {% endfor %}
