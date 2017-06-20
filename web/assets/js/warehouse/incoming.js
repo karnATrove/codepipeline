@@ -17,4 +17,17 @@ $(function () {
 		form.submit();
 	});
 
+
+	var calendar = $('#calendar');
+	var dataUrl = calendar.data('url');
+	calendar.fullCalendar({
+		header: {
+			left: 'prev,next today',
+			center: 'title',
+			right: 'month,agendaWeek,agendaDay,listMonth'
+		},
+		selectable: true,
+		selectHelper: true
+	});
+
 });

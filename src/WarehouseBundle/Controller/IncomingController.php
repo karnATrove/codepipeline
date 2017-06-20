@@ -55,6 +55,16 @@ class IncomingController extends Controller
 		]);
 	}
 
+	/**
+	 * Lists all Incoming entities.
+	 *
+	 * @Route("/get-calendar-data", name="incoming_get_calendar_data")
+	 * @Method("GET")
+	 */
+	public function getCalendarDataAction(){
+
+	}
+
 
 	/**
 	 * Displays a form to create a new Incoming entity.
