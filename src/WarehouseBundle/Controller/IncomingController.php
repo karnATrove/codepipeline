@@ -6,12 +6,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingType;
+use WarehouseBundle\Utils\AjaxCommandParser;
 
 /**
  * Booking controller.
@@ -28,7 +31,9 @@ class IncomingController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$incoming = $this->get('warehouse.manager.incoming_manager')->findBy([], ['id' => 'desc']);
+		$query = null;
+		$this->get('warehouse.manager.incoming_manager')
+			->searchContainers(null, false, [], ['i.scheduled' => 'desc'],null,null,$query);
 		return $this->render('incoming/index.html.twig', [
 			'incoming' => $incoming
 		]);
@@ -42,7 +47,16 @@ class IncomingController extends Controller
 	 */
 	public function indexContentAction(Request $request)
 	{
-
+		$keyword = empty($request->get('keyword')) ? null : $request->get('keyword');
+		$isComplete = empty($request->get('isComplete')) ? null :
+			((int)$request->get('isComplete') === 1 ? true : false);
+		$incoming = $this->get('warehouse.manager.incoming_manager')
+			->searchContainers($keyword, $isComplete, [], ['i.scheduled' => 'desc']);
+		$view = $this->renderView('incoming/_index_incoming_detail.html.twig', ['incoming' => $incoming]);
+		$ajaxCommands[] = new AjaxCommandDTO('#incoming_list_content',
+			AjaxCommandDTO::OP_HTML, $view);
+		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
+		return new JsonResponse($response, JsonResponse::HTTP_OK);
 	}
 
 
@@ -136,15 +150,15 @@ class IncomingController extends Controller
 			}
 		}
 		$em->flush();
-		
-		$savedIncomingProducts=[];
+
+		$savedIncomingProducts = [];
 		# Second loop to create incomingProduct
 		foreach ($sheetData as $row => $data) {
 			if (is_numeric($data['A'])) { # Indicates the entry row number
 				$model = strtoupper(trim($data['B']));
 				$qty = intval(trim($data['D']));
 
-				if (key_exists($model,$savedIncomingProducts)){
+				if (key_exists($model, $savedIncomingProducts)) {
 					$incomingProduct = $savedIncomingProducts[$model];
 					$incomingProduct->setQty($qty + $incomingProduct->getQty())
 						->setModified(new \DateTime())
@@ -167,7 +181,7 @@ class IncomingController extends Controller
 					$incomingProduct->setProduct($product);
 				}
 				$em->persist($incomingProduct);
-				$savedIncomingProducts[$model]=$incomingProduct;
+				$savedIncomingProducts[$model] = $incomingProduct;
 				$imports++;
 			}
 		}

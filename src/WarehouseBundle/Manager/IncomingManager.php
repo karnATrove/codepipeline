@@ -111,4 +111,22 @@ class IncomingManager extends BaseManager
 	{
 		return $this->incomingRepository->findAll();
 	}
+
+	/**
+	 * @param string|null $keyword
+	 * @param null        $complete
+	 * @param array       $criteria
+	 * @param null        $orderBy
+	 * @param null        $limit
+	 * @param null        $offset
+	 * @param null        $query
+	 *
+	 * @return array
+	 */
+	public function searchContainers(string $keyword = null, $complete = null, $criteria = [],
+	                                 $orderBy = null, $limit = null, $offset = null, &$query = null)
+	{
+		return $this->incomingRepository->searchContainers($keyword, $complete, $criteria, $orderBy,
+			$limit, $offset, $query);
+	}
 }

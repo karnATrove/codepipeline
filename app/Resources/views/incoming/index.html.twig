@@ -29,8 +29,6 @@
         </div>
     </div>
 
-
-
     <div class="x_panel">
         <div class="x_title">
             <div class="row">
@@ -40,16 +38,34 @@
                     </h2>
                 </div>
             </div>
-
         </div>
         <div class="x_body">
-            <div class="row">
-                <div class="col-md-3 pull-right">
-                    <a class="btn btn-primary h3 pull-right" href="{{ path('incoming_new') }}">
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
-                    </a>
+            <form id="search_form" class="ajaxForm" action="{{ path('incoming_index_content') }}" method="get">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input class="form-control" title="keyword" name="keyword" placeholder="Keyword Search">
+                    </div>
+                    <div class="col-md-2">
+                        <select id="is_complete_sel" name="isComplete" title="Status" class="form-control">
+                            <option value=1>Complete</option>
+                            <option value=0 selected>Incomplete</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <button class="btn btn-success pull-left">Search</button>
+                    </div>
                 </div>
-            </div>
+
+
+                <div class="row">
+                    <div class="col-md-3 pull-right">
+                        <a class="btn btn-primary h3 pull-right" href="{{ path('incoming_new') }}">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+                        </a>
+                    </div>
+                </div>
+            </form>
             <div class="row">
                 <div class="col-md-12">
                     <form method="POST" id="bulk_form" action="{{ path('incoming_bulk_action') }} ">
@@ -90,7 +106,6 @@
             </div>
         </div>
     </div>
-
 
 {% endblock %}
 
