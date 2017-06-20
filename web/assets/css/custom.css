@@ -4364,3 +4364,17 @@ table tr.border-sub-bottom td.sub { border-bottom:2px solid #000; }
   .modal.in .modal-dialog { margin:0; height:100%; }
   .modal-content { height: 100%; }
 }
+
+
+.timepicker-picker td{
+  text-align: center;
+}
+
+td.day.active{
+  color: #fff;
+  background-color: #286090;
+}
+
+.datepicker td{
+  cursor: pointer;
+}
