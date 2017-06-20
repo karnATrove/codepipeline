@@ -9,11 +9,12 @@ $(function () {
 
 	$('#is_complete_sel').change(function () {
 		var form = $('#search_form');
-		postForm(form, function (response, $form) {
-			if (typeof(response.ajaxCommand) !== 'undefined') {
-				handleAjaxResponse(response);
-			}
-		});
+		form.submit();
+	});
+
+	$('#number_per_page_sel').change(function () {
+		var form = $('#search_form');
+		form.submit();
 	});
 
 });

@@ -6,15 +6,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingType;
-use WarehouseBundle\Utils\AjaxCommandParser;
 
 /**
  * Booking controller.
@@ -31,32 +28,25 @@ class IncomingController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$query = null;
-		$this->get('warehouse.manager.incoming_manager')
-			->searchContainers(null, false, [], ['i.scheduled' => 'desc'],null,null,$query);
-		return $this->render('incoming/index.html.twig', [
-			'incoming' => $incoming
-		]);
-	}
-
-	/**
-	 * Lists all Incoming entities.
-	 *
-	 * @Route("/index-content", name="incoming_index_content")
-	 * @Method("GET")
-	 */
-	public function indexContentAction(Request $request)
-	{
 		$keyword = empty($request->get('keyword')) ? null : $request->get('keyword');
 		$isComplete = empty($request->get('isComplete')) ? null :
 			((int)$request->get('isComplete') === 1 ? true : false);
-		$incoming = $this->get('warehouse.manager.incoming_manager')
-			->searchContainers($keyword, $isComplete, [], ['i.scheduled' => 'desc']);
-		$view = $this->renderView('incoming/_index_incoming_detail.html.twig', ['incoming' => $incoming]);
-		$ajaxCommands[] = new AjaxCommandDTO('#incoming_list_content',
-			AjaxCommandDTO::OP_HTML, $view);
-		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
-		return new JsonResponse($response, JsonResponse::HTTP_OK);
+		$numberPerPage = empty($request->get('numberPerPage')) ? 25 : $request->get('numberPerPage');
+		$query = null;
+		$query = $this->get('warehouse.manager.incoming_manager')
+			->searchContainers($keyword, $isComplete, [], ['i.scheduled' => 'desc'], null, null, true);
+		$paginator = $this->get('knp_paginator');
+		$pagination = $paginator->paginate(
+			$query,
+			$request->query->getInt('page', 1),
+			$numberPerPage
+		);
+		return $this->render('incoming/index.html.twig', [
+			'pagination' => $pagination,
+			'keyword' => $keyword,
+			'isComplete' => $isComplete,
+			'numberPerPage' => $numberPerPage
+		]);
 	}
 
 

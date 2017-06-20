@@ -4349,7 +4349,7 @@ ul.notifications {
 
 .table>tbody>tr>td.actions { white-space:nowrap; }
 .table.bulk_action>thead>tr>th a { color:#ECF0F1; }
-.right_col .pull-left .pagination { margin: 10px 0; }
+/*.right_col .pull-left .pagination { margin: 10px 0; }*/
 .pagination .btn { margin-bottom:0; }
 .btn-danger.form-control[disabled], .btn-danger.form-control[readonly], fieldset[disabled] .btn-danger.form-control { background-color:#d9534f; }
 

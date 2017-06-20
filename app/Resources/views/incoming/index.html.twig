@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block body %}
-
     <div class="page-title" style="display:none;">
         <div class="title_left">
             <h3>Incoming Listing <span class="glyphicon glyphicon-truck" aria-hidden="true"></span></h3>
@@ -40,25 +39,35 @@
             </div>
         </div>
         <div class="x_body">
-            <form id="search_form" class="ajaxForm" action="{{ path('incoming_index_content') }}" method="get">
+            <form method="get" id="search_form">
                 <div class="row">
                     <div class="col-md-4">
-                        <input class="form-control" title="keyword" name="keyword" placeholder="Keyword Search">
+                        <input class="form-control" title="keyword" name="keyword" placeholder="Keyword Search"
+                               value="{{ keyword }}">
                     </div>
+
                     <div class="col-md-2">
                         <select id="is_complete_sel" name="isComplete" title="Status" class="form-control">
-                            <option value=1>Complete</option>
-                            <option value=0 selected>Incomplete</option>
+                            <option value=1 {% if isComplete %}selected{% endif %}>Complete</option>
+                            <option value=0 {% if not isComplete %}selected{% endif %}>Incomplete</option>
                         </select>
                     </div>
 
                     <div class="col-md-6">
-                        <button class="btn btn-success pull-left">Search</button>
+                        <button type="submit" class="btn btn-success pull-left">Search</button>
+                        <a href="{{ path('incoming') }}" class="btn btn-warning pull-left">Reset Filter</a>
                     </div>
                 </div>
 
-
                 <div class="row">
+                    <div class="col-md-1">
+                        <select id="number_per_page_sel" name="numberPerPage" title="numberPerPage"
+                                class="form-control" style="margin-top: 10px">
+                            <option value=25 {% if numberPerPage==25 %}selected{% endif %}>25</option>
+                            <option value=50 {% if numberPerPage==50 %}selected{% endif %}>50</option>
+                            <option value=100 {% if numberPerPage==100 %}selected{% endif %}>100</option>
+                        </select>
+                    </div>
                     <div class="col-md-3 pull-right">
                         <a class="btn btn-primary h3 pull-right" href="{{ path('incoming_new') }}">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
@@ -75,14 +84,19 @@
                             <tr>
                                 <th width="20px"><input type="checkbox" class="check-all"
                                                         onclick="toggleAll(this)" title="check"></th>
-                                <th>Name</th>
-                                <th>Type</th>
+                                <th {% if pagination.isSorted('i.name') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Name', 'i.name') }}</th>
+                                <th {% if pagination.isSorted('i.type') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Type', 'i.type') }}</th>
                                 <th>Status</th>
-                                <th>Eta</th>
-                                <th>Scheduled</th>
-                                <th>Created</th>
+                                <th {% if pagination.isSorted('i.netaame') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Eta', 'i.eta') }}</th>
+                                <th {% if pagination.isSorted('i.scheduled') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Scheduled', 'i.scheduled') }}</th>
+                                <th {% if pagination.isSorted('i.created') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Created', 'i.created') }}</th>
                                 <th>#Products</th>
-                                <th width="160px">List</th>
+                                <th width="160px">Action</th>
                             </tr>
                             </thead>
                             <tbody id="incoming_list_content">
@@ -101,6 +115,12 @@
                         </select>
                         <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')"
                                form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                    </div>
+                </div>
+                {# display navigation #}
+                <div class="col-md-8 ">
+                    <div class="navigation pull-right">
+                        {{ knp_pagination_render(pagination) }}
                     </div>
                 </div>
             </div>

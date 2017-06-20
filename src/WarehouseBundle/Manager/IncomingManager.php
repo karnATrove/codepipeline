@@ -119,14 +119,14 @@ class IncomingManager extends BaseManager
 	 * @param null        $orderBy
 	 * @param null        $limit
 	 * @param null        $offset
-	 * @param null        $query
+	 * @param bool        $queryOnly
 	 *
-	 * @return array
+	 * @return array|\Doctrine\ORM\Query
 	 */
 	public function searchContainers(string $keyword = null, $complete = null, $criteria = [],
-	                                 $orderBy = null, $limit = null, $offset = null, &$query = null)
+	                                 $orderBy = null, $limit = null, $offset = null, $queryOnly = false)
 	{
 		return $this->incomingRepository->searchContainers($keyword, $complete, $criteria, $orderBy,
-			$limit, $offset, $query);
+			$limit, $offset, $queryOnly);
 	}
 }

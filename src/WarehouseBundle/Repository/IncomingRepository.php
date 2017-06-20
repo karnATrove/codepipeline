@@ -17,14 +17,15 @@ class IncomingRepository extends EntityRepository
 	 * @param string|null $searchString
 	 * @param null        $complete
 	 * @param array       $criteria
-	 * @param array       $orderBy
+	 * @param null        $orderBy
 	 * @param null        $limit
 	 * @param null        $offset
+	 * @param bool        $queryOnly
 	 *
-	 * @return array
+	 * @return array|\Doctrine\ORM\Query
 	 */
 	public function searchContainers(string $searchString = null, $complete = null, $criteria = [],
-	                                 $orderBy = null, $limit = null, $offset = null, &$query = null)
+	                                 $orderBy = null, $limit = null, $offset = null, $queryOnly = false)
 	{
 		$queryBuilder = $this->createQueryBuilder('i');
 		if ($complete === true) {
@@ -59,8 +60,11 @@ class IncomingRepository extends EntityRepository
 		if ($offset) {
 			$queryBuilder->setFirstResult($offset);
 		}
-		$query = $queryBuilder->getQuery();
 
+		$query = $queryBuilder->getQuery();
+		if ($queryOnly) {
+			return $query;
+		}
 		return $query->getResult();
 	}
 }
