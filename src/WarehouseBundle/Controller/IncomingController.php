@@ -34,110 +34,25 @@ class IncomingController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
-		$queryBuilder = $em->getRepository('WarehouseBundle:Incoming')->createQueryBuilder('i');
-
-		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
-		list($incoming, $pagerHtml) = $this->paginator($queryBuilder, $request);
-
+		$keyword = empty($request->get('keyword')) ? null : $request->get('keyword');
+		$isComplete = empty($request->get('isComplete')) ? null :
+			((int)$request->get('isComplete') === 1 ? true : false);
+		$numberPerPage = empty($request->get('numberPerPage')) ? 25 : $request->get('numberPerPage');
+		$query = null;
+		$query = $this->get('warehouse.manager.incoming_manager')
+			->searchContainers($keyword, $isComplete, [], ['i.scheduled' => 'desc'], null, null, true);
+		$paginator = $this->get('knp_paginator');
+		$pagination = $paginator->paginate(
+			$query,
+			$request->query->getInt('page', 1),
+			$numberPerPage
+		);
 		return $this->render('incoming/index.html.twig', [
-			'incoming' => $incoming,
-			'pagerHtml' => $pagerHtml,
-			'filterForm' => $filterForm->createView(),
-
+			'pagination' => $pagination,
+			'keyword' => $keyword,
+			'isComplete' => $isComplete,
+			'numberPerPage' => $numberPerPage
 		]);
-	}
-
-
-	/**
-	 * Create filter form and process filter request.
-	 *
-	 * @param QueryBuilder $queryBuilder
-	 * @param Request      $request
-	 *
-	 * @return array
-	 */
-	protected function filter($queryBuilder, Request $request)
-	{
-		$session = $request->getSession();
-		$filterForm = $this->createForm(IncomingFilterType::class);
-
-		// Reset filter
-		if ($request->get('filter_action') == 'reset') {
-			$session->remove('IncomingControllerFilter');
-		}
-
-		// Filter action
-		if ($request->get('filter_action') == 'filter') {
-			// Bind values from the request
-			$filterForm->handleRequest($request);
-
-			if ($filterForm->isValid()) {
-				// Build the query from the given form object
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-				// Save filter to session
-				$filterData = $filterForm->getData();
-				$session->set('IncomingControllerFilter', $filterData);
-			}
-		} else {
-			// Get filter from session
-			if ($session->has('IncomingControllerFilter')) {
-				$filterData = $session->get('IncomingControllerFilter');
-
-				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
-					if (is_object($filter)) {
-						$filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
-					}
-				}
-
-				$filterForm = $this->createForm(IncomingFilterType::class, $filterData);
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
-			}
-		}
-
-		return [$filterForm, $queryBuilder];
-	}
-
-
-	/**
-	 * Get results from paginator and get paginator view.
-	 *
-	 */
-	protected function paginator(QueryBuilder $queryBuilder, Request $request)
-	{
-		//sorting
-		$sortCol = $queryBuilder->getRootAlias() . '.' . $request->get('pcg_sort_col', 'id');
-		$queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
-		// Paginator
-		$adapter = new DoctrineORMAdapter($queryBuilder);
-		$pagerfanta = new Pagerfanta($adapter);
-		$pagerfanta->setMaxPerPage($request->get('pcg_show', 20));
-
-		try {
-			$pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-		} catch (OutOfRangeCurrentPageException $ex) {
-			$pagerfanta->setCurrentPage(1);
-		}
-
-		$entities = $pagerfanta->getCurrentPageResults();
-
-		// Paginator - route generator
-		$me = $this;
-		$routeGenerator = function ($page) use ($me, $request) {
-			$requestParams = $request->query->all();
-			$requestParams['pcg_page'] = $page;
-			return $me->generateUrl('incoming', $requestParams);
-		};
-
-		// Paginator - view
-		$view = new TwitterBootstrap3View();
-		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
-			'proximity' => 3,
-			'prev_message' => 'previous',
-			'next_message' => 'next',
-		]);
-
-		return [$entities, $pagerHtml];
 	}
 
 
@@ -420,7 +335,6 @@ class IncomingController extends Controller
 	public function deleteByIdAction(Incoming $incoming)
 	{
 		$em = $this->getDoctrine()->getManager();
-
 		try {
 			# Remove incoming products scans before being able to delete incoming container
 			foreach ($incoming->getIncomingScannedProducts() as $scannedProduct) {
@@ -448,9 +362,7 @@ class IncomingController extends Controller
 		} catch (\Exception $ex) {
 			$this->get('session')->getFlashBag()->add('error', 'Problem with deletion of the Incoming');
 		}
-
 		return $this->redirect($this->generateUrl('incoming'));
-
 	}
 
 

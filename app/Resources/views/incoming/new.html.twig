@@ -45,77 +45,27 @@
                 <div class="x_content">
                     {{ form_start(form) }}
 
-                    <div class="row">
+                    {% include 'incoming/_edit_create_form.html.twig' with {'edit_form':form} %}
 
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(form.name) %}item bad{% endif %}">
-                                {{ form_label(form.name) }}
-                                {{ form_widget(form.name) }}
-                            </div>
-                        </div>
+                    {{ form_widget(form) }}
 
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(form.type) %}item bad{% endif %}">
-                                {{ form_label(form.type) }}
-                                {{ form_widget(form.type) }}
-                            </div>
-                        </div>
-
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(form.status) %}item bad{% endif %}">
-                                {{ form_label(form.status) }}
-                                {{ form_widget(form.status) }}
-                            </div>
-                        </div>
-
-                        <div class="col-xs-12 col-sm-6">
-
-                        </div>
-
-                        <div class="clearfix"></div>
-
-                        <div class="col-xs-12">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-4">
-                                    <div class="form-group {% if form_errors(form.eta) %}item bad{% endif %}">
-                                        {{ form_label(form.eta) }}
-                                        {{ form_widget(form.eta) }}
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 col-sm-4">
-                                    <div class="form-group {% if form_errors(form.scheduled) %}item bad{% endif %}">
-                                        {{ form_label(form.scheduled) }}
-                                        {{ form_widget(form.scheduled) }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xs-12 col-sm-6">
-                                {{ form_rest(form) }}
-                            </div>
-
-                        </div>
-                        {{ form_widget(form) }}
-                        <p>
-                            <button type="submit" name="submit" value="save" class="btn btn-primary">
-                                Save <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
-                            </button>
-                            <button type="submit" name="submit" value="saveAndImport" class="btn btn-info">
-                                Save and Import <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                            </button>
-                        </p>
-                        {{ form_end(form) }}
-                    </div>
+                    <button type="submit" name="submit" value="save" class="btn btn-primary">
+                        Save <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+                    </button>
+                    <button type="submit" name="submit" value="saveAndImport" class="btn btn-info">
+                        Save and Import <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
+    </div>
 
-        <hr/>
-
-        <div class="form-group">
+    <div class="row">
+        <div class="col-xs-12">
             <a class="btn btn-default" href="{{ path('incoming') }}">
                 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                Back to list
+                Back to container list
             </a>
         </div>
     </div>
