@@ -21,5 +21,9 @@ $(function () {
 		});
 	});
 
+	$('#booking_futureship').datetimepicker({
+		'format': 'YYYY-MM-DD'
+	});
+
 
 });
