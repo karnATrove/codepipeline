@@ -31,15 +31,16 @@ class IncomingType extends AbstractType
 			])
 			->add('name')
 			->add('eta', DateTimeType::class,
-				array(
+				[
 					'widget' => 'single_text',
 					'format' => 'yyyy-MM-dd'
-				))
+				])
 			->add('scheduled', DateTimeType::class,
-				array(
+				[
 					'widget' => 'single_text',
-					'format' => 'yyyy-MM-dd h:mm:ss a'
-				))
+					'format' => 'yyyy-MM-dd h:mm:ss a',
+					'required' => false
+				])
 //			->add('arrived', TextType::class)
 			->add('status', EntityType::class, [
 				'class' => IncomingStatus::class,
