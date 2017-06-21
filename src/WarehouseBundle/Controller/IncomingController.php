@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
@@ -35,7 +36,7 @@ class IncomingController extends Controller
 	public function indexAction(Request $request)
 	{
 		$keyword = empty($request->get('keyword')) ? null : $request->get('keyword');
-		$isComplete = empty($request->get('isComplete')) ? null :
+		$isComplete = empty($request->get('isComplete')) ? false :
 			((int)$request->get('isComplete') === 1 ? true : false);
 		$numberPerPage = empty($request->get('numberPerPage')) ? 25 : $request->get('numberPerPage');
 		$query = null;
@@ -61,8 +62,26 @@ class IncomingController extends Controller
 	 * @Route("/get-calendar-data", name="incoming_get_calendar_data")
 	 * @Method("GET")
 	 */
-	public function getCalendarDataAction(){
-
+	public function getCalendarDataAction(Request $request)
+	{
+//		$data = [];
+//		$date = empty($request->get('date')) ? date(\DateTime::ATOM) : $request->get('date');
+//		$query = $this->get('warehouse.manager.incoming_manager')
+//			->searchContainers(null, null, [], ['i.scheduled' => 'desc'], null, null, true);
+//
+//		foreach ($classItems as $classItem) {
+//			$color = $this->getColorCodeByClassItem($classItem);
+//			$teacherName = $classItem->teacher ? $classItem->teacher->fullName() : "N/A";
+//			$studentName = $classItem->student ? $classItem->student->fullName() : "N/A";
+//			$title = $studentName . "\r\n" .
+//				$teacherName . "\r\n" .
+//				$classItem->name;
+//			$data[] = [
+//				'start' => $classItem->class_date . " " . $classItem->start_at,
+//				'title' => $title
+//			];
+//		}
+//		return new JsonResponse($data, JsonResponse::HTTP_OK);
 	}
 
 
