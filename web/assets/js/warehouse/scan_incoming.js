@@ -23,13 +23,18 @@ $(document).ready(function() {
 		 	$('#quick-scan .loading').show();
 			$('#scan-incoming-product-form').submit();
 		 });
-		
+	 }
+
+	 if ($('#incoming-product-page-form').length) {
+		/**
+		 * DIALPAD
+		 */
 	    var dials = $(".dials ol li");
 	    var index;
 	    var number = $(".dialabs .number");
 	    var total;
 
-	    $('select.form-control').each(function() {
+	    $('#incoming-product-page-form select.form-control').each(function() {
 	    	$(this).before('<div class="diallink"><a href="#">'+ ($(this).find(':selected').val()?$(this).find(':selected').text():'Select Location') + '</a></div>');
 	    	$(this).hide();
 	    });
@@ -48,7 +53,6 @@ $(document).ready(function() {
 	    });
 
 	    dials.click(function(){
-
 	    	index = $(this).find('p>strong').html();
 	    	number.append(index);
 
