@@ -4403,3 +4403,8 @@ td.day.active{
 .datepicker td{
   cursor: pointer;
 }
+
+/*full calendar*/
+.fc-event-container{
+  cursor: pointer;
+}

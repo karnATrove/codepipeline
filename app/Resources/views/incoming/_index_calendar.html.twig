@@ -1,6 +1,6 @@
 
 
-<div class="x_panel">
+<div class="x_panel collapsed">
     <div class="x_title">
         <h2>Calender View</h2>
         <ul class="nav navbar-right panel_toolbox">
@@ -10,7 +10,10 @@
         <div class="clearfix"></div>
     </div>
     <div class="x_content">
-        <div id='calendar' data-url="{{ path('incoming_get_calendar_data') }}"></div>
+        <div id='calendar'
+             data-url="{{ path('incoming_get_calendar_data') }}"
+             data-event-url="{{ path('incoming_product_scan_url') }}"
+        ></div>
     </div>
     <!-- end x_content -->
 </div>

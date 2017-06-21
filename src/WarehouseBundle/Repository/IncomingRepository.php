@@ -3,7 +3,9 @@
 namespace WarehouseBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingStatus;
+use WarehouseBundle\Model\Incoming\IncomingSearchModel;
 
 /**
  * IncomingRepository
@@ -14,55 +16,55 @@ use WarehouseBundle\Entity\IncomingStatus;
 class IncomingRepository extends EntityRepository
 {
 	/**
-	 * @param string|null $searchString
-	 * @param null        $complete
-	 * @param array       $criteria
-	 * @param null        $orderBy
-	 * @param null        $limit
-	 * @param null        $offset
-	 * @param bool        $queryOnly
+	 * @param IncomingSearchModel $incomingSearchModel
+	 * @param bool                $returnQuery
 	 *
-	 * @return array|\Doctrine\ORM\Query
+	 * @return Incoming[]|\Doctrine\ORM\Query
 	 */
-	public function searchContainers(string $searchString = null, $complete = null, $criteria = [],
-	                                 $orderBy = null, $limit = null, $offset = null, $queryOnly = false)
+	public function searchContainers(IncomingSearchModel $incomingSearchModel, $returnQuery = false)
 	{
 		$queryBuilder = $this->createQueryBuilder('i');
-		if ($complete === true) {
+		if ($incomingSearchModel->getisComplete() === true) {
 			$queryBuilder->andWhere('i.status = :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
-		} elseif ($complete === false) {
+		} elseif ($incomingSearchModel->getisComplete() === false) {
 			$queryBuilder->andWhere('i.status != :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
 		}
 
-		if ($searchString) {
+		if ($incomingSearchModel->getSearchString()) {
 			$queryBuilder->andWhere($queryBuilder->expr()->like('i.name', ':searchString'))
-				->setParameter('searchString', '%' . $searchString . '%');
+				->setParameter('searchString', '%' . $incomingSearchModel->getSearchString() . '%');
 		}
 
-		foreach ($criteria as $param => $value) {
-			$queryBuilder->andWhere("{$param} = :value")->setParameter('value', $value);
+		foreach ($incomingSearchModel->getCriteria() as $param => $value) {
+			$queryBuilder->andWhere("i.{$param} = '{$value}'");
 		}
 
-		if (!empty($orderBy)) {
-			foreach ($orderBy as $param => $order) {
-				$queryBuilder->addOrderBy($param, $order);
-			}
+		foreach ($incomingSearchModel->getOrderBy() as $param => $order) {
+			$queryBuilder->addOrderBy("i.{$param}", $order);
 		}
 
-		if (!$limit) {
+		if ($incomingSearchModel->getEtaStartDate()) {
+			$queryBuilder->andWhere("i.eta > :startDate")->setParameter('startDate', $incomingSearchModel->getEtaStartDate());
+		}
+
+		if ($incomingSearchModel->getEtaEndDate()) {
+			$queryBuilder->andWhere("i.eta < :endDate")->setParameter('endDate', $incomingSearchModel->getEtaEndDate());
+		}
+
+		if (!$incomingSearchModel->getLimit()) {
 			$queryBuilder->setMaxResults('25');
 		} else {
-			$queryBuilder->setMaxResults($limit);
+			$queryBuilder->setMaxResults($incomingSearchModel->getLimit());
 		}
 
-		if ($offset) {
-			$queryBuilder->setFirstResult($offset);
+		if ($incomingSearchModel->getOffset()) {
+			$queryBuilder->setFirstResult($incomingSearchModel->getOffset());
 		}
 
 		$query = $queryBuilder->getQuery();
-		if ($queryOnly) {
+		if ($returnQuery) {
 			return $query;
 		}
 		return $query->getResult();
