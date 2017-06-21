@@ -24,4 +24,57 @@ $(document).ready(function() {
 			$('#scan-incoming-product-form').submit();
 		 });
 	};
+
+
+    var dials = $(".dials ol li");
+    var index;
+    var number = $(".dialabs .number");
+    var total;
+
+    $('select.form-control').each(function() {
+    	$(this).before('<div class="diallink"><a href="#">'+ ($(this).find(':selected').val()?$(this).find(':selected').text():'Select Location') + '</a></div>');
+    	$(this).hide();
+    });
+    $('.diallink>a').on('click.dialpad',function(e) {
+    	e.preventDefault();
+    	e.stopPropagation();
+    	number.html('');
+    	$(this).parent().append($('.dialabs').removeClass('hide').removeClass('only-levels').removeClass('only-rows').addClass('only-aisles'));
+    });
+    $(document).on('click.dialpad',function() {
+    	number.html('');
+    	$(this).parent().append($('.dialabs').removeClass('only-aisles').removeClass('only-levels').removeClass('only-rows').addClass('hide'));
+    });
+    $('.dialabs').on('click.dialpad',function(e) {
+    	e.stopPropagation();
+    });
+
+    dials.click(function(){
+
+    	index = $(this).find('p>strong').html();
+    	number.append(index);
+
+    	var dialstring = number.html();
+    	if (dialstring.match(/^[A-Z]$/)) {
+    		// first
+    		number.append(' - ');
+    		$('.dialabs').removeClass('only-levels').removeClass('only-aisles').addClass('only-rows');
+    	} else if (dialstring.match(/^[A-Z]\s-\s[0-9]{1,2}$/)) {
+    		// second
+    		number.append(' - ');
+    		$('.dialabs').removeClass('only-aisles').removeClass('only-rows').addClass('only-levels');
+    	} else if (dialstring.match(/^[A-Z]\s-\s[0-9]{1,2}\s-\s[0-9]{1}/)) {
+    		// done
+    		var loc_id = dials.parents('td').find('select option').filter(function () { return $(this).html() == dialstring; }).val();
+    		if (loc_id) {
+    			dials.parents('td').find('select').val(loc_id).change();
+    			dials.parents('td').find('.diallink>a').text(dialstring);
+    		} else {
+    			alert('Location '+ dialstring + ' does not exist.');
+    		}
+    		number.html('');
+    		$('.dialabs').addClass('hide');
+    	}
+    });
+
 });
