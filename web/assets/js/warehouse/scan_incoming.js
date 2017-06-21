@@ -53,8 +53,19 @@ $(document).ready(function() {
 	    });
 
 	    dials.click(function(){
-	    	index = $(this).find('p>strong').html();
-	    	number.append(index);
+	    	if ($(this).data('op') == 'clear') {
+	    		number.html('');
+	    		dials.parents('td').find('select').val('').change();
+	    		dials.parents('td').find('.diallink>a').text("Select Location");
+	    		$('.dialabs').addClass('hide');
+	    	} else {
+		    	if ($(this).data('val')) {
+		    		index = $(this).data('val');
+		    	} else {
+		    		index = $(this).find('p>strong').html();
+		    	}
+		    	number.append(index);
+		    }
 
 	    	var dialstring = number.html();
 	    	if (dialstring.match(/^[A-Z]$/)) {
@@ -65,7 +76,7 @@ $(document).ready(function() {
 	    		// second
 	    		number.append(' - ');
 	    		$('.dialabs').removeClass('only-aisles').removeClass('only-rows').addClass('only-levels');
-	    	} else if (dialstring.match(/^[A-Z]\s-\s[0-9]{1,2}\s-\s[0-9]{1}/)) {
+	    	} else if (dialstring.match(/^[A-Z]\s-\s([0-9]{1,2}|[A-Z]+)\s-\s[0-9]{1}/)) {
 	    		// done
 	    		var loc_id = dials.parents('td').find('select option').filter(function () { return $(this).html() == dialstring; }).val();
 	    		if (loc_id) {
