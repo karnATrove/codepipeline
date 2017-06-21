@@ -32,7 +32,7 @@ class IncomingRepository extends EntityRepository
 			$queryBuilder->andWhere('i.status = :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
 		} elseif ($complete === false) {
-			$queryBuilder->andWhere('i.status <> :complete')
+			$queryBuilder->andWhere('i.status != :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
 		}
 
