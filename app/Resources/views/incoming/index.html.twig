@@ -40,7 +40,7 @@
         </div>
         <div class="x_body">
             <form method="get" id="search_form">
-                <div class="row">
+                <div class="row" style="margin-bottom: 10px">
                     <div class="col-md-4">
                         <input class="form-control" title="keyword" name="keyword" placeholder="Keyword Search"
                                value="{{ keyword }}">
@@ -56,6 +56,12 @@
                     <div class="col-md-6">
                         <button type="submit" class="btn btn-success pull-left">Search</button>
                         <a href="{{ path('incoming') }}" class="btn btn-warning pull-left">Reset Filter</a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                    {% include 'incoming/_index_calendar.html.twig' %}
                     </div>
                 </div>
 

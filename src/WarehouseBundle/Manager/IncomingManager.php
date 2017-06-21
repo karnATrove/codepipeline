@@ -12,6 +12,7 @@ namespace WarehouseBundle\Manager;
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingStatus;
+use WarehouseBundle\Model\Incoming\IncomingSearchModel;
 
 class IncomingManager extends BaseManager
 {
@@ -113,20 +114,13 @@ class IncomingManager extends BaseManager
 	}
 
 	/**
-	 * @param string|null $keyword
-	 * @param null        $complete
-	 * @param array       $criteria
-	 * @param null        $orderBy
-	 * @param null        $limit
-	 * @param null        $offset
-	 * @param bool        $queryOnly
+	 * @param IncomingSearchModel $incomingSearchModel
+	 * @param bool                $returnQuery
 	 *
-	 * @return array|\Doctrine\ORM\Query
+	 * @return \Doctrine\ORM\Query|Incoming[]
 	 */
-	public function searchContainers(string $keyword = null, $complete = null, $criteria = [],
-	                                 $orderBy = null, $limit = null, $offset = null, $queryOnly = false)
+	public function searchContainers(IncomingSearchModel $incomingSearchModel, $returnQuery = false)
 	{
-		return $this->incomingRepository->searchContainers($keyword, $complete, $criteria, $orderBy,
-			$limit, $offset, $queryOnly);
+		return $this->incomingRepository->searchContainers($incomingSearchModel, $returnQuery);
 	}
 }

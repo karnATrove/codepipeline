@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
@@ -11,6 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
@@ -18,6 +20,7 @@ use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingFilterType;
 use WarehouseBundle\Form\IncomingType;
+use WarehouseBundle\Model\Incoming\IncomingSearchModel;
 
 /**
  * Booking controller.
@@ -38,9 +41,14 @@ class IncomingController extends Controller
 		$isComplete = empty($request->get('isComplete')) ? false :
 			((int)$request->get('isComplete') === 1 ? true : false);
 		$numberPerPage = empty($request->get('numberPerPage')) ? 25 : $request->get('numberPerPage');
-		$query = null;
+
+		$searchModel = new IncomingSearchModel();
+		$searchModel->setSearchString($keyword);
+		$searchModel->setIsComplete($isComplete);
+		$searchModel->setOrderBy(['eta' => 'desc']);
 		$query = $this->get('warehouse.manager.incoming_manager')
-			->searchContainers($keyword, $isComplete, [], ['i.scheduled' => 'desc'], null, null, true);
+			->searchContainers($searchModel, true);
+
 		$paginator = $this->get('knp_paginator');
 		$pagination = $paginator->paginate(
 			$query,
@@ -53,6 +61,70 @@ class IncomingController extends Controller
 			'isComplete' => $isComplete,
 			'numberPerPage' => $numberPerPage
 		]);
+	}
+
+	/**
+	 * Just get url of incoming product scan
+	 *
+	 * @Route("/get-incoming-product-scan-url", name="incoming_product_scan_url")
+	 * @Method("POST")
+	 */
+	public function getIncomingProductScanUrlAction(Request $request)
+	{
+		if (empty($request->get('id'))) {
+			$msg = "Error! Missing data. Please contact tech team.";
+			throw new \Exception($msg);
+		}
+
+		$id = $request->get('id');
+		$url = $this->generateUrl('incoming_products_scanned', ['id' => $id]);
+		return new JsonResponse(['url' => $url], JsonResponse::HTTP_OK);
+	}
+
+	/**
+	 * Lists all Incoming entities.
+	 *
+	 * @Route("/get-calendar-data", name="incoming_get_calendar_data")
+	 * @Method("POST")
+	 */
+	public function getCalendarDataAction(Request $request)
+	{
+		if (empty($request->get('start')) || empty($request->get('end'))) {
+			$msg = "Error! Missing data. Please contact tech team.";
+			throw new \Exception($msg);
+		}
+
+		$start = date('Y-m-d', $request->get('start'));
+		$end = date('Y-m-d', $request->get('end'));
+		$end = date('Y-m-d', strtotime($end . " +1 day"));
+
+		$searchModel = new IncomingSearchModel();
+		$searchModel->setEtaStartDate($start);
+		$searchModel->setEtaEndDate($end);
+		$incomingList = $this->get('warehouse.manager.incoming_manager')
+			->searchContainers($searchModel, false);
+		$data = [];
+		foreach ($incomingList as $incoming) {
+			$isScheduled = false;
+			if ($incoming->getScheduled()) {
+				$start = $incoming->getScheduled()->format('Y-m-d H:i:s');
+				$isScheduled = true;
+			} else {
+				$start = $incoming->getEta()->format('Y-m-d H:i:s');
+			}
+
+			$color = $isScheduled ? "#169F85" : "#f0ad4e";
+
+			$end = date('Y-m-d H:i:s', strtotime($start . " +1 hour"));
+			$data[] = [
+				'start' => $start,
+				'end' => $end,
+				'title' => $incoming->getName(),
+				'id' => $incoming->getId(),
+				'color' => $color
+			];
+		}
+		return new JsonResponse($data, JsonResponse::HTTP_OK);
 	}
 
 
