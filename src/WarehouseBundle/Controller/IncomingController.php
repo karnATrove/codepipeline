@@ -35,7 +35,7 @@ class IncomingController extends Controller
 	public function indexAction(Request $request)
 	{
 		$keyword = empty($request->get('keyword')) ? null : $request->get('keyword');
-		$isComplete = empty($request->get('isComplete')) ? null :
+		$isComplete = empty($request->get('isComplete')) ? false :
 			((int)$request->get('isComplete') === 1 ? true : false);
 		$numberPerPage = empty($request->get('numberPerPage')) ? 25 : $request->get('numberPerPage');
 		$query = null;
