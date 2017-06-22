@@ -29,6 +29,33 @@ use WarehouseBundle\Entity\ProductLog;
 class ProductRestController extends Controller
 {
     /**
+     * Return the overall model list.
+     *
+     * @Secure(roles="ROLE_API")
+     * @ApiDoc(
+     *   resource = "Product",
+     *   description = "Return the overall Model List",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when the model is not found"
+     *   }
+     * )
+     *
+     * @return View
+     */
+    public function getModelsAction()
+    {
+        $productManager = $this->get('ProductManager');
+        $products = $productManager->findModels();
+        if (!$products) {
+            throw $this->createNotFoundException('Products not found.');
+        }
+        $view = View::create();
+        $view->setData($products)->setStatusCode(200);
+        return $view;
+    }
+
+    /**
      * Return the overall product list.
      *
      * @Secure(roles="ROLE_API")

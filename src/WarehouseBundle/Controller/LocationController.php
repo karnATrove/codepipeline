@@ -66,22 +66,23 @@ class LocationController extends Controller
 		$aisles = ['E','F','G','H','I','J','K'];
 		#$aisles = ['A','B','C'];
 		#$aisles = ['D'];
+		$aisles = ['L'];
 		$num_rows = 24;
 		$abc = 18;
 		$d = 21;
 		$num_rows = 24;
 		foreach($aisles as $a) {
-			for($x=22;$x<=$num_rows;$x++) {
-				//for($xx=1;$xx<=1;$xx++) {
+			for($x=1;$x<=$num_rows;$x++) {
+				for($xx=1;$xx<=4;$xx++) {
 					$ent = (new Location())
 						->setAisle($a)
 						->setRow($x)
-						->setLevel(1)
+						->setLevel($xx)
 						->setStaging(FALSE)
 						->setUser($this->getUser())
 						->setCreated(new \DateTime('now'));
 					$em->persist($ent);
-				//}
+				}
 			}
 		}
 		$em->flush();
