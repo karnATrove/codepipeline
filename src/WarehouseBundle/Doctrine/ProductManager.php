@@ -83,6 +83,18 @@ class ProductManager extends BaseProductManager
     /**
      * {@inheritdoc}
      */
+    public function findModels()
+    {   
+        return $this->objectManager->createQuery(
+            'SELECT p.model         AS model
+                FROM WarehouseBundle:Product p'
+        )
+        ->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function reloadProduct(ProductInterface $product)
     {
         $this->objectManager->refresh($product);
