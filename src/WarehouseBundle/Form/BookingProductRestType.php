@@ -34,7 +34,7 @@ class BookingProductRestType extends AbstractType
                 //'expanded' => false,
                 'choice_label' => 'model',
                 //'placeholder' => 'Choose a model',
-                'property' => 'model',
+                //'property' => 'model',
                 //'query_builder' => function (EntityRepository $er) {
                  //   return $er->createQueryBuilder('p')
                  //       ->orderBy('p.model', 'ASC');
