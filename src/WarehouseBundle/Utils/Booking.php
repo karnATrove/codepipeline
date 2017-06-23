@@ -183,7 +183,7 @@ class Booking
 			BookingEntity::TYPE_CARRIER_ORDER => 'Carrier Order',
 			BookingEntity::TYPE_PICKUP_ORDER => 'Pickup Order',
 			BookingEntity::TYPE_TRANSFER => 'Transfer (Forward)',
-			BookingEntity::TYPE_PICKONLY => 'Pick Only',
+			BookingEntity::TYPE_PICK_ONLY => 'Pick Only',
 		];
 	}
 

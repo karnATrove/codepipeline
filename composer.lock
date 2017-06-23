@@ -1485,16 +1485,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.2.3",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "8d6c6cc55186db87b7dc5009827429ba4e9dc006"
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/8d6c6cc55186db87b7dc5009827429ba4e9dc006",
-                "reference": "8d6c6cc55186db87b7dc5009827429ba4e9dc006",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699",
                 "shasum": ""
             },
             "require": {
@@ -1504,8 +1504,11 @@
             },
             "require-dev": {
                 "ext-curl": "*",
-                "phpunit/phpunit": "^4.0",
+                "phpunit/phpunit": "^4.0 || ^5.0",
                 "psr/log": "^1.0"
+            },
+            "suggest": {
+                "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
             "extra": {
@@ -1543,7 +1546,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-02-28T22:50:30+00:00"
+            "time": "2017-06-22T18:50:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -4033,17 +4036,20 @@
         },
         {
             "name": "rove/canonical-dto",
-            "version": "1.0.4",
+            "version": "1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://yhnehc:d7e2a019ff9d63d00dc5b4e1cb27895a8cee9c79@github.com/roveconcepts/dto.git",
-                "reference": "ec2ebfd922cd57d519b6031e670313991ee4d5f0"
+                "reference": "e3272301b5fd73c31e47f810c8198d5a4e7abb3c"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.4-6e8084.tar",
-                "reference": "ec2ebfd922cd57d519b6031e670313991ee4d5f0",
-                "shasum": "e1a928fa64054f4b6317649e3921a1ed64a6600c"
+                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.6-dc0950.tar",
+                "reference": "e3272301b5fd73c31e47f810c8198d5a4e7abb3c",
+                "shasum": "f9eb4fabc836dd6106ad5c1675df805110c3f683"
+            },
+            "require": {
+                "jms/serializer": "^1.7"
             },
             "type": "library",
             "autoload": {
@@ -4057,7 +4063,7 @@
                     "email": "leoc@roveconcepts.com"
                 }
             ],
-            "time": "2017-06-16T22:19:06+00:00"
+            "time": "2017-06-23T18:17:04+00:00"
         },
         {
             "name": "sensio/distribution-bundle",

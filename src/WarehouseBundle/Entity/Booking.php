@@ -2,12 +2,13 @@
 
 namespace WarehouseBundle\Entity;
 
-use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
-
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use WarehouseBundle\Entity\BookingContact;
 use WarehouseBundle\Model\BookingInterface;
 
 /**
@@ -34,7 +35,7 @@ class Booking implements BookingInterface
 	const TYPE_CARRIER_ORDER = 1;
 	const TYPE_PICKUP_ORDER = 2;
 	const TYPE_TRANSFER = 3;
-	const TYPE_PICKONLY = 4;
+	const TYPE_PICK_ONLY = 4;
 
 	//endregion
 
@@ -155,6 +156,8 @@ class Booking implements BookingInterface
 	/**
 	 * One Booking has One BookingContact
 	 * @ORM\OneToOne(targetEntity="BookingContact", mappedBy="booking", cascade={"persist","remove"})
+	 * @MaxDepth(2)
+	 *
 	 */
 	private $contact;
 
@@ -493,7 +496,7 @@ class Booking implements BookingInterface
 	/**
 	 * Get contact
 	 *
-	 * @return \WarehouseBundle\Entity\BookingContact
+	 * @return BookingContact
 	 */
 	public function getContact()
 	{
@@ -503,7 +506,7 @@ class Booking implements BookingInterface
 	/**
 	 * Set contact
 	 *
-	 * @param \WarehouseBundle\Entity\BookingContact $contact
+	 * @param BookingContact $contact
 	 *
 	 * @return Booking
 	 */

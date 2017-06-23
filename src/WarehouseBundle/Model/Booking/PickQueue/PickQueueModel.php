@@ -1,9 +1,9 @@
 <?php
-/**
- * 
- */
+
 namespace WarehouseBundle\Model\Booking\PickQueue;
 
+
+use WarehouseBundle\Model\Booking\PickSummary\PickSummaryItemModel;
 
 class PickQueueModel
 {

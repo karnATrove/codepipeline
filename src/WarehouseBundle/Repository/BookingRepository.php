@@ -4,7 +4,7 @@ namespace WarehouseBundle\Repository;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\NoResultException;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\Product;
@@ -111,9 +111,19 @@ class BookingRepository extends EntityRepository
 				  AND b.pickingFlag = 1
 				ORDER BY p.model'
 		)
-		->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
-		->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
-		->getResult();
+			->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
+			->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
+			->getResult();
+	}
+
+	public function getBookingPickableStatuses()
+	{
+		return [Booking::STATUS_ACCEPTED];
+	}
+
+	public function getBookingProductPickableStatuses()
+	{
+		return [BookingProduct::STATUS_PENDING];
 	}
 
 	/**
@@ -127,7 +137,7 @@ class BookingRepository extends EntityRepository
 		$productStatuses = $this->getBookingProductPickableStatuses();
 		return $this->getEntityManager()->createQuery(
 			'SELECT
-				  SUM(bp.qty) as asked
+				  SUM(bp.qty) AS asked
 				FROM WarehouseBundle:Booking b 
 				  INNER JOIN WarehouseBundle:BookingProduct bp WITH bp.booking=b AND b.status IN (:bookingStatus)
 				  INNER JOIN WarehouseBundle:Product p WITH bp.product = p
@@ -137,17 +147,29 @@ class BookingRepository extends EntityRepository
 				GROUP BY bp.product
 				ORDER BY p.model'
 		)
-		->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
-		->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
-		->setParameter('product',$product)
-		->getSingleScalarResult();
+			->setParameter('bookingStatus', $pickableStatuses, Connection::PARAM_STR_ARRAY)
+			->setParameter('productStatus', $productStatuses, Connection::PARAM_STR_ARRAY)
+			->setParameter('product', $product)
+			->getSingleScalarResult();
 	}
 
-	public function getBookingPickableStatuses() {
-		return array(Booking::STATUS_ACCEPTED);
-	}
-
-	public function getBookingProductPickableStatuses() {
-		return array(BookingProduct::STATUS_PENDING);
+	/**
+	 * @param $criteria
+	 *
+	 * @return int|mixed
+	 */
+	public function count($criteria)
+	{
+		$queryBuilder = $this->createQueryBuilder('b');
+		$queryBuilder->select($queryBuilder->expr()->count('b'));
+		foreach ($criteria as $param => $value) {
+			$queryBuilder->andWhere("b.{$param} = '{$value}'");
+		}
+		$query = $queryBuilder->getQuery();
+		try{
+			return $query->getSingleScalarResult();
+		}catch (NoResultException $noResultException){
+			return 0;
+		}
 	}
 }

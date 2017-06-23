@@ -40,3 +40,8 @@ restful_services:
     resource: "@WarehouseBundle/Resources/config/api_routing.yml"
     type:     rest
     prefix:   /api
+
+booking_api:
+    resource: "@WarehouseApiBundle/Resources/config/routing.yml"
+    type:     rest
+    prefix:   /api

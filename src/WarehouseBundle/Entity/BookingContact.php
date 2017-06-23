@@ -2,9 +2,12 @@
 
 namespace WarehouseBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Entity\BookingContactCommunication;
 
 /**
  * BookingContact
@@ -367,11 +370,11 @@ class BookingContact
     /**
      * Set booking
      *
-     * @param \WarehouseBundle\Entity\Booking $booking
+     * @param Booking $booking
      *
      * @return BookingContact
      */
-    public function setBooking(\WarehouseBundle\Entity\Booking $booking = null)
+    public function setBooking(Booking $booking = null)
     {
         $this->booking = $booking;
 
@@ -381,7 +384,7 @@ class BookingContact
     /**
      * Get booking
      *
-     * @return \WarehouseBundle\Entity\Booking
+     * @return Booking
      */
     public function getBooking()
     {
@@ -391,11 +394,11 @@ class BookingContact
     /**
      * Add communication
      *
-     * @param \WarehouseBundle\Entity\BookingContactCommunication $communication
+     * @param BookingContactCommunication $communication
      *
      * @return BookingContact
      */
-    public function addCommunication(\WarehouseBundle\Entity\BookingContactCommunication $communication)
+    public function addCommunication(BookingContactCommunication $communication)
     {
         $communication->setContact($this);
         $this->communications[] = $communication;
@@ -406,9 +409,9 @@ class BookingContact
     /**
      * Remove communication
      *
-     * @param \WarehouseBundle\Entity\BookingContactCommunication $communication
+     * @param BookingContactCommunication $communication
      */
-    public function removeCommunication(\WarehouseBundle\Entity\BookingContactCommunication $communication)
+    public function removeCommunication(BookingContactCommunication $communication)
     {
         $this->communications->removeElement($communication);
     }
@@ -416,7 +419,7 @@ class BookingContact
     /**
      * Get communications
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection|BookingContactCommunication[]
      */
     public function getCommunications()
     {

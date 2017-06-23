@@ -1,0 +1,5 @@
+service_booking:
+    type: rest
+    prefix: /v2
+    resource: WarehouseApiBundle\Controller\BookingController
+    name_prefix:  api_2_ # naming collision
