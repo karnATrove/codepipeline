@@ -83,6 +83,37 @@ class BookingRestController extends FOSRestController
         }
         return $booking;
     }
+/**
+     * Return an booking identified by order number.
+     *
+     * @Secure(roles="ROLE_API")
+     * @ApiDoc(
+     *   resource = "Booking",
+     *   description = "Return an booking identified by order number",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when the booking is not found"
+     *   }
+     * )
+     *
+     * @Annotations\View(
+     *     template = "WarehouseBundle:Booking:getBooking.html.twig",
+     *     templateVar="booking"
+     * )
+     * 
+     * @param integer $orderNumber order number
+     *
+     * @return View
+     */
+    
+    public function getBookingOrderNumberAction($orderNumber)
+    {
+        $booking = $this->get('doctrine')->getEntityManager()->getRepository('WarehouseBundle:Booking')->findOneBy(array('orderNumber'=>$orderNumber));
+        if (false === $booking) {
+            throw $this->createNotFoundException("Booking does not exist.");
+        }
+        return $booking;
+    }
 
     /**
      * Create a Booking from the submitted form data.<br/>
