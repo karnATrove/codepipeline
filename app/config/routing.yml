@@ -1,8 +1,3 @@
-warehouse_api:
-    resource: "@WarehouseApiBundle/Controller/"
-    type:     annotation
-    prefix:   /
-
 rove_site_rest_api:
     resource: "@RoveSiteRestApiBundle/Controller/"
     type:     annotation
@@ -41,7 +36,7 @@ restful_services:
     type:     rest
     prefix:   /api
 
-booking_api:
+warehouse_api:
     resource: "@WarehouseApiBundle/Resources/config/routing.yml"
     type:     rest
     prefix:   /api

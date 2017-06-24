@@ -4036,17 +4036,17 @@
         },
         {
             "name": "rove/canonical-dto",
-            "version": "1.0.6",
+            "version": "1.0.11",
             "source": {
                 "type": "git",
                 "url": "https://yhnehc:d7e2a019ff9d63d00dc5b4e1cb27895a8cee9c79@github.com/roveconcepts/dto.git",
-                "reference": "e3272301b5fd73c31e47f810c8198d5a4e7abb3c"
+                "reference": "13ccd88c7634a4bfe95152bd482b0e872aa32d3b"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.6-dc0950.tar",
-                "reference": "e3272301b5fd73c31e47f810c8198d5a4e7abb3c",
-                "shasum": "f9eb4fabc836dd6106ad5c1675df805110c3f683"
+                "url": "http://satis.rove.team/dist/rove/canonical-dto/rove-canonical-dto-1.0.11-2f56b6.tar",
+                "reference": "13ccd88c7634a4bfe95152bd482b0e872aa32d3b",
+                "shasum": "884f1515b521db317f290c0f6be8550648dcaae4"
             },
             "require": {
                 "jms/serializer": "^1.7"
@@ -4063,7 +4063,7 @@
                     "email": "leoc@roveconcepts.com"
                 }
             ],
-            "time": "2017-06-23T18:17:04+00:00"
+            "time": "2017-06-23T23:59:45+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
