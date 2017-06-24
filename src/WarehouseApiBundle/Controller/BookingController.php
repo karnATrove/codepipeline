@@ -25,7 +25,8 @@ class BookingController extends FOSRestController
 	 *   description = "Get Bookings",
 	 *     statusCodes = {
 	 *     200 = "Returned when successful",
-	 *     404 = "Returned when the booking is not found"
+	 *     404 = "Returned when the booking is not found",
+	 *     500 = "Error"
 	 *   }
 	 * )
 	 *
@@ -53,7 +54,8 @@ class BookingController extends FOSRestController
 	 *   description = "Return an booking identified by unique id",
 	 *   statusCodes = {
 	 *     200 = "Returned when successful",
-	 *     404 = "Returned when the booking is not found"
+	 *     404 = "Returned when the booking is not found",
+	 *     500 = "Error"
 	 *   }
 	 * )
 	 *
@@ -71,19 +73,43 @@ class BookingController extends FOSRestController
 			}
 			$booking = $booking[0];
 			$bookingDto = BookingMapper::mapToDto($booking);
-			$responseDto = new ResponseDto("success", null, $bookingDto);
 			$view = View::create();
-			$view->setData($responseDto)->setStatusCode(Response::HTTP_OK);
+			$view->setData($bookingDto)->setStatusCode(Response::HTTP_OK);
 			return $view;
 		} catch (ApiException $apiException) {
 			$errorDto = new ResponseErrorDto($apiException->getHttpCode(), "Error", $apiException->getMessage());
 			$view = View::create();
 			$view->setData($errorDto)->setStatusCode(Response::HTTP_NOT_FOUND);
+			return $view;
 		} catch (\Exception $exception) {
 			$errorDto = new ResponseErrorDto(Response::HTTP_INTERNAL_SERVER_ERROR, "Error", $exception->getMessage());
 			$view = View::create();
 			$view->setData($errorDto)->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
 			return $view;
 		}
+	}
+
+	/**
+	 * Create new booking
+	 *
+	 * @Secure(roles="ROLE_API")
+	 * @ApiDoc(
+	 *   resource = "Booking",
+	 *   description = "Create new booking",
+	 *   statusCodes = {
+	 *     201 = "Created",
+	 *     400 = "Failed",
+	 *     500 = "Error"
+	 *   }
+	 * )
+	 *
+	 * @param integer $id booking id
+	 *
+	 * @return View
+	 */
+	public function postBookingsAction(Request $request)
+	{
+		$view = View::create();
+		return $view;
 	}
 }

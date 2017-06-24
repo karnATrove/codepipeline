@@ -3,3 +3,8 @@ service_booking:
     prefix: /v2
     resource: WarehouseApiBundle\Controller\BookingController
     name_prefix:  api_2_ # naming collision
+service_container:
+    type: rest
+    prefix: /v2
+    resource: WarehouseApiBundle\Controller\ContainerController
+    name_prefix:  api_2_ # naming collision
