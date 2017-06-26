@@ -131,6 +131,7 @@ class Incoming
 		$this->files = new ArrayCollection();
 		$this->incoming_products = new ArrayCollection();
 		$this->incoming_scanned_products = new ArrayCollection();
+		$this->comments = new ArrayCollection();
 	}
 
 	/**

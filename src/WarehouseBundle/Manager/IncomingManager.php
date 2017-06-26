@@ -123,4 +123,13 @@ class IncomingManager extends BaseManager
 	{
 		return $this->incomingRepository->searchContainers($incomingSearchModel, $returnQuery);
 	}
+
+	/**
+	 * @param $criteria
+	 *
+	 * @return null|object|Incoming
+	 */
+	public function findOneBy($criteria){
+		return $this->incomingRepository->findOneBy($criteria);
+	}
 }

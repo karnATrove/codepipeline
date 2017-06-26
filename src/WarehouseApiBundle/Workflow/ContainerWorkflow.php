@@ -44,10 +44,12 @@ class ContainerWorkflow extends BaseWorkflow
 	 */
 	public function createContainer(ContainerDto $containerDto)
 	{
+		if ($this->incomingManager->findOneBy(['name' => $containerDto->getName()])) {
+			throw new ApiException("Container with same name already exist", Response::HTTP_BAD_REQUEST);
+		}
 		//create container
 		$incoming = $this->createIncoming($containerDto);
 		$this->incomingManager->updateIncoming($incoming, $this->entityManager);
-
 		//create products
 		if (!empty($containerDto->getContainerProducts())) {
 			$existProductList = [];
@@ -68,7 +70,7 @@ class ContainerWorkflow extends BaseWorkflow
 					$qty = $incomingProduct->getQty() + $containerProduct->getQuantity();
 					$incomingProduct->setQty($qty);
 				} else {
-					$incomingProduct = $this->createIncomingProduct($product, $incoming, $containerProduct);
+					$incomingProduct = $this->createIncomingProduct($product, $incoming, $containerProduct->getQuantity());
 					$existProductList[$sku] = $incomingProduct;
 				}
 				$this->incomingProductManager->update($incomingProduct, $this->entityManager);
@@ -96,8 +98,8 @@ class ContainerWorkflow extends BaseWorkflow
 	private function createIncoming(ContainerDto $containerDto)
 	{
 		$incomingEntity = ContainerMapper::mapDtoToEntity($containerDto, $this->entityManager);
-		$incomingEntity->setCreated(new \DateTime());
-		$incomingEntity->setModified(new \DateTime());
+		$incomingEntity->setCreated(new \DateTime('now'));
+		$incomingEntity->setModified(new \DateTime('now'));
 		return $incomingEntity;
 	}
 
