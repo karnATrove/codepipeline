@@ -41,9 +41,8 @@ class BookingWorkflow extends BaseWorkflow
 		$offset = $limit * (($page - 1) > 0 ? ($page - 1) : 0);
 		$bookings = $this->bookingManager->findBy($criteria, $orderBy, $limit, $offset);
 		$bookingDtos = BookingMapper::mapToDtoList($bookings);
-		$responseDto = new ResponseDto("success", null, $bookingDtos);
 		$view = View::create();
-		$view->setData($responseDto)->setStatusCode(Response::HTTP_OK)->setHeader('TOTAL_COUNT', $total);
+		$view->setData($bookingDtos)->setStatusCode(Response::HTTP_OK)->setHeader('TOTAL_COUNT', $total);
 		return $view;
 	}
 
