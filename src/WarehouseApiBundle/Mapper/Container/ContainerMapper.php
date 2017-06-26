@@ -1,6 +1,6 @@
 <?php
 
-namespace RoveSiteRestApiBundle\Mapper\Container;
+namespace WarehouseApiBundle\Mapper\Container;
 
 
 use Doctrine\ORM\EntityManagerInterface;

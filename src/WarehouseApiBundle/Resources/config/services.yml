@@ -5,3 +5,6 @@ services:
     warehouse_api.workflow.booking_workflow:
         class: WarehouseApiBundle\Workflow\BookingWorkflow
         arguments: ['@service_container']
+    warehouse_api.workflow.container_workflow:
+        class: WarehouseApiBundle\Workflow\ContainerWorkflow
+        arguments: ['@service_container']

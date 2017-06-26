@@ -16,10 +16,9 @@ use JMS\Serializer\SerializerBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Rove\CanonicalDto\Container\ContainerDto;
 use Rove\CanonicalDto\Response\ResponseErrorDto;
-use RoveSiteRestApiBundle\Manager\ContainerManager;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use WarehouseApiBundle\Exception\ApiException;
 
 class ContainerController extends FOSRestController
 {
@@ -46,13 +45,14 @@ class ContainerController extends FOSRestController
 			$serializer = SerializerBuilder::create()->build();
 			/** @var ContainerDto $containerDto */
 			$containerDto = $serializer->deserialize($json, ContainerDto::class, 'json');
-//			$containerManager = $this->get('container')
-
-
-//		$productApiManager = new ProductManager($this->get('service_container'));
-//		$productDto = $productApiManager->get('sku');
-//			$view = View::create();
-//			return $view;
+			$this->get('warehouse_api.workflow.container_workflow')->createContainer($containerDto);
+			$view = View::create();
+			return $view->setStatusCode(Response::HTTP_CREATED);
+		} catch (ApiException $apiException) {
+			$errorDto = new ResponseErrorDto($apiException->getHttpCode(), "Error", $apiException->getMessage());
+			$view = View::create();
+			$view->setData($errorDto)->setStatusCode($apiException->getHttpCode());
+			return $view;
 		} catch (\Exception $exception) {
 			$errorDto = new ResponseErrorDto(Response::HTTP_INTERNAL_SERVER_ERROR, "Error", $exception->getMessage());
 			$view = View::create();

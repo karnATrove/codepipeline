@@ -6,7 +6,7 @@ namespace WarehouseApiBundle\Workflow;
 use Rove\CanonicalDto\Container\ContainerDto;
 use Rove\CanonicalDto\Product\ProductDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
-use RoveSiteRestApiBundle\Mapper\Container\ContainerMapper;
+use WarehouseApiBundle\Mapper\Container\ContainerMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use WarehouseApiBundle\Exception\ApiException;
@@ -22,6 +22,7 @@ class ContainerWorkflow extends BaseWorkflow
 	private $roveApiProductManager;
 	private $incomingManager;
 	private $incomingCommentManager;
+	private $incomingProductManager;
 
 	/**
 	 * ContainerWorkflow constructor.
@@ -35,17 +36,21 @@ class ContainerWorkflow extends BaseWorkflow
 		$this->roveApiProductManager = $container->get('rove_site_rest_api.manager.product_manager');
 		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
 		$this->incomingCommentManager = $container->get('warehouse.manager.incoming_comment_manager');
+		$this->incomingProductManager = $container->get('warehouse.manager.incoming_product_manager');
 	}
 
-
+	/**
+	 * @param ContainerDto $containerDto
+	 */
 	public function createContainer(ContainerDto $containerDto)
 	{
 		//create container
 		$incoming = $this->createIncoming($containerDto);
+		$this->incomingManager->updateIncoming($incoming, $this->entityManager);
 
 		//create products
 		if (!empty($containerDto->getContainerProducts())) {
-			$existProductList=[];
+			$existProductList = [];
 
 			foreach ($containerDto->getContainerProducts() as $containerProduct) {
 				$sku = $containerProduct->getSku();
@@ -54,18 +59,19 @@ class ContainerWorkflow extends BaseWorkflow
 				$product = $this->productManager->getOneBySku($sku);
 				if (!$product) {
 					$product = $this->createMissingProduct($sku);
+					$this->productManager->updateProduct($product, $this->entityManager);
 				}
 
-				if (array_key_exists($sku,$existProductList)){
+				if (array_key_exists($sku, $existProductList)) {
 					/** @var IncomingProduct $incomingProduct */
 					$incomingProduct = $existProductList[$sku];
-					$qty = $incomingProduct->getQty()+$containerProduct->getQuantity();
+					$qty = $incomingProduct->getQty() + $containerProduct->getQuantity();
 					$incomingProduct->setQty($qty);
-				}else{
+				} else {
 					$incomingProduct = $this->createIncomingProduct($product, $incoming, $containerProduct);
 					$existProductList[$sku] = $incomingProduct;
 				}
-
+				$this->incomingProductManager->update($incomingProduct, $this->entityManager);
 			}
 		}
 
@@ -79,7 +85,7 @@ class ContainerWorkflow extends BaseWorkflow
 				$this->incomingCommentManager->update($incomingComment, $this->entityManager);
 			}
 		}
-
+		$this->entityManager->flush();
 	}
 
 	/**
@@ -92,7 +98,6 @@ class ContainerWorkflow extends BaseWorkflow
 		$incomingEntity = ContainerMapper::mapDtoToEntity($containerDto, $this->entityManager);
 		$incomingEntity->setCreated(new \DateTime());
 		$incomingEntity->setModified(new \DateTime());
-		$this->incomingManager->updateIncoming($incomingEntity, $this->entityManager);
 		return $incomingEntity;
 	}
 
@@ -109,7 +114,6 @@ class ContainerWorkflow extends BaseWorkflow
 		$productEntity = ProductMapper::mapDtoToEntity($productDto, $productItemDto);
 		$productEntity->setCreated(new \DateTime());
 		$productEntity->setStatus(Product::PRODUCT_STATUS_DEFAULT);
-		$this->productManager->updateProduct($productEntity, $this->entityManager);
 		return $productEntity;
 	}
 
@@ -130,9 +134,22 @@ class ContainerWorkflow extends BaseWorkflow
 		throw new ApiException("Failed to get product data.", Response::HTTP_INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * @param Product  $product
+	 * @param Incoming $incoming
+	 * @param          $quantity
+	 *
+	 * @return IncomingProduct
+	 */
 	private function createIncomingProduct(Product $product, Incoming $incoming, $quantity)
 	{
 		$incomingProduct = new IncomingProduct();
 		$incomingProduct->setQty($quantity);
+		$incomingProduct->setIncoming($incoming);
+		$incomingProduct->setProduct($product);
+		$incomingProduct->setModel($product->getModel());
+		$incomingProduct->setCreated(new \DateTime());
+		$incomingProduct->setModified(new \DateTime());
+		return $incomingProduct;
 	}
 }

@@ -78,7 +78,7 @@ class BookingController extends FOSRestController
 		} catch (ApiException $apiException) {
 			$errorDto = new ResponseErrorDto($apiException->getHttpCode(), "Error", $apiException->getMessage());
 			$view = View::create();
-			$view->setData($errorDto)->setStatusCode(Response::HTTP_NOT_FOUND);
+			$view->setData($errorDto)->setStatusCode($apiException->getHttpCode());
 			return $view;
 		} catch (\Exception $exception) {
 			$errorDto = new ResponseErrorDto(Response::HTTP_INTERNAL_SERVER_ERROR, "Error", $exception->getMessage());
