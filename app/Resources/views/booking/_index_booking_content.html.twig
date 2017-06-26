@@ -24,8 +24,12 @@
             <tbody>
             {% for booking in bookings %}
                 <tr>
-                    <td><input type="checkbox" name="form[orderIds][]" onclick='bulkSubmitBtnManage();'
-                               class="check-all" value="{{ booking.id }}"/></td>
+                    <td>
+                        <input type="checkbox" name="form[orderIds][]" onclick='bulkSubmitBtnManage();'
+                               class="check-all" value="{{ booking.id }}"
+                               data-printed="{{ booking.pickingFlag }}" data-order="{{ booking.orderNumber }}"
+                        />
+                    </td>
                     <td>
                         <a href="{{ path('booking_edit', { 'id': booking.id }) }}">{{ booking.orderNumber }}</a>
                     </td>
