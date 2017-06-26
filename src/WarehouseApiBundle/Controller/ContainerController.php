@@ -46,7 +46,7 @@ class ContainerController extends FOSRestController
 			$serializer = SerializerBuilder::create()->build();
 			/** @var ContainerDto $containerDto */
 			$containerDto = $serializer->deserialize($json, ContainerDto::class, 'json');
-			$container = ContainerManager::
+			$containerManager = $this->get('container')
 
 
 //		$productApiManager = new ProductManager($this->get('service_container'));

@@ -13,6 +13,7 @@ use WarehouseApiBundle\Exception\ApiException;
 use WarehouseApiBundle\Mapper\Product\ProductMapper;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingComment;
+use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
 
 class ContainerWorkflow extends BaseWorkflow
@@ -56,10 +57,12 @@ class ContainerWorkflow extends BaseWorkflow
 				}
 
 				if (array_key_exists($sku,$existProductList)){
+					/** @var IncomingProduct $incomingProduct */
 					$incomingProduct = $existProductList[$sku];
-					$incomingProduct->
+					$qty = $incomingProduct->getQty()+$containerProduct->getQuantity();
+					$incomingProduct->setQty($qty);
 				}else{
-					$incomingProduct = $this->createIncomingProduct($product, $incoming);
+					$incomingProduct = $this->createIncomingProduct($product, $incoming, $containerProduct);
 					$existProductList[$sku] = $incomingProduct;
 				}
 
@@ -127,8 +130,9 @@ class ContainerWorkflow extends BaseWorkflow
 		throw new ApiException("Failed to get product data.", Response::HTTP_INTERNAL_SERVER_ERROR);
 	}
 
-	private function createIncomingProduct(Product $product, Incoming $incoming)
+	private function createIncomingProduct(Product $product, Incoming $incoming, $quantity)
 	{
-
+		$incomingProduct = new IncomingProduct();
+		$incomingProduct->setQty($quantity);
 	}
 }
