@@ -191,9 +191,9 @@ class Product
      */
     public function productStatusList() {
         return array(
-            0 => 'Deleted',
-            1 => 'Active',
-            2 => 'Inactive',
+            \WarehouseBundle\Entity\Product::PRODUCT_STATUS_DELETED => 'Deleted',
+	        \WarehouseBundle\Entity\Product::PRODUCT_STATUS_ACTIVE => 'Active',
+	        \WarehouseBundle\Entity\Product::PRODUCT_STATUS_INACTIVE => 'Inactive',
         );
     }
 

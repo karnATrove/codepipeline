@@ -10,6 +10,8 @@ namespace WarehouseBundle\Manager;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Rove\CanonicalDto\Product\ProductDto;
+use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Exception\Manager\ManagerException;
 

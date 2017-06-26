@@ -63,4 +63,14 @@ class IncomingStatusManager extends BaseManager
 			IncomingStatus::COMPLETED => 'Completed',
 		];
 	}
+
+	/**
+	 * @param array $criteria
+	 *
+	 * @return null|object|IncomingStatus
+	 */
+	public function findOneBy(array $criteria)
+	{
+		return $this->incomingStatusRepository->findOneBy($criteria);
+	}
 }

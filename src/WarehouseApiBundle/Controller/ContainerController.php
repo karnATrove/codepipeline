@@ -16,6 +16,8 @@ use JMS\Serializer\SerializerBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Rove\CanonicalDto\Container\ContainerDto;
 use Rove\CanonicalDto\Response\ResponseErrorDto;
+use RoveSiteRestApiBundle\Manager\ContainerManager;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,12 +46,13 @@ class ContainerController extends FOSRestController
 			$serializer = SerializerBuilder::create()->build();
 			/** @var ContainerDto $containerDto */
 			$containerDto = $serializer->deserialize($json, ContainerDto::class, 'json');
+			$container = ContainerManager::
 
 
 //		$productApiManager = new ProductManager($this->get('service_container'));
 //		$productDto = $productApiManager->get('sku');
-			$view = View::create();
-			return $view;
+//			$view = View::create();
+//			return $view;
 		} catch (\Exception $exception) {
 			$errorDto = new ResponseErrorDto(Response::HTTP_INTERNAL_SERVER_ERROR, "Error", $exception->getMessage());
 			$view = View::create();

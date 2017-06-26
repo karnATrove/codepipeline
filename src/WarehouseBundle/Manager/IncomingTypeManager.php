@@ -10,8 +10,6 @@ namespace WarehouseBundle\Manager;
 
 
 use Doctrine\ORM\EntityManagerInterface;
-use WarehouseBundle\Entity\Incoming;
-use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Entity\IncomingType;
 
 class IncomingTypeManager extends BaseManager
@@ -43,4 +41,13 @@ class IncomingTypeManager extends BaseManager
 		];
 	}
 
+	/**
+	 * @param array $criteria
+	 *
+	 * @return null|object|IncomingType
+	 */
+	public function findOneBy(array $criteria)
+	{
+		return $this->incomingTypeRepository->findOneBy($criteria);
+	}
 }

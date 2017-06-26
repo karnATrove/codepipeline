@@ -2,13 +2,9 @@
 
 namespace WarehouseBundle\Entity;
 
-use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Expose;
-
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use WarehouseBundle\Model\ProductInterface;
 
 /**
@@ -19,482 +15,484 @@ use WarehouseBundle\Model\ProductInterface;
  */
 class Product implements ProductInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+	/**
+	 * @var int
+	 *
+	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	private $id;
 
-    /**
-     * One Product has One User
-     * @ORM\ManyToOne(targetEntity="User")
-     */
-    private $user;
+	/**
+	 * One Product has One User
+	 * @ORM\ManyToOne(targetEntity="User")
+	 */
+	private $user;
 
-    /**
-     * @var string
-     * @Gedmo\Versioned
-     * @ORM\Column(name="model", type="string", length=45, unique=true)
-     */
-    private $model;
+	/**
+	 * @var string
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="model", type="string", length=45, unique=true)
+	 */
+	private $model;
 
-    /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="status", type="smallint")
-     */
-    private $status;
+	/**
+	 * @var int
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="status", type="smallint")
+	 */
+	private $status;
 
-    /**
-     * @var string
-     * @Gedmo\Versioned
-     * @ORM\Column(name="description", type="string", length=75)
-     */
-    private $description;
+	/**
+	 * @var string
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="description", type="string", length=75)
+	 */
+	private $description;
 
-    /**
-     * @var int
-     * @Gedmo\Versioned
-     * @ORM\Column(name="qty_per_carton", type="integer")
-     */
-    private $qtyPerCarton;
+	/**
+	 * @var int
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="qty_per_carton", type="integer")
+	 */
+	private $qtyPerCarton;
 
-    /**
-     * @var float
-     * @Gedmo\Versioned
-     * @ORM\Column(name="length", type="float", nullable=true)
-     */
-    private $length;
+	/**
+	 * @var float
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="length", type="float", nullable=true)
+	 */
+	private $length;
 
-    /**
-     * @var float
-     * @Gedmo\Versioned
-     * @ORM\Column(name="width", type="float", nullable=true)
-     */
-    private $width;
+	/**
+	 * @var float
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="width", type="float", nullable=true)
+	 */
+	private $width;
 
-    /**
-     * @var float
-     * @Gedmo\Versioned
-     * @ORM\Column(name="height", type="float", nullable=true)
-     */
-    private $height;
+	/**
+	 * @var float
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="height", type="float", nullable=true)
+	 */
+	private $height;
 
-    /**
-     * @var string
-     * @Gedmo\Versioned
-     * @ORM\Column(name="dim_units", type="string", length=10)
-     */
-    private $dimUnits;
+	/**
+	 * @var string
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="dim_units", type="string", length=10)
+	 */
+	private $dimUnits;
 
-    /**
-     * @var float
-     * @Gedmo\Versioned
-     * @ORM\Column(name="weight", type="float", nullable=true)
-     */
-    private $weight;
+	/**
+	 * @var float
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="weight", type="float", nullable=true)
+	 */
+	private $weight;
 
-    /**
-     * @var string
-     * @Gedmo\Versioned
-     * @ORM\Column(name="weight_units", type="string", length=10)
-     */
-    private $weightUnits;
+	/**
+	 * @var string
+	 * @Gedmo\Versioned
+	 * @ORM\Column(name="weight_units", type="string", length=10)
+	 */
+	private $weightUnits;
 
-    /**
-     * @var \DateTime
-     * 
-     * @ORM\Column(name="created", type="datetime")
-     */
-    private $created;
+	/**
+	 * @var \DateTime
+	 *
+	 * @ORM\Column(name="created", type="datetime")
+	 */
+	private $created;
 
-    /**
-     * One Product has Many LocationProduct.
-     * @ORM\OneToMany(targetEntity="LocationProduct", mappedBy="product", cascade={"persist","remove"})
-     */
-    private $locations;
+	/**
+	 * One Product has Many LocationProduct.
+	 * @ORM\OneToMany(targetEntity="LocationProduct", mappedBy="product", cascade={"persist","remove"})
+	 */
+	private $locations;
 
-    /**
-     * One Product has Many Locations.
-     * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="product")
-     */
-    private $incoming;
+	/**
+	 * One Product has Many Locations.
+	 * @ORM\OneToMany(targetEntity="IncomingProduct", mappedBy="product")
+	 */
+	private $incoming;
 
-    public function __construct() {
-        $this->locations = new ArrayCollection();
-        $this->incoming = new ArrayCollection();
-    }
+	public function __construct()
+	{
+		$this->locations = new ArrayCollection();
+		$this->incoming = new ArrayCollection();
+	}
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+	/**
+	 * Get id
+	 *
+	 * @return int
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
 
-    /**
-     * Set model
-     *
-     * @param string $model
-     *
-     * @return Product
-     */
-    public function setModel($model)
-    {
-        $this->model = $model;
+	/**
+	 * Get model
+	 *
+	 * @return string
+	 */
+	public function getModel()
+	{
+		return $this->model;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set model
+	 *
+	 * @param string $model
+	 *
+	 * @return Product
+	 */
+	public function setModel($model)
+	{
+		$this->model = $model;
 
-    /**
-     * Get model
-     *
-     * @return string
-     */
-    public function getModel()
-    {
-        return $this->model;
-    }
+		return $this;
+	}
 
-    /**
-     * Set status
-     *
-     * @param integer $status
-     *
-     * @return Product
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
+	/**
+	 * Get status
+	 *
+	 * @return int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set status
+	 *
+	 * @param integer $status
+	 *
+	 * @return Product
+	 */
+	public function setStatus($status)
+	{
+		$this->status = $status;
 
-    /**
-     * Get status
-     *
-     * @return int
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
+		return $this;
+	}
 
-    /**
-     * Set description
-     *
-     * @param string $description
-     *
-     * @return Product
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
+	/**
+	 * Get description
+	 *
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set description
+	 *
+	 * @param string $description
+	 *
+	 * @return Product
+	 */
+	public function setDescription($description)
+	{
+		$this->description = $description;
 
-    /**
-     * Get description
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
+		return $this;
+	}
 
-    /**
-     * Set qtyPerCarton
-     *
-     * @param integer $qtyPerCarton
-     *
-     * @return Product
-     */
-    public function setQtyPerCarton($qtyPerCarton)
-    {
-        $this->qtyPerCarton = $qtyPerCarton;
+	/**
+	 * Get qtyPerCarton
+	 *
+	 * @return int
+	 */
+	public function getQtyPerCarton()
+	{
+		return $this->qtyPerCarton;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set qtyPerCarton
+	 *
+	 * @param integer $qtyPerCarton
+	 *
+	 * @return Product
+	 */
+	public function setQtyPerCarton($qtyPerCarton)
+	{
+		$this->qtyPerCarton = $qtyPerCarton;
 
-    /**
-     * Get qtyPerCarton
-     *
-     * @return int
-     */
-    public function getQtyPerCarton()
-    {
-        return $this->qtyPerCarton;
-    }
+		return $this;
+	}
 
-    /**
-     * Set length
-     *
-     * @param float $length
-     *
-     * @return Product
-     */
-    public function setLength($length)
-    {
-        $this->length = $length;
+	/**
+	 * Get length
+	 *
+	 * @return float
+	 */
+	public function getLength()
+	{
+		return $this->length;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set length
+	 *
+	 * @param float $length
+	 *
+	 * @return Product
+	 */
+	public function setLength($length)
+	{
+		$this->length = $length;
 
-    /**
-     * Get length
-     *
-     * @return float
-     */
-    public function getLength()
-    {
-        return $this->length;
-    }
+		return $this;
+	}
 
-    /**
-     * Set width
-     *
-     * @param float $width
-     *
-     * @return Product
-     */
-    public function setWidth($width)
-    {
-        $this->width = $width;
+	/**
+	 * Get width
+	 *
+	 * @return float
+	 */
+	public function getWidth()
+	{
+		return $this->width;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set width
+	 *
+	 * @param float $width
+	 *
+	 * @return Product
+	 */
+	public function setWidth($width)
+	{
+		$this->width = $width;
 
-    /**
-     * Get width
-     *
-     * @return float
-     */
-    public function getWidth()
-    {
-        return $this->width;
-    }
+		return $this;
+	}
 
-    /**
-     * Set height
-     *
-     * @param float $height
-     *
-     * @return Product
-     */
-    public function setHeight($height)
-    {
-        $this->height = $height;
+	/**
+	 * Get height
+	 *
+	 * @return float
+	 */
+	public function getHeight()
+	{
+		return $this->height;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set height
+	 *
+	 * @param float $height
+	 *
+	 * @return Product
+	 */
+	public function setHeight($height)
+	{
+		$this->height = $height;
 
-    /**
-     * Get height
-     *
-     * @return float
-     */
-    public function getHeight()
-    {
-        return $this->height;
-    }
+		return $this;
+	}
 
-    /**
-     * Set dimUnits
-     *
-     * @param string $dimUnits
-     *
-     * @return Product
-     */
-    public function setDimUnits($dimUnits)
-    {
-        $this->dimUnits = $dimUnits;
+	/**
+	 * Get dimUnits
+	 *
+	 * @return string
+	 */
+	public function getDimUnits()
+	{
+		return $this->dimUnits;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set dimUnits
+	 *
+	 * @param string $dimUnits
+	 *
+	 * @return Product
+	 */
+	public function setDimUnits($dimUnits)
+	{
+		$this->dimUnits = $dimUnits;
 
-    /**
-     * Get dimUnits
-     *
-     * @return string
-     */
-    public function getDimUnits()
-    {
-        return $this->dimUnits;
-    }
+		return $this;
+	}
 
-    /**
-     * Set weight
-     *
-     * @param float $weight
-     *
-     * @return Product
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
+	/**
+	 * Get weight
+	 *
+	 * @return float
+	 */
+	public function getWeight()
+	{
+		return $this->weight;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set weight
+	 *
+	 * @param float $weight
+	 *
+	 * @return Product
+	 */
+	public function setWeight($weight)
+	{
+		$this->weight = $weight;
 
-    /**
-     * Get weight
-     *
-     * @return float
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
+		return $this;
+	}
 
-    /**
-     * Set weightUnits
-     *
-     * @param string $weightUnits
-     *
-     * @return Product
-     */
-    public function setWeightUnits($weightUnits)
-    {
-        $this->weightUnits = $weightUnits;
+	/**
+	 * Get weightUnits
+	 *
+	 * @return string
+	 */
+	public function getWeightUnits()
+	{
+		return $this->weightUnits;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set weightUnits
+	 *
+	 * @param string $weightUnits
+	 *
+	 * @return Product
+	 */
+	public function setWeightUnits($weightUnits)
+	{
+		$this->weightUnits = $weightUnits;
 
-    /**
-     * Get weightUnits
-     *
-     * @return string
-     */
-    public function getWeightUnits()
-    {
-        return $this->weightUnits;
-    }
+		return $this;
+	}
 
-    /**
-     * Set created
-     *
-     * @param \DateTime $created
-     *
-     * @return Product
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
+	/**
+	 * Get created
+	 *
+	 * @return \DateTime
+	 */
+	public function getCreated()
+	{
+		return $this->created;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set created
+	 *
+	 * @param \DateTime $created
+	 *
+	 * @return Product
+	 */
+	public function setCreated($created)
+	{
+		$this->created = $created;
 
-    /**
-     * Get created
-     *
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
+		return $this;
+	}
 
-    /**
-     * Add location
-     *
-     * @param \WarehouseBundle\Entity\Location $location
-     *
-     * @return Product
-     */
-    public function addLocation(\WarehouseBundle\Entity\Location $location)
-    {
-        $this->locations[] = $location;
+	/**
+	 * Add location
+	 *
+	 * @param \WarehouseBundle\Entity\Location $location
+	 *
+	 * @return Product
+	 */
+	public function addLocation(\WarehouseBundle\Entity\Location $location)
+	{
+		$this->locations[] = $location;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove location
-     *
-     * @param \WarehouseBundle\Entity\Location $location
-     */
-    public function removeLocation(\WarehouseBundle\Entity\Location $location)
-    {
-        $this->locations->removeElement($location);
-    }
+	/**
+	 * Remove location
+	 *
+	 * @param \WarehouseBundle\Entity\Location $location
+	 */
+	public function removeLocation(\WarehouseBundle\Entity\Location $location)
+	{
+		$this->locations->removeElement($location);
+	}
 
-    /**
-     * Get locations
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLocations()
-    {
-        return $this->locations;
-    }
+	/**
+	 * Get locations
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getLocations()
+	{
+		return $this->locations;
+	}
 
-    /**
-     * Add incoming
-     *
-     * @param \WarehouseBundle\Entity\IncomingProduct $incoming
-     *
-     * @return Product
-     */
-    public function addIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
-    {
-        $this->incoming[] = $incoming;
+	/**
+	 * Add incoming
+	 *
+	 * @param \WarehouseBundle\Entity\IncomingProduct $incoming
+	 *
+	 * @return Product
+	 */
+	public function addIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
+	{
+		$this->incoming[] = $incoming;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Remove incoming
-     *
-     * @param \WarehouseBundle\Entity\IncomingProduct $incoming
-     */
-    public function removeIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
-    {
-        $this->incoming->removeElement($incoming);
-    }
+	/**
+	 * Remove incoming
+	 *
+	 * @param \WarehouseBundle\Entity\IncomingProduct $incoming
+	 */
+	public function removeIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
+	{
+		$this->incoming->removeElement($incoming);
+	}
 
-    /**
-     * Get incoming
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getIncoming()
-    {
-        return $this->incoming;
-    }
+	/**
+	 * Get incoming
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getIncoming()
+	{
+		return $this->incoming;
+	}
 
-    /**
-     * Set user
-     *
-     * @param \WarehouseBundle\Entity\User $user
-     *
-     * @return Product
-     */
-    public function setUser(\WarehouseBundle\Entity\User $user = null)
-    {
-        $this->user = $user;
+	/**
+	 * Get user
+	 *
+	 * @return \WarehouseBundle\Entity\User
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
 
-        return $this;
-    }
+	/**
+	 * Set user
+	 *
+	 * @param \WarehouseBundle\Entity\User $user
+	 *
+	 * @return Product
+	 */
+	public function setUser(\WarehouseBundle\Entity\User $user = null)
+	{
+		$this->user = $user;
 
-    /**
-     * Get user
-     *
-     * @return \WarehouseBundle\Entity\User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
+		return $this;
+	}
 
-    public function __toString() {
-        return 'Product';
-    }
+	public function __toString()
+	{
+		return 'Product';
+	}
 }

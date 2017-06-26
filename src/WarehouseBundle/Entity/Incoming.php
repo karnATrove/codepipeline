@@ -2,10 +2,9 @@
 
 namespace WarehouseBundle\Entity;
 
-use Doctrine\ORM\Mapping\JoinColumn;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Incoming
@@ -107,11 +106,13 @@ class Incoming
 	private $incoming_products;
 
 	/**
+	 * @var IncomingType $type
 	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingType", inversedBy="incoming")
 	 */
 	private $type;
 
 	/**
+	 * @var IncomingStatus $status
 	 * @ORM\ManyToOne(targetEntity="WarehouseBundle\Entity\IncomingStatus", inversedBy="incoming")
 	 */
 	private $status;
@@ -145,7 +146,7 @@ class Incoming
 	/**
 	 * Get type
 	 *
-	 * @return int
+	 * @return IncomingType
 	 */
 	public function getType()
 	{
@@ -153,11 +154,9 @@ class Incoming
 	}
 
 	/**
-	 * Set type
+	 * @param IncomingType $type
 	 *
-	 * @param integer $type
-	 *
-	 * @return Incoming
+	 * @return $this
 	 */
 	public function setType($type)
 	{

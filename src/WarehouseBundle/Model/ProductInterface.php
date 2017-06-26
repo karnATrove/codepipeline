@@ -11,6 +11,7 @@ interface ProductInterface
     const PRODUCT_STATUS_DEFAULT = 1;
     const PRODUCT_STATUS_ACTIVE = 1;
     const PRODUCT_STATUS_DELETED = 0;
+    const PRODUCT_STATUS_INACTIVE = 2;
 
     /**
      * Returns the product unique id.

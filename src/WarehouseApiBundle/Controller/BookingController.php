@@ -87,28 +87,4 @@ class BookingController extends FOSRestController
 			return $view;
 		}
 	}
-
-	/**
-	 * Create new booking
-	 *
-	 * @Secure(roles="ROLE_API")
-	 * @ApiDoc(
-	 *   resource = "Booking",
-	 *   description = "Create new booking",
-	 *   statusCodes = {
-	 *     201 = "Created",
-	 *     400 = "Failed",
-	 *     500 = "Error"
-	 *   }
-	 * )
-	 *
-	 * @param integer $id booking id
-	 *
-	 * @return View
-	 */
-	public function postBookingsAction(Request $request)
-	{
-		$view = View::create();
-		return $view;
-	}
 }

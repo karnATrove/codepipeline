@@ -8,3 +8,6 @@ services:
     rove_site_rest_api.manager.container_manager:
         class: RoveSiteRestApiBundle\Manager\ContainerManager
         arguments: ['@service_container']
+    rove_site_rest_api.manager.product_manager:
+        class: RoveSiteRestApiBundle\Manager\ProductManager
+        arguments: ['@service_container']

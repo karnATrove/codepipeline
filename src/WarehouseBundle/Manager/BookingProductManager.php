@@ -46,7 +46,7 @@ class BookingProductManager
 				return self::STATUS_CODE_CLOSED;
 				break;
 			default:
-				throw new ManagerException("Can't find match status code");
+				throw new ManagerException("Can't find match item status code");
 				break;
 		}
 	}

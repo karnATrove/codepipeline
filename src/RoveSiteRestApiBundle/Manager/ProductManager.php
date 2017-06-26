@@ -25,7 +25,12 @@ class ProductManager extends BaseManager
 		$this->PRODUCT_URL = $this->roveSiteUrl . $container->getParameter('rove_site.api.url.product');
 	}
 
-
+	/**
+	 * @param string $sku
+	 *
+	 * @return ProductDto
+	 * @throws RoveSiteApiException
+	 */
 	public function get(string $sku)
 	{
 		$timestamp = time();
