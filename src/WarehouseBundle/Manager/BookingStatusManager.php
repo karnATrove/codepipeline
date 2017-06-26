@@ -3,18 +3,12 @@
 namespace WarehouseBundle\Manager;
 
 
+use Rove\CanonicalDto\Booking\BookingDto;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\ManagerException;
 
 class BookingStatusManager extends BaseManager
 {
-	const STATUS_CODE_DELETED = "DEL";
-	const STATUS_CODE_AWAITING_FORWARD = "AWAT";
-	const STATUS_CODE_ACCEPTED = "ACPT";
-	const STATUS_CODE_PICKED = "PICK";
-	const STATUS_CODE_PACKED = "PACK";
-	const STATUS_CODE_SHIPPED = "SHIP";
-
 	/**
 	 * get status code from status id
 	 *
@@ -27,22 +21,22 @@ class BookingStatusManager extends BaseManager
 	{
 		switch ($statusId) {
 			case Booking::STATUS_DELETED:
-				return self::STATUS_CODE_DELETED;
+				return BookingDto::STATUS_CODE_DELETED;
 				break;
 			case Booking::STATUS_AWAITING_FORWARD:
-				return self::STATUS_CODE_AWAITING_FORWARD;
+				return BookingDto::STATUS_CODE_AWAITING_FORWARD;
 				break;
 			case Booking::STATUS_ACCEPTED:
-				return self::STATUS_CODE_ACCEPTED;
+				return BookingDto::STATUS_CODE_ACCEPTED;
 				break;
 			case Booking::STATUS_PICKED:
-				return self::STATUS_CODE_PICKED;
+				return BookingDto::STATUS_CODE_PICKED;
 				break;
 			case Booking::STATUS_PACKED:
-				return self::STATUS_CODE_PACKED;
+				return BookingDto::STATUS_CODE_PACKED;
 				break;
 			case Booking::STATUS_SHIPPED:
-				return self::STATUS_CODE_SHIPPED;
+				return BookingDto::STATUS_CODE_SHIPPED;
 				break;
 			default:
 				throw new ManagerException("Can't find match status code");
