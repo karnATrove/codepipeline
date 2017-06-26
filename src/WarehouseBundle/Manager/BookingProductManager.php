@@ -18,6 +18,7 @@ class BookingProductManager
 	const STATUS_CODE_PENDING = "PEND";
 	const STATUS_CODE_IN_PROGRESS = "PROG";
 	const STATUS_CODE_PICKED = "PICK";
+	const STATUS_CODE_CLOSED = "CLOS";
 
 	/**
 	 * @param $statusId
@@ -40,6 +41,9 @@ class BookingProductManager
 				break;
 			case BookingProduct::STATUS_IN_PROGRESS:
 				return self::STATUS_CODE_IN_PROGRESS;
+				break;
+			case BookingProduct::STATUS_CLOSED:
+				return self::STATUS_CODE_CLOSED;
 				break;
 			default:
 				throw new ManagerException("Can't find match status code");

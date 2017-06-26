@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Rove\CanonicalDto\Response\ResponseDto;
 use Rove\CanonicalDto\Response\ResponseErrorDto;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +24,8 @@ class BookingController extends FOSRestController
 	 *   description = "Get Bookings",
 	 *     statusCodes = {
 	 *     200 = "Returned when successful",
-	 *     404 = "Returned when the booking is not found"
+	 *     404 = "Returned when the booking is not found",
+	 *     500 = "Error"
 	 *   }
 	 * )
 	 *
@@ -53,7 +53,8 @@ class BookingController extends FOSRestController
 	 *   description = "Return an booking identified by unique id",
 	 *   statusCodes = {
 	 *     200 = "Returned when successful",
-	 *     404 = "Returned when the booking is not found"
+	 *     404 = "Returned when the booking is not found",
+	 *     500 = "Error"
 	 *   }
 	 * )
 	 *
@@ -71,14 +72,14 @@ class BookingController extends FOSRestController
 			}
 			$booking = $booking[0];
 			$bookingDto = BookingMapper::mapToDto($booking);
-			$responseDto = new ResponseDto("success", null, $bookingDto);
 			$view = View::create();
-			$view->setData($responseDto)->setStatusCode(Response::HTTP_OK);
+			$view->setData($bookingDto)->setStatusCode(Response::HTTP_OK);
 			return $view;
 		} catch (ApiException $apiException) {
 			$errorDto = new ResponseErrorDto($apiException->getHttpCode(), "Error", $apiException->getMessage());
 			$view = View::create();
 			$view->setData($errorDto)->setStatusCode(Response::HTTP_NOT_FOUND);
+			return $view;
 		} catch (\Exception $exception) {
 			$errorDto = new ResponseErrorDto(Response::HTTP_INTERNAL_SERVER_ERROR, "Error", $exception->getMessage());
 			$view = View::create();

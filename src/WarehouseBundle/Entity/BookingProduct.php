@@ -20,6 +20,7 @@ class BookingProduct
 	const STATUS_PENDING=1;
 	const STATUS_IN_PROGRESS=2;
 	const STATUS_PICKED=3;
+	const STATUS_CLOSED=4;
 
 	//endregion
 
