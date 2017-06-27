@@ -83,7 +83,7 @@ class IncomingWorkflow extends BaseWorkflow
 	public function getIndexContent()
 	{
 		$incoming = $this->incomingManager->findBy([], ['id' => 'desc']);
-		$content = $this->templating->render('incoming/_index_incoming_detail.html.twig', [
+		$content = $this->templating->render('WarehouseBundle::Incoming/_index_incoming_detail.html.twig', [
 			'incoming' => $incoming
 		]);
 		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',

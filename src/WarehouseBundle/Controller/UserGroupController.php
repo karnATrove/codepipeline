@@ -22,7 +22,7 @@ class UserGroupController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		$userGroups = $em->getRepository('WarehouseBundle:UserGroup')->findAll();
-		return $this->render('user/user_group_list.html.twig', [
+		return $this->render('WarehouseBundle::User/user_group_list.html.twig', [
 			'userGroups' => $userGroups
 		]);
 	}
@@ -35,7 +35,7 @@ class UserGroupController extends Controller
 		if (!$userGroup) {
 			throw new \Exception('not found');
 		}
-		return $this->render('user/user_group_view.html.twig', [
+		return $this->render('WarehouseBundle::User/user_group_view.html.twig', [
 			'userGroup' => $userGroup
 		]);
 	}
@@ -56,7 +56,7 @@ class UserGroupController extends Controller
 			return $this->redirectToRoute('user_group_list');
 		}
 
-		return $this->render('user/user_group_create.html.twig', [
+		return $this->render('WarehouseBundle::User/user_group_create.html.twig', [
 			'form' => $form->createView(),
 		]);
 	}

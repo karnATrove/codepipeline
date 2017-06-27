@@ -30,7 +30,7 @@ class ProductController extends Controller
         list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($products, $pagerHtml) = $this->paginator($queryBuilder, $request);
         
-        return $this->render('product/index.html.twig', array(
+        return $this->render('WarehouseBundle::Product/index.html.twig', array(
             'products' => $products,
             'pagerHtml' => $pagerHtml,
             'filterForm' => $filterForm->createView(),

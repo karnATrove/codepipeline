@@ -46,7 +46,7 @@ class ProductController extends Controller
         list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($products, $pagerHtml) = $this->paginator($queryBuilder, $request);
 
-        return $this->render('product/index.html.twig', array(
+        return $this->render('WarehouseBundle::Product/index.html.twig', array(
             'products' => $products,
             'pagerHtml' => $pagerHtml,
             'filterForm' => $filterForm->createView(),
@@ -153,9 +153,9 @@ class ProductController extends Controller
         // Paginator - view
         $view = new TwitterBootstrap3View();
         $pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-            'proximity' => 3,
-            'prev_message' => 'previous',
-            'next_message' => 'next',
+            'proximity' => 2,
+            'prev_message' => '<',
+            'next_message' => '>',
         ));
 
         return array($entities, $pagerHtml);
@@ -195,7 +195,7 @@ class ProductController extends Controller
                 $this->get('session')->getFlashBag()->add('error', 'Product model already exists '. $existing->getId());
             }
         }
-        return $this->render('product/new.html.twig', array(
+        return $this->render('WarehouseBundle::Product/new.html.twig', array(
             'product' => $product,
             'form'   => $form->createView(),
         ));
@@ -236,7 +236,7 @@ class ProductController extends Controller
                 $this->get('session')->getFlashBag()->add('error', $error );
             }
         }
-        return $this->render('product/edit.html.twig', array(
+        return $this->render('WarehouseBundle::Product/edit.html.twig', array(
             'product' => $product,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),

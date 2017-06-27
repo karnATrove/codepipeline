@@ -127,7 +127,7 @@ class ScanController extends Controller
                 ), 400);
         }
 
-        return $this->render('scan/index.html.twig', array(
+        return $this->render('WarehouseBundle::Scan/index.html.twig', array(
             'form' => $form->createView(),
         ));
     }

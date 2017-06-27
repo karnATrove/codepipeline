@@ -79,7 +79,7 @@ class BookingCommentWorkflow extends BaseWorkflow
 		$ajaxCommands[] = new AjaxCommandDTO('#date-modified .value', AjaxCommandDTO::OP_HTML,
 			$booking->getModified()->format('Y-m-d h:i A'));
 		$ajaxCommands[] = new AjaxCommandDTO('.booking_comments', AjaxCommandDTO::OP_APPEND,
-			'<li>' . $this->templating->render('booking_comment/comment.html.twig',
+			'<li>' . $this->templating->render('WarehouseBundle::BookingComment/comment.html.twig',
 				['comment' => $bookingComment]) . '</li>');
 		$ajaxCommands[] = new AjaxCommandDTO('.booking_comments .remove', AjaxCommandDTO::OP_REMOVE);
 		return $ajaxCommands;
@@ -117,6 +117,6 @@ class BookingCommentWorkflow extends BaseWorkflow
 	 */
 	public function getMessageBagView()
 	{
-		return $this->templating->render("booking_comment/_message_bag.html.twig");
+		return $this->templating->render("WarehouseBundle::BookingComment/_message_bag.html.twig");
 	}
 }

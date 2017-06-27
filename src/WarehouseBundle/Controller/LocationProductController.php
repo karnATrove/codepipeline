@@ -59,7 +59,7 @@ class LocationProductController extends Controller
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('location_product_edit', array('id' => $locationProduct->getId()));
         }
-        return $this->render('location_product/edit.html.twig', array(
+        return $this->render('WarehouseBundle::LocationProduct/edit.html.twig', array(
             'locationProduct' => $locationProduct,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),

@@ -122,7 +122,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 	{
 		$incomingProductScans = $this->incomingProductScanManager
 			->orderIncomingProductScanBySkuAndModified($incoming->getIncomingScannedProducts());
-		$resp = $this->templating->render("incoming/products_scanned_rows.html.twig", [
+		$resp = $this->templating->render("WarehouseBundle::Incoming/products_scanned_rows.html.twig", [
 			'scannedProducts' => $incomingProductScans,
 			'incoming' => $incoming,
 			'isComplete' => IncomingManager::isComplete($incoming),
@@ -136,7 +136,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 	 */
 	public function getMessageBagView()
 	{
-		return $this->templating->render("incoming/products_scanned_form_message_bag.html.twig");
+		return $this->templating->render("WarehouseBundle::Incoming/products_scanned_form_message_bag.html.twig");
 	}
 
 	/**

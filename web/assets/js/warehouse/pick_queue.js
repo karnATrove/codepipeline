@@ -19,8 +19,8 @@ $(function () {
  */
 function ajaxUpdatePickQueue(currentElement) {
 	var value = currentElement.val();
-	var location = currentElement.parents('td').data('location');
-	var original = currentElement.parents('td').data('original');
+	var location = currentElement.parents('td, div.item').data('location');
+	var original = currentElement.parents('td, div.item').data('original');
 	/*
 	var data = $(currentElement).parents('form').serialize();
 	data.quantity = value;
@@ -29,7 +29,7 @@ function ajaxUpdatePickQueue(currentElement) {
 	var data = {'quantity': value,'original': original};
 
 	$.ajax({
-		url: currentElement.parents('td').data('url'),
+		url: currentElement.parents('td, div.item').data('url'),
 		data: data,
 		type: 'POST',
 		dataType: 'json',
@@ -70,7 +70,7 @@ function ajaxUpdatePickQueue(currentElement) {
 			}
 		},
 		complete: function () {
-			$("td[data-location='"+location+"'] input").attr('readonly',false);
+			$("td[data-location='"+location+"'] input, , div.item[data-location='"+location+"'] input").attr('readonly',false);
 		}
 	});
 }

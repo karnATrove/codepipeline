@@ -25,7 +25,7 @@ class UserController extends Controller
 	public function indexAction(Request $request)
 	{
 		$users = $this->container->get('warehouse.manager.user_manager')->getAllUsers();
-		return $this->render('user/user_list.html.twig', [
+		return $this->render('WarehouseBundle::User/user_list.html.twig', [
 			'users' => $users
 		]);
 	}
@@ -38,7 +38,7 @@ class UserController extends Controller
 		if (!$user) {
 			throw new Exception('not found');
 		}
-		return $this->render('user/user_view.html.twig', [
+		return $this->render('WarehouseBundle::User/user_view.html.twig', [
 			'user' => $user,
 		]);
 	}
@@ -59,7 +59,7 @@ class UserController extends Controller
 			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
 			return $this->redirectToRoute('user_view', ['id' => $user->getId()]);
 		}
-		return $this->render('user/user_create.html.twig', [
+		return $this->render('WarehouseBundle::User/user_create.html.twig', [
 			'form' => $form->createView(),
 		]);
 	}
@@ -77,7 +77,7 @@ class UserController extends Controller
 			$userGroupIds = $form->get('userGroup')->getData();
 			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
 		}
-		return $this->render('user/user_edit.html.twig', [
+		return $this->render('WarehouseBundle::User/user_edit.html.twig', [
 			'form' => $form->createView()
 		]);
 	}

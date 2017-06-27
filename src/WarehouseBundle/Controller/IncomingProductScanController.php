@@ -34,7 +34,7 @@ class IncomingProductScanController extends Controller
 			->getByIncoming($incoming);
 		$locations = $this->get('warehouse.manager.location_manager')->getLocations();
 		$locationDropdownList = LocationManager::toArray($locations);
-		return $this->render('incoming/products_scanned.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/products_scanned.html.twig', [
 			'incoming' => $incoming,
 			'scannedProducts' => $scannedProducts,
 			'locationDropdownList' => $locationDropdownList,

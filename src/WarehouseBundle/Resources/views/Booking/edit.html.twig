@@ -1,0 +1,167 @@
+{% extends 'WarehouseBundle::layout.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - booking
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Edit Booking #{{ booking.orderNumber }} <span class="glyphicon glyphicon-eye-open"
+                                                              aria-hidden="true"></span></h3>
+        </div>
+        <div class="title_right"></div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
+
+    <div class="row">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            {% include 'WarehouseBundle:Booking:_edit_booking_products.html.twig' %}
+            {{ render(controller('WarehouseBundle:BookingComment:view',{'id':booking.id})) }}
+            {{ render(controller('WarehouseBundle:BookingFile:create',{'id':booking.id})) }}
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2><i class="fa fa-eye"></i> Order Information
+                        <small>Contact details</small>
+                    </h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content">
+                    <div class="row">
+
+                        <div class="col-xs-12">
+                            <ul class="row stats-overview">
+                                <li id="days-since" class="col-xs-12 col-sm-4">
+                                    <span class="name"> Days since creation </span>
+                                    <span class="value text-success">{{ booking.created|days_since() }}</span>
+                                </li>
+                                <li id="date-noted" class="col-xs-12 col-sm-4">
+                                    {% if booking.shipped %}
+                                        <span class="name"> Shipped date </span>
+                                        <span class="value text-success"> {{ booking.shipped|date('Y-m-d h:i A') }} </span>
+                                    {% elseif booking.futureship %}
+                                        <span class="name"> Future ship date </span>
+                                        <span class="value text-success"> {{ booking.futureship|date('Y-m-d') }} </span>
+                                    {% else %}
+                                        <span class="name"> Created date </span>
+                                        <span class="value text-success"> {{ booking.created|date('Y-m-d h:i A') }} </span>
+                                    {% endif %}
+                                </li>
+                                <li id="date-modified" class="col-xs-12 col-sm-4">
+                                    <span class="name"> Last updated </span>
+                                    <span class="value text-success"> {% if booking.modified %}{{ booking.modified|date('Y-m-d h:i A') }}{% else %}never{% endif %} </span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {% include 'WarehouseBundle:Booking:_edit_booking_info.html.twig' %}
+
+                        <div class="col-xs-12">
+                            <section class="panel">
+                                <div class="x_title">
+                                    <h2>Consignee information
+                                        <small class="btn btn-success btn-xs">{% if booking.contact and booking.contact.isResidential %}Residential{% else %}Commercial{% endif %}</small>
+                                    </h2>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="project_detail">
+                                        {% if booking.contact %}
+                                            <div class="col-xs-12 col-sm-6">
+                                                <p class="title">Company</p>
+                                                <p>{{ booking.contact.company }}</p>
+                                                <p class="title">Consignee Name</p>
+                                                <p>{{ booking.contact.name }}</p>
+                                                <p class="title">Communication methods</p>
+                                                <ul class="list-unstyled">
+                                                    {% for com in booking.contact.communications %}
+                                                        <li>{% if com.type == 'PHONE' %}<i
+                                                                    class="fa fa-phone"></i>{% elseif com.type == 'EMAIL' %}
+                                                                <i class="fa fa-envelope"></i>{% else %}<i
+                                                                    class="fa fa-home"></i>{% endif %}
+                                                            {{ com.value }}
+                                                            {% if com.id == booking.contact.defaultCom %} (default){% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6">
+                                                <p class="title">Consignee Address</p>
+                                                <pre>{{ bookingUtil.formatContactAddress(booking.contact) }}</pre>
+                                            </div>
+                                        {% else %}
+                                            <p>There is no booking consignee.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+                <!-- end x_content -->
+            </div>
+            <!-- end x_panel -->
+
+            <!-- Log -->
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Log
+                        <small>Latest events with this booking.</small>
+                    </h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                    <div class="row">
+
+                        <div class="table-responsive col-xs-12">
+                            {% include 'WarehouseBundle:BookingProductLog:log_table.html.twig' with {'bookingLogs': bookingLogs} %}
+                            <a href="{{ path('log_booking',{'id':booking.id}) }}">View entire log</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+
+
+    <div class="form-group">
+        <a class="btn btn-default" href="{{ path('booking') }}">
+            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+            Back to list
+        </a>
+        <a class="btn btn-info" href="{{ path('booking_new') }}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            New
+        </a>
+        <form action="{{ path('booking_delete', { 'id': booking.id }) }}" method="post"
+              style="display: inline-block; vertical-align:middle;">
+            <input type="hidden" name="_method" value="DELETE"/>
+            {{ form_widget(delete_form) }}
+            <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure');">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                Delete
+            </button>
+        </form>
+    </div>
+    <!-- Modals -->
+    {% include 'WarehouseBundle:BookingProduct:picking/picking_modal.html.twig' %}
+{% endblock %}

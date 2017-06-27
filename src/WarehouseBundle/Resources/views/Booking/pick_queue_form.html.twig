@@ -11,7 +11,7 @@
         </div>
     </div>
 
-
+    {#
     {{ form_widget(form._token) }}
     <table class="table table-bordered">
         <thead>
@@ -42,3 +42,45 @@
         </tbody>
     </table>
     {{ form_rest(form) }}
+    #}
+
+
+
+    <div class="row featurette" style="border:1px solid #f7f7f7;">
+        <div class="col-xs-6 col-sm-2 heading">SKU</div>
+        <div class="col-xs-3 col-sm-2 heading">Asked</div>
+        <div class="col-xs-3 col-sm-2 heading">Staged</div>
+        <div class="col-xs-4 col-sm-2 heading hidden-xs">Locations</div>
+        <div class="col-xs-4 col-sm-2 heading hidden-xs">Available</div>
+        <div class="col-xs-4 col-sm-2 heading hidden-xs">Staged</div>
+        {% for itemDTO in form.items %}
+            <span class="item">
+                {% for itemLocationDTO in itemDTO.itemLocations %}
+                    {% if loop.first %}
+                        <div class="col-xs-6 col-sm-2 item">
+                            {{ itemDTO.vars.value.sku }}
+                        </div>
+                        <div class="col-xs-3 col-sm-2 item">
+                            {{ itemDTO.vars.value.orderedQuantity }}
+                        </div>
+                        <div class="col-xs-3 col-sm-2 item">
+                            {{ itemDTO.vars.value.quantityStaged }}
+                        </div>
+                    {% else %}
+                        <div class="col-xs-6 col-sm-2 item hidden-xs">&nbsp;</div>
+                        <div class="col-xs-3 col-sm-2 item hidden-xs">&nbsp;</div>
+                        <div class="col-xs-3 col-sm-2 item hidden-xs">&nbsp;</div>
+                    {% endif %}
+                    <div class="col-xs-6 col-sm-2 item fixed {% if loop.last %}sub-last{% endif %}">
+                        {{ itemLocationDTO.vars.value.printLocation }}
+                    </div>
+                    <div class="col-xs-3 col-sm-2 item fixed {% if loop.last %}sub-last{% endif %}">
+                        {{ itemLocationDTO.vars.value.quantity }}
+                    </div>
+                    <div class="col-xs-3 col-sm-2 item fixed {% if loop.last %}sub-last{% endif %}" data-url="{{ path('booking_pick_queue_edit_ajax',{'id':itemLocationDTO.vars.value.id}) }}" data-location="{{ itemLocationDTO.vars.value.id }}" data-original="{{ itemLocationDTO.vars.value.quantityStaged }}">
+                        {{ form_widget(itemLocationDTO) }}
+                    </div>
+                {% endfor %}
+            </span>
+        {% endfor %}
+    </div>

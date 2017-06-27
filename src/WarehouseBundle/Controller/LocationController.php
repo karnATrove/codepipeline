@@ -45,7 +45,7 @@ class LocationController extends Controller
 		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
 		list($locations, $pagerHtml) = $this->paginator($queryBuilder, $request);
 
-		return $this->render('location/index.html.twig', array(
+		return $this->render('WarehouseBundle::Location/index.html.twig', array(
 			'locations' => $locations,
 			'pagerHtml' => $pagerHtml,
 			'filterForm' => $filterForm->createView(),
@@ -170,7 +170,7 @@ class LocationController extends Controller
 
 
 
-		$html = $this->renderView('@warehouse/Location/pdf/labels.html.twig', [
+		$html = $this->renderView('WarehouseBundle::Location/pdf/labels.html.twig', [
 			'locations' => $runlocations,
 			//'locationBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $locationBarCode),
 		]);
@@ -286,9 +286,9 @@ class LocationController extends Controller
 		// Paginator - view
 		$view = new TwitterBootstrap3View();
 		$pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-			'proximity' => 3,
-			'prev_message' => 'previous',
-			'next_message' => 'next',
+			'proximity' => 2,
+			'prev_message' => '<',
+			'next_message' => '>',
 		));
 
 		return array($entities, $pagerHtml);
@@ -326,7 +326,7 @@ class LocationController extends Controller
 				$this->get('session')->getFlashBag()->add('error', 'Location already exists '. $existing->getId());
 			}
 		}
-		return $this->render('location/new.html.twig', array(
+		return $this->render('WarehouseBundle::Location/new.html.twig', array(
 			'location' => $location,
 			'form'   => $form->createView(),
 		));
@@ -367,7 +367,7 @@ class LocationController extends Controller
 //            $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
 //            return $this->redirectToRoute('location_edit', array('id' => $location->getId()));
 		}
-		return $this->render('location/edit.html.twig', array(
+		return $this->render('WarehouseBundle::Location/edit.html.twig', array(
 			'location' => $location,
 			'edit_form' => $editForm->createView(),
 			'delete_form' => $deleteForm->createView(),

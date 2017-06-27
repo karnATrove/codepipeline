@@ -39,7 +39,7 @@ class LogController extends Controller
         //list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($log_entries, $pagerHtml) = $this->paginator($queryBuilder, $request, $product);
 
-        return $this->render('log/product.html.twig', array(
+        return $this->render('WarehouseBundle::Log/product.html.twig', array(
             'product' => $product,
             'log_entries' => $log_entries,
             'pagerHtml' => $pagerHtml,
@@ -106,7 +106,7 @@ class LogController extends Controller
         //list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($log_entries, $pagerHtml) = $this->bookingLogPaginator($queryBuilder, $request, $booking);
 
-        return $this->render('log/booking.html.twig', array(
+        return $this->render('WarehouseBundle::Log/booking.html.twig', array(
             'booking' => $booking,
             'log_entries' => $log_entries,
             'pagerHtml' => $pagerHtml,

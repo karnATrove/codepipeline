@@ -48,7 +48,7 @@ class IncomingController extends Controller
 			$request->query->getInt('page', 1),
 			$numberPerPage
 		);
-		return $this->render('incoming/index.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/index.html.twig', [
 			'pagination' => $pagination,
 			'keyword' => $keyword,
 			'isComplete' => $isComplete,
@@ -150,7 +150,7 @@ class IncomingController extends Controller
 				return $this->redirectToRoute('incoming');
 			return $this->redirectToRoute('incoming_new_import', ['id' => $incoming->getId()]);
 		}
-		return $this->render('incoming/new.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/new.html.twig', [
 			'incoming' => $incoming,
 			'form' => $form->createView(),
 		]);
@@ -296,7 +296,7 @@ class IncomingController extends Controller
 			return $this->redirectToRoute('incoming_products',
 				['incoming_id' => $incoming->getId()]);
 		}
-		return $this->render('incoming/import.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/import.html.twig', [
 			'incoming' => $incoming,
 			'form' => $form->createView(),
 		]);
@@ -324,7 +324,7 @@ class IncomingController extends Controller
 			$this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
 			return $this->redirectToRoute('incoming_edit', ['id' => $incoming->getId()]);
 		}
-		return $this->render('incoming/edit.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/edit.html.twig', [
 			'incoming' => $incoming,
 			'edit_form' => $editForm->createView(),
 			'delete_form' => $deleteForm->createView(),
