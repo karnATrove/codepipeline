@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingFile;
 use WarehouseBundle\Entity\IncomingProduct;
+use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingType;
 use WarehouseBundle\Model\Incoming\IncomingSearchModel;
@@ -94,6 +95,8 @@ class IncomingController extends Controller
 		$searchModel = new IncomingSearchModel();
 		$searchModel->setEtaStartDate($start);
 		$searchModel->setEtaEndDate($end);
+		$searchModel->setScheduledStartDate($start);
+		$searchModel->setScheduledEndDate($end);
 		$incomingList = $this->get('warehouse.manager.incoming_manager')
 			->searchContainers($searchModel, false);
 		$data = [];
@@ -106,7 +109,24 @@ class IncomingController extends Controller
 				$start = $incoming->getEta()->format('Y-m-d H:i:s');
 			}
 
-			$color = $isScheduled ? "#169F85" : "#f0ad4e";
+			switch ($incoming->getStatus()->getId()) {
+				case IncomingStatus::INBOUND:
+					$color = $isScheduled ? "#337ab7" :"rgba(51, 122, 183, 0.79)";
+					break;
+				case IncomingStatus::COMPLETED:
+					$color = "#A4A4A4";
+					break;
+				case IncomingStatus::ARRIVED:
+					$color = "rgba(38, 185, 154, 0.88)";
+					break;
+				case IncomingStatus::DELETED:
+					$color = "#424242";
+					break;
+				default:
+					$color = "#f0ad4e";
+					break;
+			}
+
 
 			$end = date('Y-m-d H:i:s', strtotime($start . " +1 hour"));
 			$data[] = [
