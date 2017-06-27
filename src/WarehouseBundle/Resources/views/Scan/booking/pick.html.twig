@@ -34,7 +34,7 @@
                 <tr>
                   <th>&nbsp;</td>
                   <th>Model</th>
-                  <th>Description</th>
+                  <th class="hidden-xs">Description</th>
                   <th>Available</th>
                   <th>Ordered</th>
                   <th>Qty Picked</th>
@@ -52,7 +52,7 @@
                   <tr class="booking_product_row" data-product-id="{{ booking.products[loop.index0].id }}">
                     <td><a data-toggle="collapse" data-target=".inventory_for_{{ loop.index }}"><i class="fa fa-chevron-down show_inventory"></i></a></td>
                     <td>{{ booking.products[loop.index0].product.model }}</td>
-                    <td>{{ booking.products[loop.index0].product.description }}</td>
+                    <td class="hidden-xs">{{ booking.products[loop.index0].product.description }}</td>
                     <td>{{ qtyAvailable }} ({{ (qtyAvailable / booking.products[loop.index0].product.qtyPerCarton)|round(0,'ceil') }})</td>
                     <td>{{ booking.products[loop.index0].qty }}</td>
                     <td class="pickedQty">{{ picked_qty }}</td>

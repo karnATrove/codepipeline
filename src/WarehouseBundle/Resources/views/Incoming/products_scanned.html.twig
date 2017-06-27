@@ -30,17 +30,17 @@
         </div>
     </div>
 
-    {% include 'incoming/products_scanned_container_info.html.twig' with {'incoming':incoming} %}
+    {% include 'WarehouseBundle:Incoming:products_scanned_container_info.html.twig' with {'incoming':incoming} %}
 
     <!-- FORM -->
     <div id="scanned_form_wrap">
-        {% include 'incoming/products_scanned_form.html.twig'
+        {% include 'WarehouseBundle:Incoming:products_scanned_form.html.twig'
         with {'scannedProducts':scannedProducts, 'incoming':incoming,'locationDropdownList':locationDropdownList} %}
     </div>
     <!-- ENDFORM -->
 
     <div class="row">
-        {% include 'incoming/products_scanned_packing_list.html.twig'
+        {% include 'WarehouseBundle:Incoming:products_scanned_packing_list.html.twig'
         with {'incoming':incoming} %}
     </div>
 

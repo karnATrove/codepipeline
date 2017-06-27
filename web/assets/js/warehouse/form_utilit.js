@@ -19,12 +19,14 @@ $('[data-autorefresh="on"]').each(function() {
  */
 function autoRefresh($element,autoStart) {
 	if ($element.data('autourl') && $element.data('autoselector')) {
-		var $refresher = $('<a href="javascript:" class="refresh-toggle"></a>');
+		var $refresher = $('<a href="javascript:" class="refresh-toggle info-number"></a>');
 		if (autoStart) {
-			$refresher.append('<i class="fa fa-refresh btn btn-success"> on</i>');
+			//$refresher.append('<i class="fa fa-refresh btn btn-sm btn-success"> on</i>');
+			$refresher.append('<i class="fa fa-refresh"></i><span class="badge bg-green">On</span>');
 			autoRefreshOp($element,'init');
 		} else {
-			$refresher.append('<i class="fa fa-refresh btn btn-danger"> off</i>');
+			//$refresher.append('<i class="fa fa-refresh btn btn-sm btn-danger"> off</i>');
+			$refresher.append('<i class="fa fa-refresh"></i><span class="badge bg-red">Off</span>');
 			refreshPause = true;
 		}
 		
@@ -33,11 +35,11 @@ function autoRefresh($element,autoStart) {
 			if (refreshPause) {
 				refreshPause = false;
 				autoRefreshOp($element,'start');
-				$refresher.find('i').removeClass('btn-danger').addClass('btn-success').text(' on');
+				$refresher.find('span').removeClass('bg-red').addClass('bg-green').text('On');
 			} else {
 				refreshPause = true;
 				autoRefreshOp($element,'pause');
-				$refresher.find('i').removeClass('btn-success').addClass('btn-danger').text(' off');
+				$refresher.find('span').removeClass('bg-green').addClass('bg-red').text('Off');
 			}
 		});
 		$('#refresher').append($refresher);

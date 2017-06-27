@@ -34,7 +34,7 @@ class BookingReturnController extends Controller
         list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
         list($bookingReturns, $pagerHtml) = $this->paginator($queryBuilder, $request);
         
-        return $this->render('bookingreturn/index.html.twig', array(
+        return $this->render('WarehouseBundle::BookingReturn/index.html.twig', array(
             'bookingReturns' => $bookingReturns,
             'pagerHtml' => $pagerHtml,
             'filterForm' => $filterForm->createView(),
@@ -156,7 +156,7 @@ class BookingReturnController extends Controller
             $nextAction=  $request->get('submit') == 'save' ? 'return' : 'return_new';
             return $this->redirectToRoute($nextAction);
         }
-        return $this->render('bookingreturn/new.html.twig', array(
+        return $this->render('WarehouseBundle::BookingReturn/new.html.twig', array(
             'bookingReturn' => $bookingReturn,
             'form'   => $form->createView(),
         ));
@@ -172,7 +172,7 @@ class BookingReturnController extends Controller
     public function showAction(BookingReturn $bookingReturn)
     {
         $deleteForm = $this->createDeleteForm($bookingReturn);
-        return $this->render('bookingreturn/show.html.twig', array(
+        return $this->render('WarehouseBundle::BookingReturn/show.html.twig', array(
             'bookingReturn' => $bookingReturn,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -200,7 +200,7 @@ class BookingReturnController extends Controller
             $this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
             return $this->redirectToRoute('return_edit', array('id' => $bookingReturn->getId()));
         }
-        return $this->render('bookingreturn/edit.html.twig', array(
+        return $this->render('WarehouseBundle::BookingReturn/edit.html.twig', array(
             'bookingReturn' => $bookingReturn,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),

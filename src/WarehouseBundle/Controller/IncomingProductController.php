@@ -54,7 +54,7 @@ class IncomingProductController extends Controller
 			->where('ip.incoming = :incoming')
 			->setParameter('incoming', $incoming);
 
-		return $this->render('incoming/products.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/products.html.twig', [
 			'incoming' => $incoming,
 			'incomingProducts' => $queryBuilder->getQuery()->getResult(),
 		]);
@@ -117,7 +117,7 @@ class IncomingProductController extends Controller
 			else
 				return $this->redirectToRoute('incoming_product_new', ['incoming' => $incoming->getId()]);
 		}
-		return $this->render('incoming/product/new.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/product/new.html.twig', [
 			'incoming' => $incoming,
 			'form' => $form->createView(),
 		]);
@@ -144,7 +144,7 @@ class IncomingProductController extends Controller
 			$this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
 			return $this->redirectToRoute('incoming_product_edit', ['id' => $incomingProduct->getId()]);
 		}
-		return $this->render('incoming/product/edit.html.twig', [
+		return $this->render('WarehouseBundle::Incoming/product/edit.html.twig', [
 			'incomingProduct' => $incomingProduct,
 			'edit_form' => $editForm->createView(),
 			'delete_form' => $deleteForm->createView(),

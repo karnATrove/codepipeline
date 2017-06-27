@@ -55,7 +55,7 @@ class BookingCommentController extends Controller
 	public function viewAction(Booking $booking)
 	{
 		$commentForm = $this->get('warehouse.workflow.booking_comment_workflow')->generateCreateForm($booking);
-		return $this->render('booking_comment/form_panel.html.twig', [
+		return $this->render('WarehouseBundle::BookingComment/form_panel.html.twig', [
 			'booking' => $booking,
 			'comment_form' => $commentForm->createView(),
 		]);

@@ -21,7 +21,7 @@
 
     <div class="row">
         <div class="col-md-6 col-sm-6 col-xs-12">
-            {% include 'booking/_edit_booking_products.html.twig' %}
+            {% include 'WarehouseBundle:Booking:_edit_booking_products.html.twig' %}
             {{ render(controller('WarehouseBundle:BookingComment:view',{'id':booking.id})) }}
             {{ render(controller('WarehouseBundle:BookingFile:create',{'id':booking.id})) }}
         </div>
@@ -43,12 +43,12 @@
                     <div class="row">
 
                         <div class="col-xs-12">
-                            <ul class="stats-overview">
-                                <li id="days-since">
+                            <ul class="row stats-overview">
+                                <li id="days-since" class="col-xs-12 col-sm-4">
                                     <span class="name"> Days since creation </span>
                                     <span class="value text-success">{{ booking.created|days_since() }}</span>
                                 </li>
-                                <li id="date-noted">
+                                <li id="date-noted" class="col-xs-12 col-sm-4">
                                     {% if booking.shipped %}
                                         <span class="name"> Shipped date </span>
                                         <span class="value text-success"> {{ booking.shipped|date('Y-m-d h:i A') }} </span>
@@ -60,14 +60,14 @@
                                         <span class="value text-success"> {{ booking.created|date('Y-m-d h:i A') }} </span>
                                     {% endif %}
                                 </li>
-                                <li id="date-modified">
+                                <li id="date-modified" class="col-xs-12 col-sm-4">
                                     <span class="name"> Last updated </span>
                                     <span class="value text-success"> {% if booking.modified %}{{ booking.modified|date('Y-m-d h:i A') }}{% else %}never{% endif %} </span>
                                 </li>
                             </ul>
                         </div>
 
-                        {% include 'booking/_edit_booking_info.html.twig' %}
+                        {% include 'WarehouseBundle:Booking:_edit_booking_info.html.twig' %}
 
                         <div class="col-xs-12">
                             <section class="panel">

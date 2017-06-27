@@ -62,7 +62,7 @@ class BookingController extends Controller
 		}
 		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
 		list($bookings, $pagerHtml) = $this->paginator($queryBuilder, $request);
-		return $this->render('booking/index.html.twig', [
+		return $this->render('WarehouseBundle::Booking/index.html.twig', [
 			'bookings' => $bookings,
 			'pagerHtml' => $pagerHtml,
 			'filterForm' => $filterForm->createView(),
@@ -183,7 +183,7 @@ class BookingController extends Controller
 			$nextAction = $request->get('submit') == 'save' ? 'booking' : 'booking_new';
 			return $this->redirectToRoute($nextAction);
 		}
-		return $this->render('booking/new.html.twig', [
+		return $this->render('WarehouseBundle::Booking/new.html.twig', [
 			'booking' => $booking,
 			'form' => $form->createView(),
 		]);
@@ -292,7 +292,7 @@ class BookingController extends Controller
 		$bookingLogs = $this->getDoctrine()
 			->getRepository('WarehouseBundle:BookingLog')
 			->getLogByBooking($booking, 10);
-		return $this->render('booking/edit.html.twig', [
+		return $this->render('WarehouseBundle::Booking/edit.html.twig', [
 			'booking' => $booking,
 			'bookingLogs' => $bookingLogs,
 			'edit_form' => $editForm->createView(),
@@ -418,7 +418,7 @@ class BookingController extends Controller
 			$barCode = new barCode();
 			$barCode->savePath = $this->getBarcodeCachePath(false) . '/';
 			$orderBarCode = $barCode->getBarcodePNGPath(str_pad($booking->getOrderNumber(), 12, 0, STR_PAD_LEFT), 'C128', 1.75, 45);
-			$html = $this->renderView('booking/pdf/booking.html.twig', [
+			$html = $this->renderView('WarehouseBundle::Booking/pdf/booking.html.twig', [
 				'booking' => $booking,
 				'barcodePathAndFile' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
 				'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode)
@@ -483,7 +483,7 @@ class BookingController extends Controller
 			$product_barcodes[$product->getId()] = str_replace($this->get('kernel')->getRootDir() . '/../web', '', $barCode->getBarcodePNGPath($product->getProduct()->getModel(), 'C128', 1.5, 35));
 		}
 
-		$html = $this->renderView('booking/pdf/booking.html.twig', [
+		$html = $this->renderView('WarehouseBundle::Booking/pdf/booking.html.twig', [
 			'booking' => $booking,
 			'orderBarCodeSku' => 'BO' . str_pad($booking->getOrderNumber(), 10, 0, STR_PAD_LEFT),
 			'orderBarCode' => str_replace($this->get('kernel')->getRootDir() . '/../web', '', $orderBarCode),
@@ -508,7 +508,7 @@ class BookingController extends Controller
 		$pickSummaryDTO = $this->get('warehouse.manager.booking_manager')->getPickSummaryDTO($pickSummaryModel);
 		$bookings = $this->get('warehouse.manager.booking_manager')->getBookingByIdList($bookingIdList);
 		$viewData = BookingManager::formatPickSummaryForView($pickSummaryDTO);
-		$html = $this->renderView('booking/pdf/pick_summary.html.twig', [
+		$html = $this->renderView('WarehouseBundle::Booking/pdf/pick_summary.html.twig', [
 			'bookings' => $bookings,
 			'viewData' => $viewData]);
 		return new Response($html, 200);

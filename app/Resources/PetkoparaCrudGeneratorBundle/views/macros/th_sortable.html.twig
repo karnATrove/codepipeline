@@ -1,0 +1,13 @@
+{% macro th_sortable(colName, sortColumn, sortOrder, route, overrideTitle) %}
+    {% set iconDirection = sortOrder=='asc'?'down':'up' %}
+    {% set nextSortOrder = sortOrder=='asc'?'desc':'asc'%}
+    {% if colName == sortColumn %}
+        <a href="{{path(route ,app.request.query.all|merge({'pcg_sort_col': colName, 'pcg_sort_order': nextSortOrder})) }}">
+            {% if overrideTitle %}{{overrideTitle|capitalize}}{% else %}{{colName|capitalize}}{% endif %} <span class="glyphicon glyphicon-arrow-{{ iconDirection }}" aria-hidden="true"></span>
+        </a>
+    {% else %}
+        <a href="{{path(route ,app.request.query.all|merge({'pcg_sort_col': colName, 'pcg_sort_order':'asc'}) )}}">
+            {% if overrideTitle %}{{overrideTitle|capitalize}}{% else %}{{colName|capitalize}}{% endif %}
+        </a>
+    {% endif %}
+{% endmacro %}

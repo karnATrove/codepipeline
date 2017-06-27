@@ -13,13 +13,16 @@
         <ul class="list-unstyled timeline widget booking_comments">
             {% if booking.comments|length %}
                 {% for comment in booking.comments %}
-                    <li>{% include 'booking_comment/comment.html.twig' with {'comment': comment} %}</li>
+                    <li>{% include 'WarehouseBundle:BookingComment:comment.html.twig' with {'comment': comment} %}</li>
                 {% endfor %}
             {% else %}
                 <li class="remove">There are no comments associated with the booking.</li>
             {% endif %}
         </ul>
         <hr/>
+        <div class="booking-comment-message-bag-container">
+            {% include 'WarehouseBundle:BookingComment:_message_bag.html.twig' %}
+        </div>
         {{ form_start(comment_form, {'method':'POST','attr': {'class': 'ajaxForm','data-appendto':'.messages'}}) }}
         {% include 'WarehouseBundle:BookingComment:ajax_comment.html.twig' with {'form': comment_form, 'booking': booking} %}
         <p>

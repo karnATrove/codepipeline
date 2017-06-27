@@ -36,7 +36,7 @@ class MyAccountController extends Controller
 			$userManager->updateUser($user);
 		}
 
-		return $this->render('myaccount/my_account_edit.html.twig', [
+		return $this->render('WarehouseBundle::MyAccount/my_account_edit.html.twig', [
 			'form' => $form->createView(),
 		]);
 	}
