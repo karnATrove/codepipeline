@@ -27,6 +27,10 @@ class IncomingSearchModel
 	private $etaStartDate;
 	/** @var string|null $etaEndDate */
 	private $etaEndDate;
+	/** @var string|null $etaStartDate */
+	private $scheduledStartDate;
+	/** @var string|null $etaEndDate */
+	private $scheduledEndDate;
 
 	public function __construct()
 	{
@@ -162,6 +166,37 @@ class IncomingSearchModel
 		$this->etaEndDate = $etaEndDate;
 	}
 
+	/**
+	 * @return null|string
+	 */
+	public function getScheduledStartDate()
+	{
+		return $this->scheduledStartDate;
+	}
+
+	/**
+	 * @param null|string $scheduledStartDate
+	 */
+	public function setScheduledStartDate($scheduledStartDate)
+	{
+		$this->scheduledStartDate = $scheduledStartDate;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getScheduledEndDate()
+	{
+		return $this->scheduledEndDate;
+	}
+
+	/**
+	 * @param null|string $scheduledEndDate
+	 */
+	public function setScheduledEndDate($scheduledEndDate)
+	{
+		$this->scheduledEndDate = $scheduledEndDate;
+	}
 
 
 }

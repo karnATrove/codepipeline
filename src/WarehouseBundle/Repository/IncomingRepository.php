@@ -45,12 +45,24 @@ class IncomingRepository extends EntityRepository
 			$queryBuilder->addOrderBy("i.{$param}", $order);
 		}
 
-		if ($incomingSearchModel->getEtaStartDate()) {
-			$queryBuilder->andWhere("i.eta > :startDate")->setParameter('startDate', $incomingSearchModel->getEtaStartDate());
+		$searchEta = ($incomingSearchModel->getEtaStartDate() && $incomingSearchModel->getEtaEndDate()) ? true : false;
+		if ($searchEta) {
+			$queryBuilder->andWhere("i.eta > :startDate AND i.eta < :endDate")
+				->setParameter('startDate', $incomingSearchModel->getEtaStartDate())
+				->setParameter('endDate', $incomingSearchModel->getEtaEndDate());
 		}
 
-		if ($incomingSearchModel->getEtaEndDate()) {
-			$queryBuilder->andWhere("i.eta < :endDate")->setParameter('endDate', $incomingSearchModel->getEtaEndDate());
+		$searchSchedule = ($incomingSearchModel->getScheduledEndDate() && $incomingSearchModel->getScheduledStartDate()) ? true : false;
+		if ($searchSchedule) {
+			if ($searchEta){
+				$queryBuilder->orWhere("i.scheduled > :scheduledStartDate AND i.scheduled < :scheduledEndDate")
+					->setParameter('scheduledStartDate', $incomingSearchModel->getScheduledStartDate())
+					->setParameter('scheduledEndDate', $incomingSearchModel->getScheduledEndDate());
+			}else{
+				$queryBuilder->andWhere("i.scheduled > :scheduledStartDate AND i.scheduled < :scheduledEndDate")
+					->setParameter('scheduledStartDate', $incomingSearchModel->getScheduledStartDate())
+					->setParameter('scheduledEndDate', $incomingSearchModel->getScheduledEndDate());
+			}
 		}
 
 		if (!$incomingSearchModel->getLimit()) {
