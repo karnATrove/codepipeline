@@ -31,7 +31,7 @@ $(function () {
 			var bookings = $(this).find('input:checked');
 			var alreadyPrinted = [];
 			bookings.each(function(i, x) {
-				if($(x).data('printed') !== "" && $(x).data('printed') !== "0") {
+				if($(x).data('printed') !== "" && $(x).data('printed') != "0") {
 					alreadyPrinted.push($(x).data('order'));
 				}
 			});
