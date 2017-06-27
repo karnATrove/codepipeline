@@ -15,18 +15,8 @@
 
     <div class="clearfix"></div>
 
-    <div class="row">
-        <div class="col-md-12">
-            {% for type, flashMessages in app.session.flashbag.all() %} 
-            {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ type }} alert-dismissible fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                {{ flashMessage|raw }}
-            </div>
-             {% endfor %} 
-             {% endfor %} 
-        </div>
-    </div>
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
 
     <div class="row">
         <div class="col-xs-12">
@@ -42,10 +32,8 @@
                 <div class="x_content">
                     <!-- FILTERING -->
                     <form class="well" action="{{ path('location') }}" method="get" >
-                    <div class="col-md-12">
+                    <div class="col-xs-12">
                         <div  id="filters" class="collapse">
-
-                            
                                 <div class="row">
                                     <div class="col-md-4">{{ form_row(filterForm.aisle) }}</div>
                                     <div class="col-md-4">{{ form_row(filterForm.row) }}</div>
@@ -57,7 +45,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            
                         </div>
                     </div>
 
@@ -67,7 +54,7 @@
                     <div class="col-md-3 pull-left">
                         
                         <!-- PAGE SIZE -->
-                        <div class="pagination form-inline ">
+                        <div class="form-inline ">
                             <select class = "form-control"  onchange="window.location = this.value" >
                                 <option value='{{ path('location', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
                                 <option value='{{ path('location', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
@@ -86,7 +73,6 @@
                     </div>
 
                     <div class="col-md-3">
-
                             <a class="btn btn-primary h3 pull-right" href="{{ path('location_new') }}" style="margin-bottom:10px">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
                             </a>
@@ -96,13 +82,8 @@
                         </a>
                     </div>
 
-                    <div class="col-md-12">
-                        {%- if form_errors(filterForm) %}
-                        <div class="alert alert-block alert-error fade in form-errors">
-                            {{ form_errors(filterForm) }}
-                        </div>
-                        {% endif %}
-                    </div>
+                    <!-- Form Errors -->
+                    {% include 'default/form_errors.html.twig' with {'form':filterForm} %}
 
                     <form method="POST" id="bulk_form" action="{{ path('location_bulk_action') }} ">
                         <div class="row">
@@ -118,7 +99,7 @@
                                             <th>{{macros.th_sortable('row',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'location')}}</th>
                                             <th>{{macros.th_sortable('level',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'location')}}</th>
                                             <td>Entries</td>
-                                            <th width = "80px">List</th>
+                                            <th width="80px" class="hidden-xs">List</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -130,7 +111,7 @@
                                             <td>{{ location.row }}</td>
                                             <td>{{ location.level }}</td>
                                             <td>{{ location.products|length }}</td>
-                                            <td class="actions">
+                                            <td class="actions hidden-xs">
                                                 {#
                                                 <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('location_by_id_delete', { 'id': location.id}) }}">
                                                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
@@ -154,13 +135,17 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-4 pull-left">
-                                <div class="pagination form-inline ">
-                                    <select class = "form-control" name="bulk_action" >
-                                        <option value=""></option>
-                                        <option value="delete">DELETE</option>
-                                    </select>
-                                    <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                            <div class="col-xs-12 col-sm-4 pull-left">
+                                <div class="pagination form-inline col-xs-12">
+                                    <div class="form-group">
+                                        <select class = "form-control" name="bulk_action" >
+                                            <option value=""></option>
+                                            <option value="delete">DELETE</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled />
+                                    </div>
                                 </div>
                             </div>
 

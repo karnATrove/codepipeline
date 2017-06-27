@@ -108,21 +108,25 @@
                     <form class="" method="POST" id="bulk_form" action="{{ path('booking_bulk_action') }} ">
                         {% include 'WarehouseBundle:Booking:_index_booking_content.html.twig' with {'bookings':bookings} %}
                         <div class="row">
-                            <div class="col-md-4 pull-left">
-                                <div class="pagination form-inline ">
-                                    <select class="form-control" name="form[action]">
-                                        <option value="pickingOn">Picking Yes --> FLAG</option>
-                                        <option value="pickingOff">Picking No --> UNFLAG</option>
-                                        <option value="delete">Delete</option>
-                                        <optgroup label="PICKING">
-                                            <option value="pickSummary">Pick Summary</option>
-                                        </optgroup>
-                                        <optgroup label="PRINT">
-                                            <option value="printWithDocuments">Print w/ Documents</option>
-                                        </optgroup>
-                                    </select>
-                                    <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')"
-                                           class="form-control btn btn-danger btn-sm" disabled>
+                            <div class="col-xs-12 col-md-4 pull-left">
+                                <div class="pagination form-inline col-xs-12">
+                                    <div class="form-group">
+                                        <select class="form-control" name="form[action]">
+                                            <option value="pickingOn">Picking Yes --> FLAG</option>
+                                            <option value="pickingOff">Picking No --> UNFLAG</option>
+                                            <option value="delete">Delete</option>
+                                            <optgroup label="PICKING">
+                                                <option value="pickSummary">Pick Summary</option>
+                                            </optgroup>
+                                            <optgroup label="PRINT">
+                                                <option value="printWithDocuments">Print w/ Documents</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')"
+                                           class="form-control btn btn-danger btn-sm" disabled/>
+                                    </div>
                                 </div>
                             </div>
 

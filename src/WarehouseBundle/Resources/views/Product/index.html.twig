@@ -15,18 +15,8 @@
 
     <div class="clearfix"></div>
 
-    <div class="row">
-        <div class="col-md-12">
-            {% for type, flashMessages in app.session.flashbag.all() %} 
-            {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ type }} alert-dismissible fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                {{ flashMessage|raw }}
-            </div>
-             {% endfor %} 
-             {% endfor %} 
-        </div>
-    </div>
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
 
     <div class="row">
         <div class="col-xs-12">
@@ -42,30 +32,30 @@
                 <div class="x_content">
                     <!-- FILTERING -->
                     <form class="well" action="{{ path('product') }}" method="get" >
-                    <div class="col-md-12">
-                        {{ form_row(filterForm.model) }}
-                        <div  id="filters" class="collapse">
+                        <div class="col-md-12">
+                            {{ form_widget(filterForm.model, { attr: { placeholder: 'Model' }}) }}
+                            <div  id="filters" class="collapse">
 
-                                <div class="row">
-                                    <div class="col-xs-12 col-sm-6 col-md-4">
-                                        {{ form_row(filterForm.qtyPerCarton) }}
-                                    </div>
-                                    <div class="col-xs-12 col-sm-6 col-md-4">
-                                        {{ form_row(filterForm.status) }}
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-4">
+                                            {{ form_row(filterForm.qtyPerCarton) }}
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-4">
+                                            {{ form_row(filterForm.status, { attr: { placeholder: '# Per Carton'}}) }}
+                                        </div>
 
-                                    <div class="col-md-6">
-                                        {{ form_rest(filterForm) }}
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-warning" name="filter_action" value="filter"> <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</button>
-                                            <button type="submit" class="btn btn-default" name="filter_action" value="reset"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Reset</button>
+                                        <div class="col-xs-6">
+                                            {{ form_rest(filterForm) }}
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-warning" name="filter_action" value="filter"> <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</button>
+                                                <button type="submit" class="btn btn-default" name="filter_action" value="reset"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Reset</button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                            </div>
                         </div>
-                    </div>
                     </form>
                     <!-- END FILTERING -->
 
@@ -73,7 +63,7 @@
                     <div class="col-md-3 pull-left">
             
                         <!-- PAGE SIZE -->
-                        <div class="pagination form-inline ">
+                        <div class="form-inline ">
                             <select class = "form-control"  onchange="window.location = this.value" >
                                 <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>10</option>
                                 <option value='{{ path('product', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>20</option>
@@ -106,6 +96,9 @@
                         {% endif %}
                     </div>
 
+                    <!-- Form Errors -->
+                    {% include 'default/form_errors.html.twig' with {'form':filterForm} %}
+
                     <div class="row">
                         <div class="table-responsive col-md-12">
                             <form method="POST" id="bulk_form" action="{{ path('product_bulk_action') }} ">
@@ -114,25 +107,23 @@
                                     <tr>
                                         <th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>
 
-                                            {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
-                                            <!--<th>{{macros.th_sortable('id',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>-->
-                                            <th>{{macros.th_sortable('model',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('description',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('qtyPerCarton',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('qtyOnHand',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{'Allocated'}}</th>
-                                            <th>{{'Available'}}</th>
-                                            <th>{{'Locations'}}</th>
-                                            {#<th>{{macros.th_sortable('length',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('width',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('height',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('dimUnits',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('weight',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                                            <th>{{macros.th_sortable('weightUnits',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>#}
-                                            <th>{{macros.th_sortable('created',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
-                    
-                                       
-                                        <th width = "130px">List</th>
+                                        {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
+                                        <!--<th>{{macros.th_sortable('id',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>-->
+                                        <th>{{macros.th_sortable('model',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product', 'Model')}}</th>
+                                        <th class="hidden-xs">{{macros.th_sortable('description',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product', 'Description')}}</th>
+                                        <th>{{macros.th_sortable('qtyPerCarton',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product', 'Per Ctn')}}</th>
+                                        <th>{{macros.th_sortable('qtyOnHand',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product','On Hand')}}</th>
+                                        <th><span title="Allocated">Allo<span class="hidden-xs">cated</span></span></th>
+                                        <th><span title="Available">Avai<span class="hidden-xs">lable</span></span></th>
+                                        <th class="hidden-xs"><span title="Locations">Locations</span></th>
+                                        {#<th>{{macros.th_sortable('length',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
+                                        <th>{{macros.th_sortable('width',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
+                                        <th>{{macros.th_sortable('height',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
+                                        <th>{{macros.th_sortable('dimUnits',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
+                                        <th>{{macros.th_sortable('weight',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
+                                        <th>{{macros.th_sortable('weightUnits',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>#}
+                                        <th class="hidden-xs">{{macros.th_sortable('created',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product','Created')}}</th>
+                                        <th width = "130px" class="hidden-xs">List</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -143,21 +134,21 @@
                                         <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{product.id}}"/></td>
                                         <!--<td><a href="{{ path('product_edit', { 'id': product.id }) }}">{{ product.id }}</a></td>-->
                                         <td><a href="{{ path('product_edit', { 'id': product.id }) }}">{{ product.model }}</a></td>
-                                        <td>{{ product.description }}</td>
+                                        <td class="hidden-xs">{{ product.description }}</td>
                                         <td>{{ product.qtyPerCarton }}</td>
-                                        <td>{{ qtyonhand }} ({{ (qtyonhand / product.qtyPerCarton)|round(0,'ceil') }})</td>
+                                        <td>{{ qtyonhand }}</td>
                                         <td>{{ productUtil.getAllocated(product) }}</td>
                                         <td>{{ productUtil.getAvailable(product) }}</td>
-                                        <td>{{ product.locations|length }} {% if locationMap|length %}<ul>{% for location in locationMap %}<li>{{ location }}</li>{% endfor %}</ul>{% endif %}</td>
+                                        <td class="hidden-xs">{{ product.locations|length }} {% if locationMap|length %}<ul>{% for location in locationMap %}<li>{{ location }}</li>{% endfor %}</ul>{% endif %}</td>
                                         {#<td>{{ product.length }}</td>
                                         <td>{{ product.width }}</td>
                                         <td>{{ product.height }}</td>
                                         <td>{{ product.dimUnits }}</td>
                                         <td>{{ product.weight }}</td>
                                         <td>{{ product.weightUnits }}</td>#}
-                                        <td>{% if product.created %}{{ product.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+                                        <td class="hidden-xs">{% if product.created %}{{ product.created|date('Y-m-d H:i:s') }}{% endif %}</td>
                     
-                                        <td class="actions">
+                                        <td class="actions hidden-xs">
                                             <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('product_by_id_delete',  app.request.query.all|merge({'id':product.id})) }}">
                                                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                             </a>
@@ -176,12 +167,16 @@
                     </div> <!-- /#list -->
 
                     <div class="row">
-                        <div class="col-md-4 pull-left">
-                            <div class="pagination form-inline ">
-                                <select class = "form-control" name="bulk_action" >
-                                    <option value="delete">DELETE</option>
-                                </select>
-                                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                        <div class="col-xs-12 col-md-4 pull-left">
+                            <div class="pagination form-inline col-xs-12">
+                                <div class="form-group">
+                                    <select class = "form-control" name="bulk_action" >
+                                        <option value="delete">DELETE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled/>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6 col-md-offset-2 text-right">

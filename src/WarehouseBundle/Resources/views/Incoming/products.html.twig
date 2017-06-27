@@ -15,18 +15,8 @@
 
     <div class="clearfix"></div>
 
-    <div class="row">
-        <div class="col-md-12">
-            {% for type, flashMessages in app.session.flashbag.all() %} 
-            {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ type }} alert-dismissible fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                {{ flashMessage|raw }}
-            </div>
-             {% endfor %} 
-             {% endfor %} 
-        </div>
-    </div>
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
 
     <div class="row">
         <div class="col-xs-12">
@@ -52,7 +42,7 @@
                                             {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
                                             <th>{{ 'Model' }}</th>
                                             <th>{{ 'Qty Incoming' }}</th>
-                                            <th>{{ 'Qty Scanned' }}</th>
+                                            <th>{{ 'Qty Scan' }}</th>
                                        
                                         <th width = "130px">List</th>
                                     </tr>
@@ -90,27 +80,43 @@
                                 </tbody>
                                 </table>
                             </form>
+
+                            <hr />
+
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4 pull-left">
+                                    <div class="form-inline ">
+                                        <a class="btn btn-default" href="{{ path('incoming_edit',{'id':incoming.id}) }}">
+                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                            Back to {{ incoming.name }}
+                                        </a>
+                                        <a class="btn btn-info" href="{{ path('incoming_product_new', {'incoming':incoming.id}) }}">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                            <span class="hidden-xs">New</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr />
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4 pull-left">
+                                    <div class="form-inline col-xs-12">
+                                        <div class="form-group">
+                                            <select class="form-control" name="bulk_action" >
+                                                <option value="delete">DELETE</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!-- /#bottom -->
                         </div>
                     </div> <!-- /#list -->
 
-                    <div class="row">
-                        <div class="col-md-4 pull-left">
-                            <div class="pagination form-inline ">
-                                <a class="btn btn-default" href="{{ path('incoming_edit',{'id':incoming.id}) }}">
-                                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                                    Back to {{ incoming.name }}
-                                </a>
-                                <a class="btn btn-info" href="{{ path('incoming_product_new', {'incoming':incoming.id}) }}">
-                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                                    New
-                                </a>
-                                <select class = "form-control" name="bulk_action" >
-                                    <option value="delete">DELETE</option>
-                                </select>
-                                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="bulk_form" class="form-control btn btn-danger btn-sm" disabled>
-                            </div>
-                        </div>
-                    </div> <!-- /#bottom -->
+                    
                 </div>
             </div>
 
@@ -142,7 +148,7 @@
                             <tbody>
                                 {% for file in incoming.files %}
                                 <tr>
-                                    <td><a href="{{ asset('uploads/imports/' ~ file.filepath) }}">{{ file.filepath }}</a></td>
+                                    <td><a href="{{ asset('uploads/imports/' ~ file.filepath) }}"><span class="hidden-xs">{{ file.filepath }}</span><span class="visible-xs">{{ file.filepath|slice(0, 8) }}</span></a></td>
                                     <td>{{ file.created|date('Y-m-d H:i:s A') }}</td>
                                     <td class="actions">
                                         <a  onclick="return confirm('Are you sure!');" title='Re-import' class="btn btn-primary btn-sm" href="{{ path('incoming_import_file', app.request.query.all|merge({'incoming':incoming.id,'id':file.id})) }}">

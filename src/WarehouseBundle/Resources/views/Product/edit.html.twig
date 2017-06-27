@@ -15,19 +15,8 @@
 
     <div class="clearfix"></div>
 
-    <div class="row">
-        <div class="col-md-12">
-            {% for type, flashMessages in app.session.flashbag.all() %} 
-            {% for flashMessage in flashMessages %}
-            <div class="alert alert-{{ type }} alert-dismissible fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                {{ flashMessage|raw }}
-            </div>
-             {% endfor %} 
-             {% endfor %} 
-        </div>
-    </div>
-
+    <!-- Flash messaging -->
+    {% include 'default/flash_messaging.html.twig' %}
     
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-6">
@@ -77,12 +66,16 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 pull-left">
-                            <div class="pagination form-inline ">
-                                <select class = "form-control" name="bulk_action" >
-                                    <option value="delete">DELETE</option>
-                                </select>
-                                <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="location_product_bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                        <div class="col-xs-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <select class="form-control" name="bulk_action" >
+                                        <option value="delete">DELETE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" id='bulkSubmitBtn' onclick="return confirm('Are you sure?')" form="location_product_bulk_form" class="form-control btn btn-danger btn-sm" disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +93,7 @@
             <!-- End Locations -->
 
             <!-- Product edit -->
-        <div class="x_panel">
+            <div class="x_panel">
                 <div class="x_title">
                   <h2>{{ product.model }} <small>Product information</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
@@ -110,39 +103,42 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
+                    <!-- Form Errors -->
+                    {% include 'default/form_errors.html.twig' with {'form':edit_form} %}
+
                     {{ form_start(edit_form) }}
                     <div class="row">
 
                         <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(edit_form.model) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.model) %}item bad{% endif %}">
                                 {{ form_label(edit_form.model) }}
                                 {{ form_widget(edit_form.model) }}
                             </div>
                         </div>
 
                         <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(edit_form.status) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.status) %}item bad{% endif %}">
                                 {{ form_label(edit_form.status) }}
                                 {{ form_widget(edit_form.status) }}
                             </div>
                         </div>
 
                         <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(edit_form.description) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.description) %}item bad{% endif %}">
                                 {{ form_label(edit_form.description) }}
                                 {{ form_widget(edit_form.description) }}
                             </div>
                         </div>
 
                         <div class="col-xs-12 col-sm-6">
-                            <div class="form-group {% if form_errors(edit_form.qtyPerCarton) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.qtyPerCarton) %}item bad{% endif %}">
                                 {{ form_label(edit_form.qtyPerCarton) }}
                                 {{ form_widget(edit_form.qtyPerCarton) }}
                             </div>
                         </div>
 
                         <div class="col-xs-6 col-sm-3">
-                            <div class="form-group {% if form_errors(edit_form.length) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.length) %}item bad{% endif %}">
                                 {{ form_label(edit_form.length) }}
                                 {{ form_widget(edit_form.length) }}
                             </div>
@@ -157,7 +153,7 @@
                         </div>
 
                         <div class="col-xs-6 col-sm-3">
-                            <div class="form-group {% if form_errors(edit_form.height) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.height) %}item bad{% endif %}">
                                 {{ form_label(edit_form.height) }}
                                 {{ form_widget(edit_form.height) }}
                             </div>
@@ -171,14 +167,14 @@
                         </div>
 
                         <div class="col-xs-6 col-sm-3">
-                            <div class="form-group {% if form_errors(edit_form.weight) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.weight) %}item bad{% endif %}">
                                 {{ form_label(edit_form.weight) }}
                                 {{ form_widget(edit_form.weight) }}
                             </div>
                         </div>
 
                         <div class="col-xs-6 col-sm-3">
-                            <div class="form-group {% if form_errors(edit_form.weightUnits) %}item bad{% endif %}"">
+                            <div class="form-group {% if form_errors(edit_form.weightUnits) %}item bad{% endif %}>
                                 {{ form_label(edit_form.weightUnits) }}
                                 {{ form_widget(edit_form.weightUnits) }}
                             </div>
@@ -187,8 +183,6 @@
                         <div class="col-xs-12 col-sm-6">
                             {{ form_rest(edit_form) }}
                         </div>
-
-                        
 
                     </div>
                     <hr />
@@ -225,10 +219,10 @@
                                 <table class="table table-striped jambo_table" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
-                                            <th>{{ 'Order Number' }}</th>
+                                            <th>{{ 'Order #' }}</th>
                                             <th>{{ 'Qty' }}</th>
                                             <th>{{ 'Picked' }}</th>
-                                            <th>{{ 'PickSummaryItemDTO Status' }}</th>
+                                            <th>{{ 'Status' }}</th>
                                             <th class="hidden-xs">{{ 'Last Picked' }}</th>
                                             <th width="60px">List</th>
                                         </tr>
@@ -269,10 +263,10 @@
                                 <table class="table table-striped jambo_table" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
-                                            <th>{{ 'Order Number' }}</th>
+                                            <th>{{ 'Order #' }}</th>
                                             <th>{{ 'Qty' }}</th>
                                             <th>{{ 'Picked' }}</th>
-                                            <th>{{ 'PickSummaryItemDTO Status' }}</th>
+                                            <th>{{ 'Status' }}</th>
                                             <th class="hidden-xs">{{ 'Last Picked' }}</th>
                                             <th width="60px">List</th>
                                         </tr>
@@ -312,10 +306,10 @@
                                 <table class="table table-striped jambo_table" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
-                                            <th>{{ 'Order Number' }}</th>
+                                            <th>{{ 'Order #' }}</th>
                                             <th>{{ 'Qty' }}</th>
                                             <th>{{ 'Picked' }}</th>
-                                            <th>{{ 'PickSummaryItemDTO Status' }}</th>
+                                            <th>{{ 'Status' }}</th>
                                             <th class="hidden-xs">{{ 'Last Picked' }}</th>
                                             <th width="60px">List</th>
                                         </tr>
@@ -357,12 +351,12 @@
                                     <thead>
                                         <tr>
                                             <th>{{ 'Name' }}</th>
-                                            <th>{{ 'Type' }}</th>
+                                            <th class="hidden-xs">{{ 'Type' }}</th>
                                             <th>{{ 'Qty' }}</th>
                                             <th>{{ 'Scanned' }}</th>
                                             <th>{{ 'Status' }}</th>
                                             <th class="hidden-xs">{{ 'ETA' }}</th>
-                                            <th width="60px">List</th>
+                                            <th width="60px" class="hidden-xs">List</th>
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -286,9 +286,9 @@ class LocationController extends Controller
 		// Paginator - view
 		$view = new TwitterBootstrap3View();
 		$pagerHtml = $view->render($pagerfanta, $routeGenerator, array(
-			'proximity' => 3,
-			'prev_message' => 'previous',
-			'next_message' => 'next',
+			'proximity' => 2,
+			'prev_message' => '<',
+			'next_message' => '>',
 		));
 
 		return array($entities, $pagerHtml);
