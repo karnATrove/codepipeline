@@ -6,6 +6,7 @@ namespace WarehouseApiBundle\Mapper\Product;
 use Rove\CanonicalDto\Product\ProductDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Manager\ProductManager;
 
 class ProductMapper
 {
@@ -20,21 +21,15 @@ class ProductMapper
 		$product = new Product();
 		$product->setModel($productItemDto->getSku());
 		$product->setDescription($productDto->getDescription());
-		$quantityPerCarton = $productItemDto->getPackageQuantity()??$productDto->getPackageQuantity();
-		$product->setQtyPerCarton($quantityPerCarton);
-		$length = $productItemDto->getLength()??$productDto->getLength();
-		$product->setLength($length);
-		$width = $productItemDto->getWidth()??$productDto->getWidth();
-		$product->setWidth($width);
-		$height = $productItemDto->getHeight()??$productDto->getHeight();
-		$product->setHeight($height);
+		$product->setQtyPerCarton($productItemDto->getPackageQuantity());
+		$dimension = ProductManager::getProductItemDimensionFromProductItemDto($productItemDto);
+		$product->setLength($dimension->getLength());
+		$product->setWidth($dimension->getWidth());
+		$product->setHeight($dimension->getHeight());
 		//use length unit as dimension unit for now
-		$lengthUnit = $productItemDto->getLengthUnit()??$productDto->getLengthUnit();
-		$product->setDimUnits($lengthUnit);
-		$weight = $productItemDto->getWeight()??$productDto->getWeight();
-		$product->setWeight($weight);
-		$weightUnit = $productItemDto->getWidthUnit()??$productDto->getWeightUnit();
-		$product->setWeightUnits($weightUnit);
+		$product->setDimUnits($dimension->getLengthUnit());
+		$product->setWeight($dimension->getWeight());
+		$product->setWeightUnits($dimension->getWeightUnit());
 		return $product;
 	}
 }

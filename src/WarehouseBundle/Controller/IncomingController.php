@@ -2,6 +2,7 @@
 
 namespace WarehouseBundle\Controller;
 
+use Rove\CanonicalDto\Container\ContainerUpdateDto;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -111,7 +112,7 @@ class IncomingController extends Controller
 
 			switch ($incoming->getStatus()->getId()) {
 				case IncomingStatus::INBOUND:
-					$color = $isScheduled ? "#337ab7" :"rgba(51, 122, 183, 0.79)";
+					$color = $isScheduled ? "#337ab7" : "rgba(51, 122, 183, 0.79)";
 					break;
 				case IncomingStatus::COMPLETED:
 					$color = "#A4A4A4";
@@ -336,10 +337,22 @@ class IncomingController extends Controller
 		$editForm->handleRequest($request);
 
 		if ($editForm->isSubmitted() && $editForm->isValid()) {
-			$em = $this->getDoctrine()->getManager();
-			$incoming->setModified(new \DateTime());
-			$em->persist($incoming);
-			$em->flush();
+			try {
+				$em = $this->getDoctrine()->getManager();
+				$incoming->setModified(new \DateTime());
+				$em->persist($incoming);
+
+				$containerUpdateDto = new ContainerUpdateDto();
+				$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
+				$containerUpdateDto->setName($incoming->getName());
+				$containerUpdateDto->setScheduledArrivalTime($incoming->getScheduled());
+				$this->container->get('rove_site_rest_api.manager.container_manager')
+					->update($containerUpdateDto, $incoming->getName());
+				$em->flush();
+			} catch (\Exception $exception) {
+				$this->get('session')->getFlashBag()->add('error', "Error! {$exception->getMessage()}");
+				return $this->redirectToRoute('incoming_edit', ['id' => $incoming->getId()]);
+			}
 
 			$this->get('session')->getFlashBag()->add('success', 'Edited Successfully!');
 			return $this->redirectToRoute('incoming_edit', ['id' => $incoming->getId()]);

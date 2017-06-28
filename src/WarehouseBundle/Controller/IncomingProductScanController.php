@@ -161,8 +161,7 @@ class IncomingProductScanController extends Controller
 			$form = $request->get('scannedProduct');
 
 			//if receive force submit, we don't want update roveconcepts
-			$forceSubmit = $request->get('forceSubmit');
-			$updateRove = $forceSubmit ? false : true;
+			$updateRove = $request->get('forceSubmit') ? false : true;
 
 			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
 				->completeProductScan($incoming, $form, $updateRove);
