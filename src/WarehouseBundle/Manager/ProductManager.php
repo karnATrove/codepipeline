@@ -11,14 +11,14 @@ namespace WarehouseBundle\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Rove\CanonicalDto\Product\ProductDto;
+use Rove\CanonicalDto\Product\ProductItemDimensionDot;
 use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Exception\Manager\ManagerException;
 
-class ProductManager
+class ProductManager extends BaseManager
 {
 	private $productRepository;
-	private $em;
 
 	/**
 	 * ProductManager constructor.
@@ -27,8 +27,27 @@ class ProductManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		$this->em = $entityManager;
+		parent::__construct($entityManager);
 		$this->productRepository = $entityManager->getRepository('WarehouseBundle:Product');
+	}
+
+	/**
+	 * @param ProductItemDto $productItemDto
+	 *
+	 * @return null|ProductItemDimensionDot
+	 */
+	public static function getProductItemDimensionFromProductItemDto(ProductItemDto $productItemDto)
+	{
+		$dimensions = $productItemDto->getDimensions();
+		if (empty($dimension)) {
+			return null;
+		}
+		foreach ($dimensions as $dimension) {
+			if ($dimension->getType() == ProductItemDimensionDot::TYPE_PRODUCT) {
+				return $dimension;
+			}
+		}
+		return $dimensions[0];
 	}
 
 	/**
@@ -83,7 +102,7 @@ class ProductManager
 	public function updateProduct(Product $product, $entityManager = null, $user = null)
 	{
 		$flush = $entityManager ? false : true;
-		$entityManager = $entityManager ? $entityManager : $this->em;
+		$entityManager = $entityManager ? $entityManager : $this->entityManager;
 		if ($user) {
 			$product->setUser($user);
 		}
