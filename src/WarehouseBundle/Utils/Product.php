@@ -104,10 +104,18 @@ class Product
     public function getOnHand(\WarehouseBundle\Entity\Product $product) {
         $onHand = 0;
         foreach($product->getLocations() as $location) {
-            $onHand += $location->getOnHand();
+            $onHand += $location;
         }
-	    $onHand += $this->getAllocated($product);
         return $onHand;
+    }
+
+	/**
+	 * @param ProductEntity $product
+	 *
+	 * @return mixed
+	 */
+    public function getOnHold(\WarehouseBundle\Entity\Product $product){
+    	return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getOnHoldQuantityByProduct($product);
     }
 
     /**
@@ -155,7 +163,7 @@ class Product
 	 * @return [type]                                   [description]
 	 */
 	public function getAvailableByProduct(\WarehouseBundle\Entity\Product $product) {
-		return $this->getOnHand($product) - $this->getAllocated($product);
+		return $this->getOnHand($product) - $this->getOnHold($product);
 	}
 
     /**
