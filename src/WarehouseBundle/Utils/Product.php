@@ -2,12 +2,10 @@
 namespace WarehouseBundle\Utils;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use WarehouseBundle\Entity\Product as ProductEntity;
 use WarehouseBundle\Model\ProductInterface;
 use WarehouseBundle\Model\ProductManagerInterface;
-use WarehouseBundle\Entity\Product as ProductEntity;
-use WarehouseBundle\Entity\LocationProduct as LocationProductEntity;
 
 class Product
 {
@@ -108,6 +106,7 @@ class Product
         foreach($product->getLocations() as $location) {
             $onHand += $location->getOnHand();
         }
+	    $onHand += $this->getAllocated($product);
         return $onHand;
     }
 
