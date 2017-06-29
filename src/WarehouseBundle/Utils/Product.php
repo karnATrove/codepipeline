@@ -104,7 +104,7 @@ class Product
     public function getOnHand(\WarehouseBundle\Entity\Product $product) {
         $onHand = 0;
         foreach($product->getLocations() as $location) {
-            $onHand += $location;
+            $onHand += $location->getOnHand();
         }
         return $onHand;
     }
