@@ -109,14 +109,14 @@ class Product
         return $onHand;
     }
 
-	/**
-	 * @param ProductEntity $product
-	 *
-	 * @return mixed
-	 */
-    public function getOnHold(\WarehouseBundle\Entity\Product $product){
-    	return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getOnHoldQuantityByProduct($product);
-    }
+//	/**
+//	 * @param ProductEntity $product
+//	 *
+//	 * @return mixed
+//	 */
+//    public function getOnHold(\WarehouseBundle\Entity\Product $product){
+//    	return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getOnHoldQuantityByProduct($product);
+//    }
 
     /**
      * Get allocated quantity
@@ -163,7 +163,7 @@ class Product
 	 * @return [type]                                   [description]
 	 */
 	public function getAvailableByProduct(\WarehouseBundle\Entity\Product $product) {
-		return $this->getOnHand($product) - $this->getOnHold($product);
+		return $this->getOnHand($product) - $this->getAllocated($product);
 	}
 
     /**

@@ -113,8 +113,9 @@
                                         <th class="hidden-xs">{{macros.th_sortable('description',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product', 'Description')}}</th>
                                         <th>{{macros.th_sortable('qtyPerCarton',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product', 'Per Ctn')}}</th>
                                         <th>{{macros.th_sortable('qtyOnHand',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product','On Hand')}}</th>
-                                        <th><span title="Allocated">Allo<span class="hidden-xs">cated</span></span></th>
-                                        <th><span title="Available">Avai<span class="hidden-xs">lable</span></span></th>
+                                        <th><span title="Allocated">Allocated</span></th>
+                                        <th><span title="Picked">Picked</span></th>
+                                        <th><span title="Available">Available</span></th>
                                         <th class="hidden-xs"><span title="Locations">Locations</span></th>
                                         {#<th>{{macros.th_sortable('length',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
                                         <th>{{macros.th_sortable('width',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'product')}}</th>
@@ -138,6 +139,7 @@
                                         <td>{{ product.qtyPerCarton }}</td>
                                         <td>{{ qtyonhand }}</td>
                                         <td>{{ productUtil.getAllocated(product) }}</td>
+                                        <td>{{ productUtil.getPicked(product) }}</td>
                                         <td>{{ productUtil.getAvailable(product) }}</td>
                                         <td class="hidden-xs">{{ product.locations|length }} {% if locationMap|length %}<ul>{% for location in locationMap %}<li>{{ location }}</li>{% endfor %}</ul>{% endif %}</td>
                                         {#<td>{{ product.length }}</td>

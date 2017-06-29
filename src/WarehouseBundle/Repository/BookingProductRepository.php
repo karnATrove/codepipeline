@@ -22,21 +22,21 @@ class BookingProductRepository extends \Doctrine\ORM\EntityRepository
 	 *
 	 * @return     <type>                           The allocated by product.
 	 */
-	public function getAllocatedQuantityByProduct(\WarehouseBundle\Entity\Product $product)
-	{
-		return $this->createQueryBuilder('op')
-			->andWhere('op.product = :product')
-			->andWhere('op.status IN (:status)')
-			->join('WarehouseBundle:Booking', 'b', 'WITH', 'op.booking = b.id')
-			->andWhere('b.status IN (:booking_status)')
-			->setParameter('product', $product)
-			->setParameter('status', [1, 2, 3, 4])# Allow all except deleted (closed is okay since booking status below will filter out shipped)
-			->setParameter('booking_status', [1, 2, 3, 4])# TODO: Verify with art these statuses (All excepted deleted and shipped (0 & 5))
-			->select('COALESCE(SUM(op.qty),0) as quantity')
-			->setMaxResults(1)
-			->getQuery()
-			->getSingleScalarResult();
-	}
+//	public function getAllocatedQuantityByProduct(\WarehouseBundle\Entity\Product $product)
+//	{
+//		return $this->createQueryBuilder('op')
+//			->andWhere('op.product = :product')
+//			->andWhere('op.status IN (:status)')
+//			->join('WarehouseBundle:Booking', 'b', 'WITH', 'op.booking = b.id')
+//			->andWhere('b.status IN (:booking_status)')
+//			->setParameter('product', $product)
+//			->setParameter('status', [1, 2, 3, 4])# Allow all except deleted (closed is okay since booking status below will filter out shipped)
+//			->setParameter('booking_status', [1, 2, 3, 4])# TODO: Verify with art these statuses (All excepted deleted and shipped (0 & 5))
+//			->select('COALESCE(SUM(op.qty),0) as quantity')
+//			->setMaxResults(1)
+//			->getQuery()
+//			->getSingleScalarResult();
+//	}
 
 	/**
 	 * Get on hold product quantity by product
@@ -45,7 +45,7 @@ class BookingProductRepository extends \Doctrine\ORM\EntityRepository
 	 *
 	 * @return mixed
 	 */
-	public function getOnHoldQuantityByProduct(Product $product)
+	public function getAllocatedQuantityByProduct(Product $product)
 	{
 		return $this->createQueryBuilder('op')
 			->andWhere('op.product = :product')
