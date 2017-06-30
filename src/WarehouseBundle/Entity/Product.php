@@ -3,6 +3,7 @@
 namespace WarehouseBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use WarehouseBundle\Model\ProductInterface;
@@ -426,7 +427,7 @@ class Product implements ProductInterface
 	/**
 	 * Get locations
 	 *
-	 * @return \Doctrine\Common\Collections\Collection
+	 * @return Collection|LocationProduct[]
 	 */
 	public function getLocations()
 	{
@@ -460,7 +461,7 @@ class Product implements ProductInterface
 	/**
 	 * Get incoming
 	 *
-	 * @return \Doctrine\Common\Collections\Collection
+	 * @return Collection
 	 */
 	public function getIncoming()
 	{

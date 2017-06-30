@@ -2,12 +2,10 @@
 namespace WarehouseBundle\Utils;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use WarehouseBundle\Entity\Product as ProductEntity;
 use WarehouseBundle\Model\ProductInterface;
 use WarehouseBundle\Model\ProductManagerInterface;
-use WarehouseBundle\Entity\Product as ProductEntity;
-use WarehouseBundle\Entity\LocationProduct as LocationProductEntity;
 
 class Product
 {
@@ -110,6 +108,15 @@ class Product
         }
         return $onHand;
     }
+
+//	/**
+//	 * @param ProductEntity $product
+//	 *
+//	 * @return mixed
+//	 */
+//    public function getOnHold(\WarehouseBundle\Entity\Product $product){
+//    	return $this->container->get("doctrine")->getRepository('WarehouseBundle:BookingProduct')->getOnHoldQuantityByProduct($product);
+//    }
 
     /**
      * Get allocated quantity
