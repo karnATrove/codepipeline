@@ -32,7 +32,8 @@ class LocationProductType extends AbstractType
                     ->orderBy('l.aisle,l.row + 0,l.level');
                 },
             ))
-            ->add('onHand',IntegerType::class,array('attr'=>array('placeholder'=>'Enter input qty','min'=>1,'max'=>10000)))
+            ->add('onHand',IntegerType::class,array('attr'=>array('placeholder'=>'Enter input qty','min'=>0,'max'=>10000)))
+            ->add('staged',IntegerType::class,array('attr'=>array('placeholder'=>'Enter input qty','min'=>0,'max'=>10000)))
         ;
     }
     

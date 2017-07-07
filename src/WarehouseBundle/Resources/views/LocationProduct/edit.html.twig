@@ -44,23 +44,31 @@
                     {{ form_start(edit_form) }}
                     <div class="row">
 
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-4">
                             <div class="form-group {% if form_errors(edit_form.location) %}item bad{% endif %}"">
                                 {{ form_label(edit_form.location) }}
                                 {{ form_widget(edit_form.location) }}
                             </div>
                         </div>
 
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-4">
                             <div class="form-group {% if form_errors(edit_form.onHand) %}item bad{% endif %}"">
                                 {{ form_label(edit_form.onHand) }}
                                 {{ form_widget(edit_form.onHand) }}
                             </div>
                         </div>
 
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="form-group {% if form_errors(edit_form.onHand) %}item bad{% endif %}"">
+                                {{ form_label(edit_form.staged) }}
+                                {{ form_widget(edit_form.staged) }}
+                            </div>
+                        </div>
+
                         {{ form_rest(edit_form) }}
 
                     </div>
+
                     <hr />
 
                     <p>

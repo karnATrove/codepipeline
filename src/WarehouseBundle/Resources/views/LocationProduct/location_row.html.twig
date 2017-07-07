@@ -1,9 +1,11 @@
 <tr id="location_{{ locationProduct.location.id }}">
     <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();' class="check-all" value="{{locationProduct.id}}"/></td>
-    <td>{{ locationProduct.location.aisle }}</td>
-    <td>{{ locationProduct.location.row }}</td>
-    <td>{{ locationProduct.location.level }}</td>
+    <td class="visible-xs">{{ locationProduct.location.aisle }}-{{ locationProduct.location.row }}-{{ locationProduct.location.level }}</td>
+    <td class="hidden-xs">{{ locationProduct.location.aisle }}</td>
+    <td class="hidden-xs">{{ locationProduct.location.row }}</td>
+    <td class="hidden-xs">{{ locationProduct.location.level }}</td>
     <td>{{ locationProduct.onHand }} ({{ (locationProduct.onHand / locationProduct.product.qtyPerCarton)|round(0,'ceil') }})</td>
+    <td>{{ locationProduct.staged }}</td>
     <td class="hidden-xs">{%- if locationProduct.modified %}{{ locationProduct.modified|date('Y-m-d H:i:s') }}{% else %}never{% endif %}</td>
     <td class="actions">
         <a  onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm" href="{{ path('location_product_by_id_delete', { 'id': locationProduct.id}) }}">
