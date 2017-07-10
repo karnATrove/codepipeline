@@ -3,7 +3,7 @@
 namespace WarehouseBundle\Utils;
 
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MessagePrinter
 {
