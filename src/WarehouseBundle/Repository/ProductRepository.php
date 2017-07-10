@@ -80,4 +80,26 @@ class ProductRepository extends EntityRepository
 		return isset($results[0]) ? $results[0]['quantity'] : 0;
 	}
 
+	/**
+	 * Identify if there is an 'onHand' amount greater then 'Staged'.
+	 * This is bad and can be caused by transferring stock from one location to another.
+	 */
+	public function isDefunct(Product $product) {
+		$query = $this->getEntityManager()->createQuery(
+			'SELECT
+			  SUM(lp.onHand) AS hand,
+			  (SELECT SUM(lpp.staged) FROM WarehouseBundle:LocationProduct lpp WHERE lpp.product = lp.product) as x
+			 FROM WarehouseBundle:LocationProduct lp 
+			 INNER JOIN WarehouseBundle:Location l WITH l = lp.location
+			 INNER JOIN WarehouseBundle:Product p WITH p = lp.product
+
+			 WHERE p.id = :product
+			 GROUP BY lp.product
+			 HAVING x < hand'
+		)->setParameter('product',$product);
+
+		$results = $query->getResult();
+		return isset($results[0]) ? TRUE : FALSE;
+	}
+
 }

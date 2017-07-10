@@ -58,6 +58,8 @@ $(document).ready(function() {
 	    		dials.parents('td').find('select').val('').change();
 	    		dials.parents('td').find('.diallink>a').text("Select Location");
 	    		$('.dialabs').addClass('hide');
+	    	} else if ($(this).data('op') == 'nil') {
+	    		
 	    	} else {
 		    	if ($(this).data('val')) {
 		    		index = $(this).data('val');
@@ -74,6 +76,10 @@ $(document).ready(function() {
 	    		$('.dialabs').removeClass('only-levels').removeClass('only-aisles').addClass('only-rows');
 	    	} else if (dialstring.match(/^[A-Z]\s-\s[0-9]{1,2}$/)) {
 	    		// second
+	    		number.append(' - ');
+	    		$('.dialabs').removeClass('only-aisles').removeClass('only-rows').addClass('only-levels');
+	    	} else if (dialstring.match(/^[A-Z]\s-\s([0-9]{1,2}|[A-Z]+)$/)) {
+	    		// X - STAGING....
 	    		number.append(' - ');
 	    		$('.dialabs').removeClass('only-aisles').removeClass('only-rows').addClass('only-levels');
 	    	} else if (dialstring.match(/^[A-Z]\s-\s([0-9]{1,2}|[A-Z]+)\s-\s[0-9]{1}/)) {

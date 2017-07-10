@@ -43,12 +43,14 @@
                                         <tr>
                                             <th width="20px"><input type="checkbox" class="check-all" onclick="toggleAll(this)"></th>
                                             {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
-                                            <th>{{ 'Aisle' }}</th>
-                                            <th>{{ 'Row' }}</th>
-                                            <th>{{ 'Level' }}</th>
+                                            <th class="visible-xs">{{ 'Location' }}</th>
+                                            <th class="hidden-xs">{{ 'Aisle' }}</th>
+                                            <th class="hidden-xs">{{ 'Row' }}</th>
+                                            <th class="hidden-xs">{{ 'Level' }}</th>
                                             <th>{{ 'Qty' }}</th>
+                                            <th>{{ 'Stg' }}</th>
                                             <th class="hidden-xs">{{ 'Modified' }}</th>
-                                            <th width="100px">List</th>
+                                            <th width="80px">List</th>
                                         </tr>
                                     </thead>
                                     <tbody>

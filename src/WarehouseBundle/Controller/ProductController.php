@@ -217,6 +217,10 @@ class ProductController extends Controller
         $editForm = $this->createForm('WarehouseBundle\Form\ProductType', $product);
         $editForm->handleRequest($request);
 
+        if ($em->getRepository('WarehouseBundle:Product')->isDefunct($product)) {
+            $this->get('session')->getFlashBag()->add('error', 'Product Defunct: Staged is lower then the on hand amount in a staged location.');
+        }
+
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             # Log the save
             $log = new ProductLog();
