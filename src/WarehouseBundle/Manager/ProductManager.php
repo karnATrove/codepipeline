@@ -12,6 +12,7 @@ namespace WarehouseBundle\Manager;
 use Doctrine\ORM\EntityManagerInterface;
 use Rove\CanonicalDto\Product\ProductDto;
 use Rove\CanonicalDto\Product\ProductItemDimensionDot;
+use Rove\CanonicalDto\Product\ProductItemDimensionDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Exception\Manager\ManagerException;
@@ -34,7 +35,7 @@ class ProductManager extends BaseManager
 	/**
 	 * @param ProductItemDto $productItemDto
 	 *
-	 * @return null|ProductItemDimensionDot
+	 * @return null|ProductItemDimensionDto
 	 */
 	public static function getProductItemDimensionFromProductItemDto(ProductItemDto $productItemDto)
 	{
@@ -43,7 +44,7 @@ class ProductManager extends BaseManager
 			return null;
 		}
 		foreach ($dimensions as $dimension) {
-			if ($dimension->getType() == ProductItemDimensionDot::TYPE_PRODUCT) {
+			if ($dimension->getType() == ProductItemDimensionDto::TYPE_PRODUCT) {
 				return $dimension;
 			}
 		}

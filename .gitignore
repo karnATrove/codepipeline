@@ -45,3 +45,4 @@ gen
 /.jshintrc
 /bower_components/
 /web/js/
+/composer.lock
