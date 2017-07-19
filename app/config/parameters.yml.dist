@@ -27,3 +27,4 @@ parameters:
     rove_site.api.url.comment: /order-comment
     rove_site.api.url.container: /container
     rove_site.api.url.product: /product
+    rove_site.api.url.productItem: /product-item
