@@ -11,18 +11,30 @@ use WarehouseBundle\Manager\ProductManager;
 class ProductMapper
 {
 	/**
-	 * @param ProductDto     $productDto
+     * Map product to production
 	 * @param ProductItemDto $productItemDto
 	 *
 	 * @return Product
 	 */
-	public static function mapDtoToEntity(ProductDto $productDto, ProductItemDto $productItemDto)
+	public static function mapDtoToEntity(ProductItemDto $productItemDto)
 	{
 		$product = new Product();
 		$product->setModel($productItemDto->getSku());
-		$product->setDescription($productDto->getDescription());
+		// get product title from $productItemDto->attributes
+		$productAttributes = $productItemDto->getAttributes();
+        $productTitle = '';
+        foreach ($productAttributes as $productAttribute) {
+            if ($productAttribute->getKey() == 'title') {
+                $productTitle = $productAttribute->getValue();
+                break;
+            }
+        }
+		$product->setDescription(empty($productTitle)?$productItemDto->getSku():$productTitle);
 		$product->setQtyPerCarton($productItemDto->getPackageQuantity());
 		$dimension = ProductManager::getProductItemDimensionFromProductItemDto($productItemDto);
+		if ($dimension === NULL) {
+		    return $product;
+        }
 		$product->setLength($dimension->getLength());
 		$product->setWidth($dimension->getWidth());
 		$product->setHeight($dimension->getHeight());

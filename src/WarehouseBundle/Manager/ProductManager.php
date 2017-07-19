@@ -33,6 +33,7 @@ class ProductManager extends BaseManager
 	}
 
 	/**
+     * Get product item dimension
 	 * @param ProductItemDto $productItemDto
 	 *
 	 * @return null|ProductItemDimensionDto
@@ -40,7 +41,7 @@ class ProductManager extends BaseManager
 	public static function getProductItemDimensionFromProductItemDto(ProductItemDto $productItemDto)
 	{
 		$dimensions = $productItemDto->getDimensions();
-		if (empty($dimension)) {
+		if (empty($dimensions)) {
 			return null;
 		}
 		foreach ($dimensions as $dimension) {
