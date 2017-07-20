@@ -8,6 +8,7 @@
                                         onclick="toggleAll(this)"></th>
                 {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
                 <th>{{ macros.th_sortable('orderNumber',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Order #') }}</th>
+                <th>{{ macros.th_sortable('orderReference',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Order Reference') }}</th>
                 <th class="hidden-xs">{{ macros.th_sortable('pickingFlag',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Flag') }}</th>
                 <th class="hidden-xs">{{ macros.th_sortable('orderType',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Type') }}</th>
                 <th>{{ macros.th_sortable('status',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Status') }}</th>
@@ -33,6 +34,9 @@
                             <div class="visible-xs">
                                 {% if booking.pickingFlag %}<i class="fa fa-flag aero"></i>{% endif %}
                             </div>
+                    </td>
+                    <td>
+                        <div>{{ booking.orderReference }}</div>
                     </td>
                     <td class="hidden-xs">{% if booking.pickingFlag %}<i class="fa fa-flag aero"></i>{% endif %}</td>
                     <td class="hidden-xs">{{ bookingUtil.bookingOrderTypeName(booking.orderType) }}</td>
