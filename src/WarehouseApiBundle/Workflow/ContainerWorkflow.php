@@ -6,6 +6,7 @@ namespace WarehouseApiBundle\Workflow;
 use Rove\CanonicalDto\Container\ContainerDto;
 use Rove\CanonicalDto\Product\ProductDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
+use RoveSiteRestApiBundle\Exception\RoveSiteApiException;
 use WarehouseApiBundle\Mapper\Container\ContainerMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,9 +112,15 @@ class ContainerWorkflow extends BaseWorkflow
 	private function createMissingProduct(string $sku)
 	{
 		//create product
-		$productDto = $this->roveApiProductManager->get($sku);
-		$productItemDto = $this->getProductItemDtoFromProductDto($productDto, $sku);
-		$productEntity = ProductMapper::mapDtoToEntity($productDto, $productItemDto);
+        try{
+            $productItemDto = $this->roveApiProductManager->getItemBySku($sku);
+        }catch (RoveSiteApiException $exception) {
+            throw new ApiException("Can not create missing sku $sku Detail: ".$exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        // only need product item to do mapping,
+        // put product title into $productItemDto->attributes
+		$productEntity = ProductMapper::mapDtoToEntity($productItemDto);
 		$productEntity->setCreated(new \DateTime());
 		$productEntity->setStatus(Product::PRODUCT_STATUS_DEFAULT);
 		return $productEntity;

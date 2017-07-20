@@ -10,6 +10,7 @@ namespace RoveSiteRestApiBundle\Manager;
 
 
 use Guzzle\Http\Client;
+use Guzzle\Http\Message\Response;
 use RoveSiteRestApiBundle\Utils\ApiSignatureGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -47,4 +48,24 @@ class BaseManager
 		];
 		return $headers;
 	}
+
+    /**
+     * Return the total count of record.
+     * @param \Guzzle\Http\Message\Response $response
+     *
+     * @return int
+     */
+    static public function ResponseDataCountGet(Response $response) {
+	    if ($response->hasHeader('TOTAL_COUNT')) {
+            return $response->getHeader('TOTAL_COUNT')->parseParams()[0];
+        } else{
+	        $data = $response->json();
+	        if (is_object($data)) {
+	            return 1;
+            } elseif (is_array($data)) {
+	            return count($data);
+            }
+        }
+        return 0;
+    }
 }
