@@ -24,7 +24,7 @@ class BookingType extends AbstractType
 				'choices_as_values' => true,
 			])
 			->add('carrierId', ChoiceType::class, [
-				'choices' => ['' => ''] + array_flip(\WarehouseBundle\Utils\Booking::bookingCarrierList()),
+				'choices' => $options['carrier_list'],
 				'choices_as_values' => true,
 			])
 			->add('skidCount')
@@ -46,7 +46,8 @@ class BookingType extends AbstractType
 	public function configureOptions(OptionsResolver $resolver)
 	{
 		$resolver->setDefaults([
-			'data_class' => 'WarehouseBundle\Entity\Booking'
+			'data_class' => 'WarehouseBundle\Entity\Booking',
+            'carrier_list' => [''=>'']
 		]);
 	}
 }

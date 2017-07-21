@@ -57,6 +57,9 @@ services:
     warehouse.manager.incoming_comment_manager:
         class: WarehouseBundle\Manager\IncomingCommentManager
         arguments: ['@doctrine.orm.entity_manager']
+    warehouse.manager.carrier_manager:
+            class: WarehouseBundle\Manager\CarrierManager
+            arguments: ['@doctrine.orm.entity_manager']
 
     warehouse.work_flow.booking_work_flow:
         class: WarehouseBundle\Workflow\BookingWorkflow

@@ -479,6 +479,9 @@ class BookingManager
 	 */
 	public static function getDefaultBookingLabel(Booking $booking)
 	{
+        if (!$booking->getCarrier()) {
+            return null;
+        }
 		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/label";
 		return DownloadUtility::isLinkExist($url) ? $url : null;
 	}
@@ -492,6 +495,9 @@ class BookingManager
 	 */
 	public static function getDefaultBookingBol(Booking $booking)
 	{
+	    if (!$booking->getCarrier()) {
+	        return null;
+        }
 		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/bol";
 		return DownloadUtility::isLinkExist($url) ? $url : null;
 	}

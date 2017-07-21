@@ -170,12 +170,12 @@ class BookingController extends Controller
 	{
 		$bookingManager = $this->get('BookingManager');
 		$booking = $bookingManager->createBooking();
-
-		$form = $this->createForm(BookingType::class, $booking);
+        $carrierList = $this->get('warehouse.manager.carrier_manager')->getCarrierList('name', TRUE);
+		$form = $this->createForm(BookingType::class, $booking, ['carrier_list'=>$carrierList]);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			$bookingManager->updateBooking($booking, TRUE); # Persists/flush
+            $bookingManager->updateBooking($booking, TRUE); # Persists/flush
 
 			$editLink = $this->generateUrl('booking_edit', ['id' => $booking->getId()]);
 			$this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New booking was created successfully.</a>");
@@ -199,7 +199,8 @@ class BookingController extends Controller
 	{
 		$bookingManager = $this->get('BookingManager');
 		$deleteForm = $this->createDeleteForm($booking);
-		$editForm = $this->createForm(BookingType::class, $booking);
+        $carrierList = $this->get('warehouse.manager.carrier_manager')->getCarrierList('name', TRUE);
+		$editForm = $this->createForm(BookingType::class, $booking, ['carrier_list'=>$carrierList]);
 		$editForm->handleRequest($request);
 
 		if ($editForm->isSubmitted() && $editForm->isValid()) {
