@@ -6,6 +6,7 @@ use Rove\CanonicalDto\Container\ContainerUpdateDto;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -332,7 +333,7 @@ class IncomingController extends Controller
 	 */
 	public function editAction(Request $request, Incoming $incoming)
 	{
-		$deleteForm = $this->createDeleteForm($incoming);
+		$deleteForm = $this->createEditForm($incoming);
 		$editForm = $this->createForm(IncomingType::class, $incoming);
 		$editForm->handleRequest($request);
 
@@ -346,8 +347,11 @@ class IncomingController extends Controller
 				$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
 				$containerUpdateDto->setName($incoming->getName());
 				$containerUpdateDto->setScheduledArrivalTime($incoming->getScheduled());
-				$this->container->get('rove_site_rest_api.manager.container_manager')
-					->update($containerUpdateDto, $incoming->getName());
+				if ($incoming->getType()->getCode() == \WarehouseBundle\Entity\IncomingType::OCEAN_FREIGHT_CODE) {
+					$this->container->get('rove_site_rest_api.manager.container_manager')
+						->update($containerUpdateDto, $incoming->getName());
+				}
+
 				$em->flush();
 			} catch (\Exception $exception) {
 				$this->get('session')->getFlashBag()->add('error', "Error! {$exception->getMessage()}");
@@ -369,9 +373,9 @@ class IncomingController extends Controller
 	 *
 	 * @param Incoming $incoming The Incoming entity
 	 *
-	 * @return \Symfony\Component\Form\Form The form
+	 * @return Form The form
 	 */
-	private function createDeleteForm(Incoming $incoming)
+	private function createEditForm(Incoming $incoming)
 	{
 		return $this->createFormBuilder()
 			->setAction($this->generateUrl('incoming_delete', ['id' => $incoming->getId()]))
@@ -388,7 +392,7 @@ class IncomingController extends Controller
 	public function deleteAction(Request $request, Incoming $incoming)
 	{
 
-		$form = $this->createDeleteForm($incoming);
+		$form = $this->createEditForm($incoming);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {

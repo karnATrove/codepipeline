@@ -12,93 +12,96 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IncomingType
 {
-	const OCEAN_FREIGHT=1;
-	const FORWARD=2;
+	const OCEAN_FREIGHT = 1;
+	const FORWARD = 2;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     */
-    private $id;
+	const OCEAN_FREIGHT_CODE = "OCEAN_FREIGHT";
+	const FORWARD_CODE = 'FORWARD';
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="code", type="string", length=20)
-     */
-    private $code;
+	/**
+	 * @var int
+	 *
+	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Id
+	 */
+	private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="detail", type="string", length=255)
-     */
-    private $detail;
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="code", type="string", length=20)
+	 */
+	private $code;
+
+	/**
+	 * @var string
+	 *
+	 * @ORM\Column(name="detail", type="string", length=255)
+	 */
+	private $detail;
 
 	/**
 	 * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Incoming", mappedBy="type")
 	 */
 	private $incoming;
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+	/**
+	 * Get id
+	 *
+	 * @return int
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
 
-    /**
-     * Set code
-     *
-     * @param string $code
-     *
-     * @return IncomingType
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
+	/**
+	 * Set code
+	 *
+	 * @param string $code
+	 *
+	 * @return IncomingType
+	 */
+	public function setCode($code)
+	{
+		$this->code = $code;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
+	/**
+	 * Get code
+	 *
+	 * @return string
+	 */
+	public function getCode()
+	{
+		return $this->code;
+	}
 
-    /**
-     * Set detail
-     *
-     * @param string $detail
-     *
-     * @return IncomingType
-     */
-    public function setDetail($detail)
-    {
-        $this->detail = $detail;
+	/**
+	 * Set detail
+	 *
+	 * @param string $detail
+	 *
+	 * @return IncomingType
+	 */
+	public function setDetail($detail)
+	{
+		$this->detail = $detail;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Get detail
-     *
-     * @return string
-     */
-    public function getDetail()
-    {
-        return $this->detail;
-    }
+	/**
+	 * Get detail
+	 *
+	 * @return string
+	 */
+	public function getDetail()
+	{
+		return $this->detail;
+	}
 
 	/**
 	 * @return mixed

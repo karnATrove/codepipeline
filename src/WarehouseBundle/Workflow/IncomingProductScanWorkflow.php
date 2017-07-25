@@ -16,6 +16,7 @@ use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Entity\IncomingStatus;
+use WarehouseBundle\Entity\IncomingType;
 use WarehouseBundle\Exception\Manager\ManagerException;
 use WarehouseBundle\Exception\WorkflowException\WorkflowAPIException;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
@@ -268,7 +269,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$incomingWorkflow = new IncomingWorkflow($this->container);
 		$incomingWorkflow->setIncomingComplete($incoming, $this->entityManager);
 
-		if ($updateRove) {
+		if ($updateRove && $incoming->getType() == IncomingType::OCEAN_FREIGHT_CODE) {
 			//update container in rove site first, it throw RoveSiteApiException.
 			$containerUpdateDto = new ContainerUpdateDto();
 			$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
