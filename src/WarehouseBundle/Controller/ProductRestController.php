@@ -261,11 +261,11 @@ class ProductRestController extends Controller
         if (false === $product) {
             throw $this->createNotFoundException("Product does not exist.");
         }
-
-        if($paramFetcher->get('ordernumber')){$product->setOrderNumber($paramFetcher->get('ordernumber'));}
-        if($paramFetcher->get('orderreference')){$product->setOrderReference($paramFetcher->get('orderreference'));}
-        if($paramFetcher->get('ordertype')){$product->setOrderType($paramFetcher->get('ordertype'));}
-        if($paramFetcher->get('carrierid')){$product->setCarrierId($paramFetcher->get('carrierid'));}
+        // product dont have ordernumber/orderreference/ordertype/carrierid
+//        if($paramFetcher->get('ordernumber')){$product->setOrderNumber($paramFetcher->get('ordernumber'));}
+//        if($paramFetcher->get('orderreference')){$product->setOrderReference($paramFetcher->get('orderreference'));}
+//        if($paramFetcher->get('ordertype')){$product->setOrderType($paramFetcher->get('ordertype'));}
+//        if($paramFetcher->get('carrierid')){$product->setCarrierId($paramFetcher->get('carrierid'));}
         $product->setModified(new \DateTime('now'));
 
         $view = View::create();
