@@ -34,11 +34,13 @@ class Booking
 	 */
 	private $requestStack;
 
-	/**
-	 * Make the utility container-aware. (giving access to doctrine for example)
-	 *
-	 * @param      <type>  $container  The container
-	 */
+    /**
+     * Make the utility container-aware. (giving access to doctrine for example)
+     *
+     * @param \Symfony\Component\DependencyInjection\Container  $container The container
+     * @param \WarehouseBundle\Model\BookingManagerInterface    $bookingManager
+     * @param \Symfony\Component\HttpFoundation\RequestStack    $requestStack
+     */
 	public function __construct(Container $container, BookingManagerInterface $bookingManager, RequestStack $requestStack)
 	{
 		$this->container = $container;
@@ -121,43 +123,19 @@ class Booking
 	 *
 	 * @return     string  Human readable text.
 	 */
-	public static function bookingCarrierName($carrierId)
+	public function bookingCarrierName($carrierId)
 	{
-		return isset(self::bookingCarrierList()[$carrierId]) ? self::bookingCarrierList()[$carrierId] : 'Unknown';
+	    $list = $this->bookingCarrierList();
+		return isset($list[$carrierId]) ? $list[$carrierId] : 'Unknown';
 	}
 
 	/**
 	 * Listing of available carriers.
-	 *
-	 * @return     array  Available carriers.
+	 * @return  array  ['carrierId'=>'name']
 	 */
-	public static function bookingCarrierList()
+	public function bookingCarrierList()
 	{
-		return [
-			Carrier::CARRIER_XPO_LOGISTICS => 'XPO Logistics',
-			Carrier::CARRIER_NON_STOP_DELIVERY => 'Non Stop Delivery',
-			Carrier::CARRIER_UPS => 'UPS',
-			Carrier::CARRIER_FEDEX => 'FedEx',
-			Carrier::CARRIER_HOME_DIRECT => 'Home Direct',
-			Carrier::CARRIER_VITRAN => 'VITRAN',
-			Carrier::CARRIER_MACTRAN => 'MACTRAN',
-			Carrier::CARRIER_CEVA_LOGISTICS => 'CEVA Logistics',
-			Carrier::CARRIER_AGS_LOGISTICS => 'AGS Logistics',
-			Carrier::CARRIER_SEKO_LOGISTICS => 'SEKO Logistics',
-			Carrier::CARRIER_MANNA_LOGISTICS => 'Manna Logistics',
-			Carrier::CARRIER_PILOT_LOGISTICS => 'Pilot Logistics',
-			Carrier::CARRIER_TEST_LOGISTICS => 'TEST Logistics',
-			Carrier::CARRIER_PROPACK_SHIPPING => 'Propack Shipping',
-			Carrier::CARRIER_DWS_PICKUP => 'DWS Pickup',
-			Carrier::CARRIER_SUNSHINE => 'Sunshine',
-			Carrier::CARRIER_CUSTOMER_PICKUP => 'Customer Pickup',
-			Carrier::CARRIER_ATS => 'ATS',
-			Carrier::CARRIER_WAYFAIR_CARRIER => 'Wayfair Carrier',
-			Carrier::CARRIER_AMAZON_CARRIER => 'Amazon Carrier',
-			Carrier::CARRIER_BUILDDIRECT_CARRIER => 'BuildDirect Carrier',
-			Carrier::CARRIER_HAYNEEDLE_CARRIER => 'HayNeedle Carrier',
-			Carrier::CARRIER_LOCAL_CARRIER => 'Local Carrier',
-		];
+        return $this->container->get('warehouse.manager.carrier_manager')->getCarrierList('name');
 	}
 
 	/**
@@ -206,7 +184,7 @@ class Booking
 		$booking->setOrderNumber($orderNumber);
 		$booking->setOrderReference($orderReference);
 		$booking->setOrderType($orderType);
-		$booking->setCarrierId($carrierId);
+		$booking->setCarrier($this->container->get('warehouse.manager.carrier_manager')->find($carrierId));
 		$booking->setSkidCount(NULL);
 		$booking->setStatus(BookingEntity::STATUS_ACCEPTED);
 		$booking->setFutureShip($futureShip);

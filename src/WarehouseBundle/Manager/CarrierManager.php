@@ -36,6 +36,15 @@ class CarrierManager extends BaseManager {
     }
 
     /**
+     * Find carrier by carrier id
+     * @param $carrierId
+     * @return Carrier
+     */
+    public function find($carrierId) {
+        return $this->carrierRepository->find($carrierId);
+    }
+
+    /**
      * Return list of carrier ['id'=>(name|code)]
      *
      * @param string $type

@@ -21,6 +21,11 @@ $(function () {
 		});
 	});
 
+	$('form#booking-search-form #number_per_page_sel').on('change',function(event){
+        var form = $('#booking-search-form');
+        form.submit();
+	});
+
 	$('#booking_futureship').datetimepicker({
 		'format': 'YYYY-MM-DD'
 	});

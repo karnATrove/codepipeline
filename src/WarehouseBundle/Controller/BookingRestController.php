@@ -255,7 +255,10 @@ class BookingRestController extends FOSRestController
         if($paramFetcher->get('ordernumber')){$booking->setOrderNumber($paramFetcher->get('ordernumber'));}
         if($paramFetcher->get('orderreference')){$booking->setOrderReference($paramFetcher->get('orderreference'));}
         if($paramFetcher->get('ordertype')){$booking->setOrderType($paramFetcher->get('ordertype'));}
-        if($paramFetcher->get('carrierid')){$booking->setCarrierId($paramFetcher->get('carrierid'));}
+        if($paramFetcher->get('carrierid')){
+            $carrierManager = $this->get('warehouse.manager.carrier_manager');
+            $booking->setCarrier($carrierManager->find($paramFetcher->get('carrierid')));
+        }
         $booking->setModified(new \DateTime('now'));
 
         $view = View::create();

@@ -71,20 +71,20 @@ interface BookingInterface
     public function getOrderType();
 
     /**
-     * Sets the Carrier ID.
+     * Sets the Carrier.
      *
-     * @param integer $carrierId
+     * @param \WarehouseBundle\Entity\Carrier $carrier
      *
      * @return self
      */
-    public function setCarrierId($carrierId);
+    public function setCarrier(\WarehouseBundle\Entity\Carrier $carrier);
 
     /**
-     * Gets the Carrier ID.
+     * Gets the Carrier.
      *
-     * @return int
+     * @return \WarehouseBundle\Entity\Carrier
      */
-    public function getCarrierId();
+    public function getCarrier();
 
     /**
      * Sets the Skid Count.

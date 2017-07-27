@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+use WarehouseBundle\Entity\Carrier;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Entity\BookingContact;
 
@@ -31,7 +32,10 @@ class BookingRestType extends AbstractType
                 'choices' => array_flip(\WarehouseBundle\Utils\Booking::bookingOrderTypeList()),
                 'choices_as_values' => true,
             ))
-            ->add('carrierId')
+            ->add('carrier', EntityType::class,array(
+                'class' => Carrier::class,
+                'choice_label' => 'code',
+            ))
             //->add('skidCount')
             ->add('status',ChoiceType::class,array(
                 'choices' => array_flip(\WarehouseBundle\Utils\Booking::bookingStatusList()),

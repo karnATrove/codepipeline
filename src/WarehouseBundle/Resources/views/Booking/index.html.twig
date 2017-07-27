@@ -33,15 +33,15 @@
                 </div>
                 <div class="x_content">
                     <!-- FILTERING -->
-                    <form class="well" action="{{ path('booking') }}" method="get">
-                        <div class="row">
+                    <form action="{{ path('booking') }}" method="get" id="booking-search-form">
+                        <div class="row well">
                             <div class="col-xs-12">
                                 <div class="col-xs-12">{{ form_widget(filterForm.orderNumber, { attr: { placeholder:'Order Number' }}) }}</div>
                                 <div id="filters" class="collapse">
                                     <div class="col-xs-6 col-md-6">{{ form_row(filterForm.orderReference, { attr: { placeholder:'Order Reference' }}) }}</div>
                                     <div class="col-xs-6 col-md-6">{{ form_row(filterForm.orderType) }}</div>
                                     <div class="col-xs-6 col-md-6">{{ form_row(filterForm.status) }}</div>
-                                    <div class="col-xs-6 col-md-6">{{ form_row(filterForm.carrierId) }}</div>
+                                    <div class="col-xs-6 col-md-6">{{ form_row(filterForm.carrier) }}</div>
                                     <div class="col-xs-6 col-md-6">{{ form_row(filterForm.pickingFlag) }}</div>
                                     <div class="col-xs-6 col-md-6">{{ form_row(filterForm.futureship) }}</div>
 
@@ -63,50 +63,41 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-xs-4 col-md-3 pull-left">
+
+                            <!-- PAGE SIZE -->
+                            <div class="form-inline ">
+                                <select class="form-control" id="number_per_page_sel" name="numberPerPage" title="numberPerPage">
+                                    <option value=10 {% if numberPerPage==10 %}selected{% endif %}>10</option>
+                                    <option value=20 {% if numberPerPage==20 %}selected{% endif %}>20</option>
+                                    <option value=50 {% if numberPerPage==50 %}selected{% endif %}>50</option>
+                                    <option value=100 {% if numberPerPage==100 %}selected{% endif %}>100</option>
+                                    <option value=500 {% if numberPerPage==500 %}selected{% endif %}>500</option>
+
+                                </select>
+                            </div>
+                            <!-- END PAGE SIZE -->
+
+                        </div>
+
+                        <div class="col-xs-8 col-md-offset-6 col-md-3">
+                            <a class="btn btn-primary h3 pull-right" href="{{ path('booking_new') }}" style="margin-bottom:10px">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
+                            </a>
+                            <a class="btn dropdown-toggle pull-right h3" data-toggle="collapse" data-target="#filters">
+                                Filter
+                                <span class="caret"></span>
+                            </a>
+                        </div>
                     </form>
                     <!-- END FILTERING -->
 
-                    <div class="col-xs-4 col-md-3 pull-left">
-
-                        <!-- PAGE SIZE -->
-                        <div class="form-inline ">
-                            <select class="form-control" onchange="window.location = this.value">
-                                <option value='{{ path('booking', app.request.query.all|merge({'pcg_show': '10'})) }}' {% if app.request.get('pcg_show') == 10 %} selected {% endif %}>
-                                    10
-                                </option>
-                                <option value='{{ path('booking', app.request.query.all|merge({'pcg_show': '20'})) }}' {% if app.request.get('pcg_show') == 20 %} selected {% endif %}>
-                                    20
-                                </option>
-                                <option value='{{ path('booking', app.request.query.all|merge({'pcg_show': '50'})) }}' {% if app.request.get('pcg_show') == 50 or app.request.query.get('pcg_show') == '' %} selected {% endif %}>
-                                    50
-                                </option>
-                                <option value='{{ path('booking', app.request.query.all|merge({'pcg_show': '100'})) }}' {% if app.request.get('pcg_show') == 100 %} selected {% endif %}>
-                                    100
-                                </option>
-                                <option value='{{ path('booking', app.request.query.all|merge({'pcg_show': '500'})) }}' {% if app.request.get('pcg_show') == 500 %} selected {% endif %}>
-                                    500
-                                </option>
-                            </select>
-                        </div>
-                        <!-- END PAGE SIZE -->
-
-                    </div>
-
-                    <div class="col-xs-8 col-md-offset-6 col-md-3">
-                        <a class="btn btn-primary h3 pull-right" href="{{ path('booking_new') }}" style="margin-bottom:10px">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New
-                        </a>
-                        <a class="btn dropdown-toggle pull-right h3" data-toggle="collapse" data-target="#filters">
-                            Filter
-                            <span class="caret"></span>
-                        </a>
-                    </div>
 
                     <!-- Form Errors -->
                     {% include 'default/form_errors.html.twig' with {'form':filterForm} %}
 
                     <form class="" method="POST" id="bulk_form" action="{{ path('booking_bulk_action') }} ">
-                        {% include 'WarehouseBundle:Booking:_index_booking_content.html.twig' with {'bookings':bookings} %}
+                        {% include 'WarehouseBundle:Booking:_index_booking_content.html.twig' with {'pagination':pagination} %}
                         <div class="row">
                             <div class="col-xs-12 col-md-4 pull-left">
                                 <div class="pagination form-inline col-xs-12">
@@ -130,7 +121,8 @@
                             </div>
 
                             <div class="col-md-6 col-md-offset-2 text-right">
-                                {{ pagerHtml|raw }}
+                                {#{{ pagerHtml|raw }}#}
+                                {{ knp_pagination_render(pagination) }}
                             </div>
                         </div> <!-- /#bottom -->
                     </form>

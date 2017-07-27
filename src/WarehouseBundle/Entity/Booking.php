@@ -85,14 +85,6 @@ class Booking implements BookingInterface
 	 */
 	private $orderType;
 
-	/**
-	 * @var int
-	 *
-	 * @ORM\Column(name="carrier_id", type="integer", nullable=true)
-	 * @Gedmo\Versioned
-	 * @Expose
-	 */
-	private $carrierId;
 
 	/**
 	 * @var int
@@ -183,7 +175,8 @@ class Booking implements BookingInterface
 	 * @var Carrier
 	 *
 	 * Many booking have one carrier
-	 * @ORM\ManyToOne(targetEntity="Carrier")
+	 * @ORM\ManyToOne(targetEntity="Carrier", inversedBy="bookings")
+     * @ORM\JoinColumn(name="carrier_id", referencedColumnName="id")
 	 */
 	private $carrier;
 
@@ -301,29 +294,6 @@ class Booking implements BookingInterface
 		return $this;
 	}
 
-	/**
-	 * Get carrierId
-	 *
-	 * @return int
-	 */
-	public function getCarrierId()
-	{
-		return $this->carrierId;
-	}
-
-	/**
-	 * Set carrierId
-	 *
-	 * @param integer $carrierId
-	 *
-	 * @return Booking
-	 */
-	public function setCarrierId($carrierId)
-	{
-		$this->carrierId = $carrierId;
-
-		return $this;
-	}
 
 	/**
 	 * Get skidCount
@@ -691,7 +661,7 @@ class Booking implements BookingInterface
 	/**
 	 * @param Carrier $carrier
 	 */
-	public function setCarrier($carrier)
+	public function setCarrier(Carrier $carrier)
 	{
 		$this->carrier = $carrier;
 	}

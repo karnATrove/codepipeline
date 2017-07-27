@@ -172,4 +172,54 @@ class BookingRepository extends EntityRepository
 			return 0;
 		}
 	}
+
+    /**
+     * Search bookings
+     *
+     * @param array $criteria
+     * @param array $sorting
+     * @param bool  $query      true return query builder; false return result.
+     *
+     * @return mixed
+     */
+    public function searchBookings($criteria, $sorting, $query = FALSE) {
+	    $queryBuilder = $this->createQueryBuilder('b');
+	    $queryBuilder->leftJoin('b.carrier', 'c');
+
+	    foreach ($criteria as $param => $value) {
+	        if (is_scalar($value)) {
+	            if ($value === '') {
+	                unset($criteria[$param]);
+                }
+            } elseif (is_array($value)) {
+	            if (!isset($value['op'])) {
+                    $criteria[$param]['op'] = '=';
+                }
+                if (!isset($value['value']) || is_null($value['value']) || $value['value'] === '') {
+                    unset($criteria[$param]);
+                }
+            } elseif(is_null($value)) {
+                unset($criteria[$param]);
+            }
+        }
+        foreach ($criteria as $param => $value) {
+            if (is_scalar($value) || is_object($value)) {
+                $queryBuilder->andWhere("b.{$param} = :{$param}");
+                $queryBuilder->setParameter("{$param}", $value);
+            } elseif(is_array($value)) {
+                $queryBuilder->andWhere("b.{$param} {$value['op']} :{$param}");
+                $queryBuilder->setParameter("{$param}", $value['value']);
+            }
+        }
+
+        foreach($sorting as $sort => $direction) {
+            $queryBuilder->orderBy("b.{$sort}", $direction);
+        }
+
+        if ($query) {
+            return $queryBuilder;
+        } else {
+            return $queryBuilder->getQuery()->getResult();
+        }
+    }
 }

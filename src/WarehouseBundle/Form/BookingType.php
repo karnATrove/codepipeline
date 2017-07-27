@@ -5,8 +5,10 @@ namespace WarehouseBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use WarehouseBundle\Entity\Carrier;
 
 class BookingType extends AbstractType
 {
@@ -23,9 +25,9 @@ class BookingType extends AbstractType
 				'choices' => ['' => ''] + array_flip(\WarehouseBundle\Utils\Booking::bookingOrderTypeList()),
 				'choices_as_values' => true,
 			])
-			->add('carrierId', ChoiceType::class, [
-				'choices' => $options['carrier_list'],
-				'choices_as_values' => true,
+			->add('carrier', EntityType::class, [
+			    'class' => Carrier::class,
+                'choice_label' => 'name',
 			])
 			->add('skidCount')
 			->add('status', ChoiceType::class, [
@@ -47,7 +49,6 @@ class BookingType extends AbstractType
 	{
 		$resolver->setDefaults([
 			'data_class' => 'WarehouseBundle\Entity\Booking',
-            'carrier_list' => [''=>'']
 		]);
 	}
 }
