@@ -6,23 +6,22 @@
             <tr>
                 <th width="20px"><input type="checkbox" class="check-all"
                                         onclick="toggleAll(this)"></th>
-                {% import "PetkoparaCrudGeneratorBundle::macros/th_sortable.html.twig" as macros %}
-                <th>{{ macros.th_sortable('orderNumber',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Order #') }}</th>
-                <th>{{ macros.th_sortable('orderReference',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Order Reference') }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('pickingFlag',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Flag') }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('orderType',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Type') }}</th>
-                <th>{{ macros.th_sortable('status',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Status') }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('carrierId',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Carrier') }}</th>
+                <th>{{ knp_pagination_sortable(pagination,'Order #','b.orderNumber') }}</th>
+                <th>{{ knp_pagination_sortable(pagination,'Order Ref','b.orderReference') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Flag','b.pickingFlag') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Type','b.orderType') }}</th>
+                <th>{{ knp_pagination_sortable(pagination,'Status','b.status') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Carrier','c.id') }}</th>
                 <th class="hidden-xs">{{ 'Line Items' }}</th>
                 <th class="hidden-xs">{{ 'Quantity' }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('futureship',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Future Date') }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('shipped',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Ship Date') }}</th>
-                <th class="hidden-xs">{{ macros.th_sortable('created',app.request.get('pcg_sort_col'), app.request.get('pcg_sort_order') , 'booking', 'Created') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Future Date','b.futureship') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Ship Date','b.shipped') }}</th>
+                <th class="hidden-xs">{{ knp_pagination_sortable(pagination,'Created','b.created') }}</th>
                 <th width="80px">List</th>
             </tr>
             </thead>
             <tbody>
-            {% for booking in bookings %}
+            {% for booking in pagination %}
                 <tr>
                     <td>
                         <input type="checkbox" name="form[orderIds][]" onclick='bulkSubmitBtnManage();'
@@ -42,10 +41,10 @@
                     <td class="hidden-xs">{{ bookingUtil.bookingOrderTypeName(booking.orderType) }}</td>
                     <td>{{ bookingUtil.bookingStatusName(booking.status) }}
                         <div class="visible-xs">
-                            {{ bookingUtil.bookingCarrierName(booking.carrierId) }}
+                            {{ booking.carrier.getName }}
                         </div>
                     </td>
-                    <td class="hidden-xs">{{ bookingUtil.bookingCarrierName(booking.carrierId) }}</td>
+                    <td class="hidden-xs">{{ booking.carrier.getName }}</td>
                     <td class="hidden-xs">
                         <a href="{{ path('booking_edit', { 'id': booking.id }) }}">{{ booking.products|length }}
                             {% if booking.skidCount > 0 %} ({{ booking.skidCount }} skids){% endif %}</a>

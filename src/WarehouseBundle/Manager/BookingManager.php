@@ -133,6 +133,15 @@ class BookingManager
 		return $this->bookingRepository->count($criteria);
 	}
 
+    /**
+     * @param $criteria
+     * @param $sorting
+     * @param bool $query  true return query builder otherwise return result.
+     */
+    public function searchBookings($criteria, $sorting, $query = FALSE) {
+        return $this->bookingRepository->searchBookings($criteria,$sorting,$query);
+    }
+
 	/**
 	 * @param $status
 	 *

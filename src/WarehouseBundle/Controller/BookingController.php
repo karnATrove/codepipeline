@@ -49,22 +49,31 @@ class BookingController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$em = $this->getDoctrine()->getManager();
-		$bookingRepository = $em->getRepository('WarehouseBundle:Booking');
-		$queryBuilder = $bookingRepository->createQueryBuilder('e');
 
-		// Remove deleted
+        $criteria = array();
+		// Remove deleted status
 		if (empty($request->get('status')) || !(is_numeric($request->get('status'))
 				|| intval($request->get('status')) == 0)
 		) {
-			$queryBuilder->andWhere('e.status <> :bstatus');
-			$queryBuilder->setParameter('bstatus', Booking::STATUS_DELETED);
+		    $criteria['status'] = array('op'=>'<>','value'=>Booking::STATUS_DELETED);
 		}
-		list($filterForm, $queryBuilder) = $this->filter($queryBuilder, $request);
-		list($bookings, $pagerHtml) = $this->paginator($queryBuilder, $request);
+		$sorting = array('id'=>'desc');// default sorting by id
+
+        $numberPerPage = empty($request->get('numberPerPage')) ? 50 : $request->get('numberPerPage');
+
+        // set filter & filter form
+        list($filterForm, $criteria) = $this->filter($criteria, $request);
+        $queryBuilder = $this->get('warehouse.manager.booking_manager')->searchBookings($criteria,$sorting,TRUE);
+        $paginator  = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $queryBuilder, /* query NOT result */
+            $request->query->getInt('page', 1),/*page number*/
+            $numberPerPage
+        );
+
 		return $this->render('WarehouseBundle::Booking/index.html.twig', [
-			'bookings' => $bookings,
-			'pagerHtml' => $pagerHtml,
+            'numberPerPage' => $numberPerPage,
+            'pagination' => $pagination,
 			'filterForm' => $filterForm->createView(),
 		]);
 	}
@@ -72,16 +81,12 @@ class BookingController extends Controller
 	/**
 	 * Create filter form and process filter request
 	 */
-	protected function filter(QueryBuilder $queryBuilder, Request $request)
+	protected function filter($criteria, Request $request)
 	{
 		$session = $request->getSession();
+
 		$filterForm = $this->createForm(BookingFilterType::class);
 
-		# Default sort
-		if (empty($request->request->set('pcg_sort_col', ''))) {
-			$request->request->set('pcg_sort_col', 'status');
-			$request->request->set('pcg_sort_order', 'asc');
-		}
 
 		// Reset filter
 		if ($request->get('filter_action') == 'reset') {
@@ -89,12 +94,13 @@ class BookingController extends Controller
 		}
 
 		// Filter action
+        $filterData = array();
 		if ($request->get('filter_action') == 'filter') {
 			// Bind values from the request
 			$filterForm->handleRequest($request);
 			if ($filterForm->isValid()) {
-				// Build the query from the given form object
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
+//				// Build the query from the given form object
+//				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 				// Save filter to session
 				$filterData = $filterForm->getData();
 				$session->set(SessionEnum::BOOKING_CONTROLLER_FILTER, $filterData);
@@ -104,17 +110,18 @@ class BookingController extends Controller
 			if ($session->has(SessionEnum::BOOKING_CONTROLLER_FILTER)) {
 				$filterData = $session->get(SessionEnum::BOOKING_CONTROLLER_FILTER);
 
-				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
-					if (is_object($filter)) {
-						$filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
-					}
-				}
+//				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
+//					if (is_object($filter)) {
+//						$filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
+//					}
+//				}
 
 				$filterForm = $this->createForm(BookingFilterType::class, $filterData);
-				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
+//				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 			}
 		}
-		return [$filterForm, $queryBuilder];
+		$criteria = $criteria + $filterData;
+		return [$filterForm, $criteria];
 	}
 
 
@@ -124,21 +131,32 @@ class BookingController extends Controller
 	 */
 	protected function paginator(QueryBuilder $queryBuilder, Request $request)
 	{
+	    echo 111;
 		//sorting
-		$sortCol = $queryBuilder->getRootAlias() . '.' . $request->get('pcg_sort_col', 'id');
+		$sortCol = $queryBuilder->getRootAliases()[0] . '.' . $request->get('pcg_sort_col', 'id');
+		echo $sortCol;
 		$queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
+
+        $paginator  = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $queryBuilder, /* query NOT result */
+            $request->get('pcg_page', 1)/*page number*/,
+            $request->get('pcg_show', 50)/*limit per page*/
+        );
+
+
 		// Paginator
-		$adapter = new DoctrineORMAdapter($queryBuilder);
-		$pagerfanta = new Pagerfanta($adapter);
-		$pagerfanta->setMaxPerPage($request->get('pcg_show', 50));
+//		$adapter = new DoctrineORMAdapter($queryBuilder);
+//		$pagerfanta = new Pagerfanta($adapter);
+//		$pagerfanta->setMaxPerPage($request->get('pcg_show', 50));
 
-		try {
-			$pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-		} catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
-			$pagerfanta->setCurrentPage(1);
-		}
-
-		$entities = $pagerfanta->getCurrentPageResults();
+//		try {
+//			$pagerfanta->setCurrentPage($request->get('pcg_page', 1));
+//		} catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
+//			$pagerfanta->setCurrentPage(1);
+//		}
+//
+//		$entities = $pagerfanta->getCurrentPageResults();
 
 		// Paginator - route generator
 		$me = $this;
@@ -149,14 +167,15 @@ class BookingController extends Controller
 		};
 
 		// Paginator - view
-		$view = new TwitterBootstrap3View();
-		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
-			'proximity' => 2,
-			'prev_message' => '<',
-			'next_message' => '>',
-		]);
-
-		return [$entities, $pagerHtml];
+//		$view = new TwitterBootstrap3View();
+//		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
+//			'proximity' => 2,
+//			'prev_message' => '<',
+//			'next_message' => '>',
+//		]);
+//        $pagerHtml = knp_pagination_render($pagination);
+//		return [$entities, $pagerHtml];
+        return $pagination;
 	}
 
 
@@ -170,8 +189,7 @@ class BookingController extends Controller
 	{
 		$bookingManager = $this->get('BookingManager');
 		$booking = $bookingManager->createBooking();
-        $carrierList = $this->get('warehouse.manager.carrier_manager')->getCarrierList('name', TRUE);
-		$form = $this->createForm(BookingType::class, $booking, ['carrier_list'=>$carrierList]);
+		$form = $this->createForm(BookingType::class, $booking);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
@@ -199,8 +217,7 @@ class BookingController extends Controller
 	{
 		$bookingManager = $this->get('BookingManager');
 		$deleteForm = $this->createDeleteForm($booking);
-        $carrierList = $this->get('warehouse.manager.carrier_manager')->getCarrierList('name', TRUE);
-		$editForm = $this->createForm(BookingType::class, $booking, ['carrier_list'=>$carrierList]);
+		$editForm = $this->createForm(BookingType::class, $booking);
 		$editForm->handleRequest($request);
 
 		if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -257,9 +274,10 @@ class BookingController extends Controller
 						}
 						continue;
 						break;
-					case "carrierId":
-						$changedFrom = BookingUtility::bookingCarrierName($change[0]);
-						$changedTo = BookingUtility::bookingCarrierName($change[1]);
+					case "carrier":
+                        /** @var \WarehouseBundle\Entity\Carrier[] $change */
+                        $changedFrom = $change[0]->getName();
+						$changedTo = $change[1]->getName();
 						$note .= "Booking Carrier changed from {$changedFrom} to {$changedTo}. ";
 						continue;
 						break;

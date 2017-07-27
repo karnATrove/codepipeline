@@ -2,12 +2,14 @@
 
 namespace WarehouseBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Lexik\Bundle\FormFilterBundle\Filter\Form\Type as Filters;
+use WarehouseBundle\Entity\Carrier;
 
 
 class BookingFilterType extends AbstractType
@@ -24,10 +26,10 @@ class BookingFilterType extends AbstractType
                 'choices_as_values' => true,
                 'required' => false,
             ))
-            //->add('carrierId', Filters\NumberFilterType::class)
-            ->add('carrierId', ChoiceType::class, array(
-                'choices' => array(''=>'') + array_flip(\WarehouseBundle\Utils\Booking::bookingCarrierList()),
-                'choices_as_values' => true,
+            ->add('carrier', EntityType::class, array(
+                'class' => Carrier::class,
+                'choice_label' => 'name',
+                'choice_value' => 'id',
                 'required' => false,
             ))
             //->add('skidCount', Filters\NumberFilterType::class)
@@ -85,7 +87,7 @@ class BookingFilterType extends AbstractType
         $resolver->setDefaults(array(
             'allow_extra_fields' => true,
             'csrf_protection' => false,
-            'validation_groups' => array('filtering') // avoid NotBlank() constraint-related message
+            'validation_groups' => array('filtering'), // avoid NotBlank() constraint-related message
         ));
     }
 }

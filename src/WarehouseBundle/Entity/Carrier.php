@@ -64,6 +64,11 @@ class Carrier
 	 */
 	private $code;
 
+    /**
+     * @ORM\OneToMany(targetEntity="WarehouseBundle\Entity\Booking", mappedBy="carrier")
+     */
+	private $bookings;
+
 	/**
 	 * @return string
 	 */
@@ -103,5 +108,19 @@ class Carrier
 	{
 		return $this->id;
 	}
+
+    /**
+     * @return \WarehouseBundle\Entity\Booking[]
+     */
+    public function getBookings() {
+        return $this->bookings;
+    }
+
+    /**
+     * @param \WarehouseBundle\Entity\Booking[] $booking
+     */
+    public function setBookings($bookings) {
+        $this->bookings = $bookings;
+    }
 }
 

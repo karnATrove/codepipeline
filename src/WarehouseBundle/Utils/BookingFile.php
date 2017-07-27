@@ -26,7 +26,7 @@ class BookingFile
 
 	public function getDefaultBolUrl(BookingEntity $booking)
 	{
-		switch ($booking->getCarrierId()) {
+		switch ($booking->getCarrier()->getId()) {
 			case Carrier::CARRIER_FEDEX:
 				break;
 			default:
