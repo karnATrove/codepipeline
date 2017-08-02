@@ -33,4 +33,18 @@ class BookingCommentMapper
 		$bookingCommentDto->setCreatedAt($bookingComment->getCreated());
 		return $bookingCommentDto;
 	}
+
+    /**
+     * @param \Rove\CanonicalDto\Booking\BookingCommentDto $bookingCommentDto
+     *
+     * @return BookingComment
+     */
+    public static function mapDtoToEntity(BookingCommentDto $bookingCommentDto)
+    {
+        $bookingComment = new BookingComment();
+        $bookingComment->setComment($bookingCommentDto->getComment());
+        $bookingComment->setCreated($bookingCommentDto->getCreatedAt());
+
+        return $bookingComment;
+    }
 }

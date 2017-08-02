@@ -24,7 +24,7 @@ class BookingContactCommunication
     /**
      * Many BookingContactCommunication have One BookingContact
      * @ORM\ManyToOne(targetEntity="BookingContact", inversedBy="communications")
-     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="cascade")
      */
     private $contact;
 
@@ -176,7 +176,7 @@ class BookingContactCommunication
      *
      * @return BookingContactCommunication
      */
-    public function setContact(\WarehouseBundle\Entity\BookingContact $contact = null)
+    public function setContact(BookingContact $contact = null)
     {
         $this->contact = $contact;
 

@@ -23,6 +23,7 @@ class BookingStatusLog
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Booking", inversedBy="bookingStatusLogs")
+     * @ORM\JoinColumn(onDelete="cascade")
 	 */
 	private $booking;
 

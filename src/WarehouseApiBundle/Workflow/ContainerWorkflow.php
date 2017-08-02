@@ -6,12 +6,10 @@ namespace WarehouseApiBundle\Workflow;
 use Rove\CanonicalDto\Container\ContainerDto;
 use Rove\CanonicalDto\Product\ProductDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
-use RoveSiteRestApiBundle\Exception\RoveSiteApiException;
 use WarehouseApiBundle\Mapper\Container\ContainerMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use WarehouseApiBundle\Exception\ApiException;
-use WarehouseApiBundle\Mapper\Product\ProductMapper;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingComment;
 use WarehouseBundle\Entity\IncomingProduct;
@@ -20,7 +18,6 @@ use WarehouseBundle\Entity\Product;
 class ContainerWorkflow extends BaseWorkflow
 {
 	private $productManager;
-	private $roveApiProductManager;
 	private $incomingManager;
 	private $incomingCommentManager;
 	private $incomingProductManager;
@@ -34,7 +31,6 @@ class ContainerWorkflow extends BaseWorkflow
 	{
 		parent::__construct($container);
 		$this->productManager = $container->get('warehouse.manager.product_manager');
-		$this->roveApiProductManager = $container->get('rove_site_rest_api.manager.product_manager');
 		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
 		$this->incomingCommentManager = $container->get('warehouse.manager.incoming_comment_manager');
 		$this->incomingProductManager = $container->get('warehouse.manager.incoming_product_manager');
@@ -102,28 +98,6 @@ class ContainerWorkflow extends BaseWorkflow
 		$incomingEntity->setCreated(new \DateTime('now'));
 		$incomingEntity->setModified(new \DateTime('now'));
 		return $incomingEntity;
-	}
-
-	/**
-	 * @param string $sku
-	 *
-	 * @return Product
-	 */
-	private function createMissingProduct(string $sku)
-	{
-		//create product
-        try{
-            $productItemDto = $this->roveApiProductManager->getItemBySku($sku);
-        }catch (RoveSiteApiException $exception) {
-            throw new ApiException("Can not create missing sku $sku Detail: ".$exception->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
-
-        // only need product item to do mapping,
-        // put product title into $productItemDto->attributes
-		$productEntity = ProductMapper::mapDtoToEntity($productItemDto);
-		$productEntity->setCreated(new \DateTime());
-		$productEntity->setStatus(Product::PRODUCT_STATUS_DEFAULT);
-		return $productEntity;
 	}
 
 	/**

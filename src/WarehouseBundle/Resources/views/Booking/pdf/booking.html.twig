@@ -80,7 +80,7 @@
 	                        {% for com in booking.contact.communications %}
 	                            <li>{% if com.type == 'PHONE' %}<i class="fa fa-phone"></i>{% elseif com.type == 'EMAIL' %}<i class="fa fa-envelope"></i>{% else %}<i class="fa fa-home"></i>{% endif %}
 	                            {{ com.value }}
-	                            {% if com.id == booking.contact.defaultCom %} (default){% endif %}</li>
+	                            {% if booking.contact.defaultCom and com.id == booking.contact.defaultCom.id %} (default){% endif %}</li>
 	                        {% endfor %}
 	                        </ul>
 	                    </div>

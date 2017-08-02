@@ -10,37 +10,59 @@ use WarehouseBundle\Exception\Manager\ManagerException;
 class BookingStatusManager extends BaseManager
 {
 	/**
-	 * get status code from status id
+	 * get bookingDto status code from internal booking status id
 	 *
-	 * @param $statusId
+	 * @param int $statusId
 	 *
 	 * @return string
 	 * @throws ManagerException
 	 */
-	public static function getCode($statusId)
+	public static function getCode(int $statusId)
 	{
-		switch ($statusId) {
-			case Booking::STATUS_DELETED:
-				return BookingDto::STATUS_CODE_DELETED;
-				break;
-			case Booking::STATUS_AWAITING_FORWARD:
-				return BookingDto::STATUS_CODE_AWAITING_FORWARD;
-				break;
-			case Booking::STATUS_ACCEPTED:
-				return BookingDto::STATUS_CODE_ACCEPTED;
-				break;
-			case Booking::STATUS_PICKED:
-				return BookingDto::STATUS_CODE_PICKED;
-				break;
-			case Booking::STATUS_PACKED:
-				return BookingDto::STATUS_CODE_PACKED;
-				break;
-			case Booking::STATUS_SHIPPED:
-				return BookingDto::STATUS_CODE_SHIPPED;
-				break;
-			default:
-				throw new ManagerException("Can't find match status code");
-				break;
-		}
+        $mapping = static::getStatusMapper('id');
+        if (!isset($mapping[$statusId])) {
+            throw new ManagerException("Can't find match booking status code by {$statusId}");
+        }
+        return $mapping[$statusId];
 	}
+
+    /**
+     * Get internal booking status by
+     * @param string $statusCode
+     * @return int
+     *
+     * @throws ManagerException
+     */
+    public static function getStatusByCode(string $statusCode) {
+        $mapping = static::getStatusMapper('code');
+        if (!isset($mapping[$statusCode])) {
+            throw new ManagerException("Can't find match booking status by {$statusCode}");
+        }
+        return $mapping[$statusCode];
+    }
+
+    /**
+     * Get the mapping array of booking dto status and internal booking status
+     *
+     * @param string $key   define dto/entity is the key of mapping array
+     * @return array
+     * @throws ManagerException
+     */
+    private static function getStatusMapper(string $key = 'id') {
+        $mapper = array(
+            Booking::STATUS_DELETED          => BookingDto::STATUS_CODE_DELETED,
+            Booking::STATUS_AWAITING_FORWARD => BookingDto::STATUS_CODE_AWAITING_FORWARD,
+            Booking::STATUS_ACCEPTED         => BookingDto::STATUS_CODE_ACCEPTED,
+            Booking::STATUS_PICKED           => BookingDto::STATUS_CODE_PICKED,
+            Booking::STATUS_PACKED           => BookingDto::STATUS_CODE_PACKED,
+            Booking::STATUS_SHIPPED          => BookingDto::STATUS_CODE_SHIPPED,
+        );
+        if ($key == 'id') {
+            return $mapper;
+        }elseif ($key == 'code') {
+            return array_flip($mapper);
+        }
+        throw new ManagerException("Booking Status Mapper {!key} not found");
+
+    }
 }

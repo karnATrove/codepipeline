@@ -2,9 +2,8 @@
 
 namespace WarehouseApiBundle\Mapper\Booking;
 
-use Rove\CanonicalDto\Booking\BookingCommentDto;
 use Rove\CanonicalDto\Booking\BookingItemDto;
-use WarehouseBundle\Entity\BookingComment;
+use WarehouseApiBundle\Exception\MapperException;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Manager\BookingProductManager;
 
@@ -41,4 +40,24 @@ class BookingItemMapper
 		return $bookingItemDto;
 	}
 
+    /**
+     * @param \Rove\CanonicalDto\Booking\BookingItemDto $bookingItemDto
+     * @param \WarehouseBundle\Manager\ProductManager $productManager
+     *
+     * @throws \WarehouseApiBundle\Exception\MapperException
+     */
+    public static function mapDtoToEntity(BookingItemDto $bookingItemDto, $productManager)
+    {
+        $bookingProduct = new BookingProduct();
+        $product = $productManager->getOneBySku($bookingItemDto->getSku());
+        if (!$product) {
+            throw new MapperException("Cannot find sku:{$bookingItemDto->getSku()}");
+        }
+        $bookingProduct->setProduct($product);
+        $bookingProduct->setQty($bookingItemDto->getQuantity());
+        $bookingProduct->setPickedDate($bookingItemDto->getPickedDate());
+        $bookingProduct->setStatus(BookingProductManager::getStatusIdByCode($bookingItemDto->getStatusCode()));
+
+        return $bookingProduct;
+    }
 }
