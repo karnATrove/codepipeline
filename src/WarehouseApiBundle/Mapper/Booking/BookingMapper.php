@@ -8,13 +8,14 @@
 
 namespace WarehouseApiBundle\Mapper\Booking;
 
+use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializerBuilder;
 use Rove\CanonicalDto\Booking\BookingDto;
-use Rove\CanonicalDto\Booking\BookingLogDto;
+use WarehouseApiBundle\Exception\MapperException;
 use WarehouseBundle\Entity\Booking;
-use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Manager\BookingStatusManager;
 use WarehouseBundle\Manager\BookingTypeManager;
+use WarehouseBundle\Manager\CarrierManager;
 
 class BookingMapper
 {
@@ -56,4 +57,33 @@ class BookingMapper
 		}
 		return $dtoList;
 	}
+
+    /**
+     *
+     * @param BookingDto $bookingDto
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     *
+     * @return \WarehouseBundle\Entity\Booking
+     * @throws \WarehouseApiBundle\Exception\MapperException
+     */
+    public static function mapDtoToEntity(BookingDto $bookingDto, EntityManagerInterface $entityManager)
+    {
+        $booking = new Booking();
+        $booking->setOrderNumber($bookingDto->getOrderNumber());
+        $booking->setOrderType(BookingTypeManager::getTypeIdByCode($bookingDto->getOrderType()));
+        $booking->setOrderReference($bookingDto->getOrderReference());
+        $carrierManager = new CarrierManager($entityManager);
+        $carrier = $carrierManager->findOneBy(['code'=>$bookingDto->getCarrierCode()]);
+        if (!$carrier) {
+            throw new MapperException("Failed to match carrier with code {$bookingDto->getCarrierCode()}");
+        }
+        $booking->setCarrier($carrier);
+        $booking->setSkidCount($bookingDto->getSkidCount());
+        $booking->setFutureship($bookingDto->getFutureShipDate());
+        $booking->setShipped($bookingDto->getShippedDate());
+        $booking->setStatus(BookingStatusManager::getStatusByCode($bookingDto->getStatusCode()));
+
+        return $booking;
+    }
 }

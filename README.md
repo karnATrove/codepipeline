@@ -1,5 +1,16 @@
 Update log
 =
+v1.1.11
+-
+Add new feature: /api/v2/bookings.json (post)
+Update booking & related entity.
+Run
+```
+composer update
+php bin/console doctrine:schema:update --force
+php bin/console cache:clear --no-warmup --env prod
+```
+
 v1.0.3
 -
 Add new feature: Staging Queue service that operates auto picking from locations into a staging location.

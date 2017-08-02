@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\Collection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use WarehouseBundle\Entity\Booking;
-use WarehouseBundle\Entity\BookingContactCommunication;
 
 /**
  * BookingContact
@@ -30,7 +28,7 @@ class BookingContact
     /**
      * One BookingContact has One Booking
      * @ORM\OneToOne(targetEntity="Booking", inversedBy="contact")
-     * @ORM\JoinColumn(name="booking_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="booking_id", referencedColumnName="id", onDelete="cascade")
      */
     private $booking;
 
@@ -56,9 +54,10 @@ class BookingContact
     private $name;
 
     /**
-     * @var int
+     * @var BookingContactCommunication
      * @Gedmo\Versioned
-     * @ORM\Column(name="default_com", type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="BookingContactCommunication")
+     * @ORM\JoinColumn(name="default_com", referencedColumnName="id", nullable=true, onDelete="cascade")
      */
     private $defaultCom;
 
@@ -202,11 +201,11 @@ class BookingContact
     /**
      * Set defaultCom
      *
-     * @param integer $defaultCom
+     * @param BookingContactCommunication $defaultCom
      *
      * @return BookingContact
      */
-    public function setDefaultCom($defaultCom)
+    public function setDefaultCom(BookingContactCommunication $defaultCom)
     {
         $this->defaultCom = $defaultCom;
 
@@ -216,7 +215,7 @@ class BookingContact
     /**
      * Get defaultCom
      *
-     * @return int
+     * @return BookingContactCommunication
      */
     public function getDefaultCom()
     {

@@ -45,6 +45,18 @@ class CarrierManager extends BaseManager {
     }
 
     /**
+     * find one carrier by criteria
+     *
+     * @param array      $criteria
+     * @param array|null $orderBy
+     *
+     * @return null|Carrier
+     */
+    public function findOneBy($criteria, $orderBy = NULL) {
+        return $this->carrierRepository->findOneBy($criteria, $orderBy);
+    }
+
+    /**
      * Return list of carrier ['id'=>(name|code)]
      *
      * @param string $type

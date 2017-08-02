@@ -5,9 +5,6 @@ namespace WarehouseBundle\Controller;
 use BG\BarcodeBundle\Util\Base1DBarcode as barCode;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\View\TwitterBootstrap3View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -99,8 +96,7 @@ class BookingController extends Controller
 			// Bind values from the request
 			$filterForm->handleRequest($request);
 			if ($filterForm->isValid()) {
-//				// Build the query from the given form object
-//				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
+
 				// Save filter to session
 				$filterData = $filterForm->getData();
 				$session->set(SessionEnum::BOOKING_CONTROLLER_FILTER, $filterData);
@@ -110,14 +106,7 @@ class BookingController extends Controller
 			if ($session->has(SessionEnum::BOOKING_CONTROLLER_FILTER)) {
 				$filterData = $session->get(SessionEnum::BOOKING_CONTROLLER_FILTER);
 
-//				foreach ($filterData as $key => $filter) { //fix for entityFilterType that is loaded from session
-//					if (is_object($filter)) {
-//						$filterData[$key] = $queryBuilder->getEntityManager()->merge($filter);
-//					}
-//				}
-
 				$filterForm = $this->createForm(BookingFilterType::class, $filterData);
-//				$this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($filterForm, $queryBuilder);
 			}
 		}
 		$criteria = $criteria + $filterData;
@@ -144,20 +133,6 @@ class BookingController extends Controller
             $request->get('pcg_show', 50)/*limit per page*/
         );
 
-
-		// Paginator
-//		$adapter = new DoctrineORMAdapter($queryBuilder);
-//		$pagerfanta = new Pagerfanta($adapter);
-//		$pagerfanta->setMaxPerPage($request->get('pcg_show', 50));
-
-//		try {
-//			$pagerfanta->setCurrentPage($request->get('pcg_page', 1));
-//		} catch (\Pagerfanta\Exception\OutOfRangeCurrentPageException $ex) {
-//			$pagerfanta->setCurrentPage(1);
-//		}
-//
-//		$entities = $pagerfanta->getCurrentPageResults();
-
 		// Paginator - route generator
 		$me = $this;
 		$routeGenerator = function ($page) use ($me, $request) {
@@ -165,16 +140,7 @@ class BookingController extends Controller
 			$requestParams['pcg_page'] = $page;
 			return $me->generateUrl('booking', $requestParams);
 		};
-
-		// Paginator - view
-//		$view = new TwitterBootstrap3View();
-//		$pagerHtml = $view->render($pagerfanta, $routeGenerator, [
-//			'proximity' => 2,
-//			'prev_message' => '<',
-//			'next_message' => '>',
-//		]);
-//        $pagerHtml = knp_pagination_render($pagination);
-//		return [$entities, $pagerHtml];
+        
         return $pagination;
 	}
 

@@ -41,10 +41,10 @@
                     <td class="hidden-xs">{{ bookingUtil.bookingOrderTypeName(booking.orderType) }}</td>
                     <td>{{ bookingUtil.bookingStatusName(booking.status) }}
                         <div class="visible-xs">
-                            {{ booking.carrier.getName }}
+                            {% if (booking.carrier) %} {{  booking.carrier.getName }} {% endif %}
                         </div>
                     </td>
-                    <td class="hidden-xs">{{ booking.carrier.getName }}</td>
+                    <td class="hidden-xs">{% if (booking.carrier) %} {{  booking.carrier.getName }} {% endif %}</td>
                     <td class="hidden-xs">
                         <a href="{{ path('booking_edit', { 'id': booking.id }) }}">{{ booking.products|length }}
                             {% if booking.skidCount > 0 %} ({{ booking.skidCount }} skids){% endif %}</a>

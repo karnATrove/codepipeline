@@ -10,7 +10,7 @@ use WarehouseBundle\Exception\Manager\ManagerException;
 class BookingTypeManager extends BaseManager
 {
 	/**
-	 * get type code from type id
+	 * get type code by type id
 	 *
 	 * @param $typeId
 	 *
@@ -19,22 +19,50 @@ class BookingTypeManager extends BaseManager
 	 */
 	public static function getCode($typeId)
 	{
-		switch ($typeId) {
-			case Booking::TYPE_CARRIER_ORDER:
-				return BookingDto::TYPE_CODE_CARRIER_ORDER;
-				break;
-			case Booking::TYPE_PICKUP_ORDER:
-				return BookingDto::TYPE_CODE_PICKUP_ORDER;
-				break;
-			case Booking::TYPE_TRANSFER:
-				return BookingDto::TYPE_CODE_TRANSFER;
-				break;
-			case Booking::TYPE_PICK_ONLY:
-				return BookingDto::TYPE_CODE_PICK_ONLY;
-				break;
-			default:
-				throw new ManagerException("Can't find match type code");
-				break;
-		}
+		$mapper = self::getStatusMapper('id');
+		if (!isset($mapper[$typeId])) {
+		    throw new ManagerException("Booking Type Code not found by {$typeId}");
+        }
+        return $mapper[$typeId];
 	}
+
+    /**
+     * get type id by type code
+     * @param $typeCode
+     *
+     * @return mixed
+     * @throws ManagerException
+     */
+    public static function getTypeIdByCode($typeCode)
+    {
+        $mapper = self::getStatusMapper('code');
+        if (!isset($mapper[$typeCode])) {
+            throw new ManagerException("Booking Type ID not found by {$typeCode}");
+        }
+        return $mapper[$typeCode];
+    }
+
+    /**
+     * Return the booking type mapper [id=>code] or [code=>id]
+     * @param string $key
+     *
+     * @return array
+     * @throws \WarehouseBundle\Exception\Manager\ManagerException
+     */
+    private static function getStatusMapper(string $key = 'id')
+    {
+        $mapper = array(
+            Booking::TYPE_CARRIER_ORDER => BookingDto::TYPE_CODE_CARRIER_ORDER,
+            Booking::TYPE_PICKUP_ORDER  => BookingDto::TYPE_CODE_PICKUP_ORDER,
+            Booking::TYPE_TRANSFER      => BookingDto::TYPE_CODE_TRANSFER,
+            Booking::TYPE_PICK_ONLY     => BookingDto::TYPE_CODE_PICK_ONLY,
+        );
+        if ($key == 'id') {
+            return $mapper;
+        }elseif ($key == 'code') {
+            return array_flip($mapper);
+        }
+        throw new ManagerException("Booking Type Mapper {$key} not found");
+
+    }
 }
