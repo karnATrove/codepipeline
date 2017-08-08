@@ -269,7 +269,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$incomingWorkflow = new IncomingWorkflow($this->container);
 		$incomingWorkflow->setIncomingComplete($incoming, $this->entityManager);
 
-		if ($updateRove && $incoming->getType() == IncomingType::OCEAN_FREIGHT_CODE) {
+		if ($updateRove && $incoming->getType()->getCode() == IncomingType::OCEAN_FREIGHT_CODE) {
 			//update container in rove site first, it throw RoveSiteApiException.
 			$containerUpdateDto = new ContainerUpdateDto();
 			$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
