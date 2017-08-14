@@ -241,6 +241,7 @@ class BookingProductController extends Controller
      */
     public function formAjaxBookingProductPickForm(Request $request, BookingProduct $bookingProduct) {
 	    $bookingManager = $this->get('BookingManager');
+        $bookingProductOriginalStatus = $bookingProduct->getStatus();
 
 	    /** @var Form $form */
 	    $form = $this->createFormBuilder($bookingProduct)
@@ -275,6 +276,10 @@ class BookingProductController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $booking = $bookingProduct->getBooking();
             $booking->setModified(new \DateTime('now'));
+
+            # Mark the modified date and picked date for booking product
+            if( $bookingProductOriginalStatus <> $bookingProduct->getStatus())$bookingProduct->setModified(new \DateTime('now'));
+            if(\WarehouseBundle\Utils\Booking::bookingProductStatusList()[$bookingProduct->getStatus()] == 'Picked' && $bookingProductOriginalStatus <> $bookingProduct->getStatus())  $bookingProduct->setPickedDate(new \DateTime('now'));
 
             # See if any picks were set
             $locations = isset($request->request->get('form')['location']) ? $request->request->get('form')['location'] : array();
