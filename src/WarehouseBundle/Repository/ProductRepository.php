@@ -129,7 +129,7 @@ class ProductRepository extends EntityRepository
             ->select('SUM(lp.onHand) AS on_hand')
             ->leftJoin('WarehouseBundle:LocationProduct', 'lp', 'WITH', 'p = lp.product')
             ->groupBy('p.model')
-            ->having('on_hand > 0');
+            ->andHaving('on_hand > 0');
 
         if(!empty($criteria)){
             foreach ($criteria as $param => $value) {

@@ -166,6 +166,9 @@ class BookingRepository extends EntityRepository
 		$criteria = $bookingSearchModel->getCriteria();
 		$criteriaStartDate = $bookingSearchModel->getCriteriaStartDate();
 		$criteriaEndDate = $bookingSearchModel->getCriteriaEndDate();
+        $orderBy = $bookingSearchModel->getOrderBy();
+        $offset = $bookingSearchModel->getOffset();
+        $limit = $bookingSearchModel->getLimit();
 		if(!empty($criteria)){
             foreach ($criteria as $param => $value) {
                 $queryBuilder->andWhere("b.{$param} = '{$value}'");

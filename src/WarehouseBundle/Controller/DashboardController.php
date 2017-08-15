@@ -7,8 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Workflow\DashboardWorkflow;
 
-class DefaultController extends Controller
+class DashboardController extends Controller
 {
 	/**
      * @Route("/", name="dashboard")
@@ -19,13 +20,13 @@ class DefaultController extends Controller
      */
     public function dashboardAction()
     {
-        $bookingWorkflow = $this->get('warehouse.workflow.default_workflow');
+        $bookingWorkflow = $this->get(DashboardWorkflow::class);
         $dashboardValues = [];
         $dashboardValues['countBookingsCreatedToday'] = $bookingWorkflow->countBookingsCreatedToday();
         $dashboardValues['countBookingsShippedToday'] = $bookingWorkflow->countBookingsShippedToday();
         $dashboardValues['countStockedProducts'] = $bookingWorkflow->countStockedProducts();
-        $dashboardValues['countPickedProductsToday'] = $bookingWorkflow->countPickedProductsToday();
-        return $this->render('WarehouseBundle:Default:dashboard.html.twig', $dashboardValues);
+        $dashboardValues['countPickedBookingProductsToday'] = $bookingWorkflow->countPickedBookingProductsToday();
+        return $this->render('WarehouseBundle:Dashboard:dashboard.html.twig', $dashboardValues);
     }
 
 }
