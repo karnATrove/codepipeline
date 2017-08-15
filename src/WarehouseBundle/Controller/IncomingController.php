@@ -349,8 +349,8 @@ class IncomingController extends Controller
 				$containerUpdateDto->setName($incoming->getName());
 				$containerUpdateDto->setScheduledArrivalTime($incoming->getScheduled());
 				if ($incoming->getType()->getCode() == \WarehouseBundle\Entity\IncomingType::OCEAN_FREIGHT_CODE) {
-					$this->container->get('rove_site_rest_api.manager.container_manager')
-						->update($containerUpdateDto, $incoming->getName());
+					$this->container->get('rove_rove_site_rest_api.service.container_service')
+						->update($containerUpdateDto);
 				}
 
 				$em->flush();

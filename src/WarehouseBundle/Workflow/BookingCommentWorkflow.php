@@ -99,7 +99,7 @@ class BookingCommentWorkflow extends BaseWorkflow
 		$orderCommentCreateDto->setNotifyCustomerCare(true);
 		$orderCommentCreateDto->setComment($comment);
 		$orderCommentCreateDto->setCreatedBy($this->user->getEmail());
-		$this->container->get('rove_site_rest_api.manager.order_comment_manager')->create($orderCommentCreateDto);
+		$this->container->get('rove_rove_site_rest_api.service.order_comment_service')->create($orderCommentCreateDto);
 	}
 
 	/**

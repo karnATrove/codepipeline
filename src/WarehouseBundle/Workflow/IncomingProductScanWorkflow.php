@@ -278,8 +278,8 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
 			$containerUpdateDto->setName($incoming->getName());
 			try {
-				$this->container->get('rove_site_rest_api.manager.container_manager')
-					->update($containerUpdateDto, $incoming->getName());
+				$this->container->get('rove_rove_site_rest_api.service.container_service')
+					->update($containerUpdateDto);
 
 			} catch (RoveSiteApiException $roveSiteApiException) {
 				throw new WorkflowAPIException("Error from roveconcepts.com:<br>"
