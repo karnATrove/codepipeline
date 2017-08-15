@@ -194,13 +194,13 @@ fos_http_cache:
                     vary: [Accept-Encoding, Accept-Language]
 
 rove_rove_site_rest_api:
-    api_key: d21zIGxpbmsgdG8gcm92ZSBhd2Vzb21l
+    api_key: "%rove_site.api.key%"
     url:
-      base: 'http://lee.roveconcepts.com/api'
+      base: "%rove_site.api.url.base%"
 #      base: 'https://www.roveconcepts.com/api'
-      comment: /order-comment
-      container: /container
-      product: /product
-      product_item: /product-item
+      comment: "%rove_site.api.url.comment%"
+      container: "%rove_site.api.url.container%"
+      product: "%rove_site.api.url.product%"
+      product_item: "%rove_site.api.url.productItem%"
       order: /order
       inventory: /inventory
