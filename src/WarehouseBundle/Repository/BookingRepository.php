@@ -181,6 +181,15 @@ class BookingRepository extends EntityRepository
                 $queryBuilder->andWhere("b.{$param} <= '{$value}'");
             }
         }
+        if(!empty($orderBy)){
+            foreach ($orderBy as $param => $value) {
+                $queryBuilder->orderBy("b.{$value}");
+            }
+        }
+        if(!empty($limit)){
+            $queryBuilder->setMaxResults($limit);
+            if(!empty($offset)) $queryBuilder->setFirstResult($offset);
+        }
 
 		$query = $queryBuilder->getQuery();
 		try{

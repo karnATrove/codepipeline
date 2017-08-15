@@ -11,6 +11,7 @@ namespace WarehouseBundle\Workflow;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WarehouseBundle\Model\Booking\BookingSearchModel;
+use WarehouseBundle\Model\Product\ProductSearchModel;
 
 class DefaultWorkflow
 {
@@ -40,7 +41,8 @@ class DefaultWorkflow
 
     public function countStockedProducts()
     {
-
+        $productSearchModel = new ProductSearchModel();
+        return $this->productManager->countStockProduct($productSearchModel);
     }
 
     public function countPickedProductsToday()
