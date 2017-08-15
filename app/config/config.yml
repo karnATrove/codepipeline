@@ -193,3 +193,15 @@ fos_http_cache:
                     cache_control: { public: true, max_age: 15, s_maxage: 30 }
                     last_modified: "-1 hour"
                     vary: [Accept-Encoding, Accept-Language]
+
+rove_rove_site_rest_api:
+    api_key: d21zIGxpbmsgdG8gcm92ZSBhd2Vzb21l
+    url:
+      base: 'http://lee.roveconcepts.com/api'
+#      base: 'https://www.roveconcepts.com/api'
+      comment: /order-comment
+      container: /container
+      product: /product
+      product_item: /product-item
+      order: /order
+      inventory: /inventory

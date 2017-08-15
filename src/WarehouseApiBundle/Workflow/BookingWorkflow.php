@@ -16,6 +16,9 @@ use WarehouseApiBundle\Mapper\Booking\BookingContactMapper;
 use WarehouseApiBundle\Mapper\Booking\BookingItemMapper;
 use WarehouseApiBundle\Mapper\Booking\BookingMapper;
 use WarehouseBundle\Entity\BookingContact;
+use WarehouseBundle\Manager\BookingContactManager;
+use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Manager\ProductManager;
 
 class BookingWorkflow extends BaseWorkflow
 {
@@ -31,9 +34,9 @@ class BookingWorkflow extends BaseWorkflow
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		$this->bookingManager = $container->get('warehouse.manager.booking_manager');
-        $this->productManager = $container->get('warehouse.manager.product_manager');
-        $this->bookingContactManger = $container->get('warehouse.manager.booking_contact_manager');
+		$this->bookingManager = $container->get(BookingManager::class);
+		$this->productManager = $container->get(ProductManager::class);
+		$this->bookingContactManger = $container->get(BookingContactManager::class);
 
 	}
 
@@ -70,96 +73,103 @@ class BookingWorkflow extends BaseWorkflow
 		return $order;
 	}
 
-    /**
-     * Create booking
-     * @param Request $request
-     * @throws \WarehouseApiBundle\Exception\ApiException
-     */
-    public function createBooking (Request $request) {
+	/**
+	 * Create booking
+	 *
+	 * @param Request $request
+	 *
+	 * @throws \WarehouseApiBundle\Exception\ApiException
+	 */
+	public function createBooking(Request $request)
+	{
 
-        $data = $request->getContent();
-        /** @var BookingDto $bookingDto */
-        $bookingDto = SerializerBuilder::create()->build()->deserialize($data, BookingDto::class,'json');
-        $activeBookingStatuses = array_keys($this->container->get('app.booking')->bookingStatusList(TRUE, TRUE));
+		$data = $request->getContent();
+		/** @var BookingDto $bookingDto */
+		$bookingDto = SerializerBuilder::create()->build()->deserialize($data, BookingDto::class, 'json');
+		$activeBookingStatuses = array_keys($this->container->get('app.booking')->bookingStatusList(TRUE, TRUE));
 
-        ## check if booking exists
-        $booking = $this->bookingManager->findBy(['orderReference' => $bookingDto->getOrderReference(), 'status' => $activeBookingStatuses  ], null, 1);
-        if (!empty($booking)) {
-            throw new ApiException("Booking {$bookingDto->getOrderReference()} already exists.", Response::HTTP_BAD_REQUEST);
-        }
+		## check if booking exists
+		$booking = $this->bookingManager->findBy(['orderReference' => $bookingDto->getOrderReference(), 'status' => $activeBookingStatuses], null, 1);
+		if (!empty($booking)) {
+			throw new ApiException("Booking {$bookingDto->getOrderReference()} already exists.", Response::HTTP_BAD_REQUEST);
+		}
 
-        ## check if missing any booking product or product out of stock.
-        /** @var \Rove\CanonicalDto\Booking\BookingItemDto $item */
-        foreach ($bookingDto->getBookingItems() as $item) {
-            //check product existence, create if not exist
-            $product = $this->productManager->getOneBySku($item->getSku());
-            if (!$product) {
-                // if not exists, try to create missing product, but still throw exception next, as missing product stock must be empty.
-                $product = $this->createMissingProduct($item->getSku());
-                $this->productManager->updateProduct($product, null);// we want to save this no matter what
-                throw new ApiException("Booking {$bookingDto->getOrderReference()} product {$item->getSku()} is not available.", Response::HTTP_BAD_REQUEST);
-            } else {
-                $available = $this->productManager->getProductAvailableQuantity($item->getSku());
-                if ($available < $item->getQuantity()) {
-                    throw new ApiException("Booking {$bookingDto->getOrderReference()} product {$item->getSku()} is not available.", Response::HTTP_BAD_REQUEST);
-                }
-            }
-        }
+		## check if missing any booking product or product out of stock.
+		/** @var \Rove\CanonicalDto\Booking\BookingItemDto $item */
+		foreach ($bookingDto->getBookingItems() as $item) {
+			//check product existence, create if not exist
+			$product = $this->productManager->getOneBySku($item->getSku());
+			if (!$product) {
+				// if not exists, try to create missing product, but still throw exception next, as missing product stock must be empty.
+				$product = $this->createMissingProduct($item->getSku());
+				$this->productManager->updateProduct($product, null);// we want to save this no matter what
+				throw new ApiException("Booking {$bookingDto->getOrderReference()} product {$item->getSku()} is not available.", Response::HTTP_BAD_REQUEST);
+			} else {
+				$available = $this->productManager->getProductAvailableQuantity($item->getSku());
+				if ($available < $item->getQuantity()) {
+					throw new ApiException("Booking {$bookingDto->getOrderReference()} product {$item->getSku()} is not available.", Response::HTTP_BAD_REQUEST);
+				}
+			}
+		}
 
 
-        // create booking
-        $booking = $this->createBookingFromDto($bookingDto);
+		// create booking
+		$booking = $this->createBookingFromDto($bookingDto);
 
-        // create booking product
-        if (!empty($bookingDto->getBookingItems())) {
-            foreach ($bookingDto->getBookingItems() as $item) {
-                $bookingProduct = BookingItemMapper::mapDtoToEntity($item, $this->productManager);
-                $bookingProduct->setBooking($booking);
-                $booking->addProduct($bookingProduct);
-            }
-        }
-        // create booking comment
-        if (!empty($bookingDto->getBookingComments())) {
-            foreach ($bookingDto->getBookingComments() as $bookingCommentDto) {
-                $bookingComment = BookingCommentMapper::mapDtoToEntity($bookingCommentDto);
-                $bookingComment->setBooking($booking);
-                $booking->addComment($bookingComment);
-            }
-        }
+		// create booking product
+		if (!empty($bookingDto->getBookingItems())) {
+			foreach ($bookingDto->getBookingItems() as $item) {
+				$bookingProduct = BookingItemMapper::mapDtoToEntity($item, $this->productManager);
+				$bookingProduct->setBooking($booking);
+				$booking->addProduct($bookingProduct);
+			}
+		}
+		// create booking comment
+		if (!empty($bookingDto->getBookingComments())) {
+			foreach ($bookingDto->getBookingComments() as $bookingCommentDto) {
+				$bookingComment = BookingCommentMapper::mapDtoToEntity($bookingCommentDto);
+				$bookingComment->setBooking($booking);
+				$booking->addComment($bookingComment);
+			}
+		}
 
-        // create booking contacts but wont set the default
-        if (!empty($bookingDto->getBookingContacts())) {
-            // only grab the first one
-            $bookingContactDto = $bookingDto->getBookingContacts()[0];
-            $bookingContact = $this->createBookingContactFromDto($bookingContactDto);
-            $bookingContact->setBooking($booking);
-            $booking->setContact($bookingContact);
-        }
+		// create booking contacts but wont set the default
+		if (!empty($bookingDto->getBookingContacts())) {
+			// only grab the first one
+			$bookingContactDto = $bookingDto->getBookingContacts()[0];
+			$bookingContact = $this->createBookingContactFromDto($bookingContactDto);
+			$bookingContact->setBooking($booking);
+			$booking->setContact($bookingContact);
+		}
 
-        $this->bookingManager->updateBooking($booking, $this->entityManager, FALSE); // wont flush
-        $this->entityManager->flush();
-    }
+		$this->bookingManager->updateBooking($booking, $this->entityManager, FALSE); // wont flush
+		$this->entityManager->flush();
+	}
 
-    /**
-     * Create booking from bookingDto
-     * @param \Rove\CanonicalDto\Booking\BookingDto $bookingDto
-     * @return \WarehouseBundle\Entity\Booking
-     */
-    public function createBookingFromDto(BookingDto $bookingDto) {
-        $bookingEntity = BookingMapper::mapDtoToEntity($bookingDto, $this->entityManager);
-        $bookingEntity->setCreated(new \DateTime('now'));
-        $bookingEntity->setModified(new \DateTime('now'));
-        return $bookingEntity;
-    }
+	/**
+	 * Create booking from bookingDto
+	 *
+	 * @param \Rove\CanonicalDto\Booking\BookingDto $bookingDto
+	 *
+	 * @return \WarehouseBundle\Entity\Booking
+	 */
+	public function createBookingFromDto(BookingDto $bookingDto)
+	{
+		$bookingEntity = BookingMapper::mapDtoToEntity($bookingDto, $this->entityManager);
+		$bookingEntity->setCreated(new \DateTime('now'));
+		$bookingEntity->setModified(new \DateTime('now'));
+		return $bookingEntity;
+	}
 
-    /**
-     * @param BookingContactDto $bookingContactDto
-     *
-     * @return BookingContact
-     */
-    public function createBookingContactFromDto(BookingContactDto $bookingContactDto) {
-        $bookingContactEntity = BookingContactMapper::mapDtoToEntity($bookingContactDto);
-        return $bookingContactEntity;
-    }
+	/**
+	 * @param BookingContactDto $bookingContactDto
+	 *
+	 * @return BookingContact
+	 */
+	public function createBookingContactFromDto(BookingContactDto $bookingContactDto)
+	{
+		$bookingContactEntity = BookingContactMapper::mapDtoToEntity($bookingContactDto);
+		return $bookingContactEntity;
+	}
 
 }

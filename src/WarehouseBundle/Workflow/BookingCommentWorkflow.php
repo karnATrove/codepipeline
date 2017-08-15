@@ -18,6 +18,9 @@ use WarehouseBundle\Entity\BookingComment;
 use WarehouseBundle\Entity\User;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Form\BookingCommentType;
+use WarehouseBundle\Manager\BookingCommentManager;
+use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Utils\MessagePrinter;
 
 class BookingCommentWorkflow extends BaseWorkflow
 {
@@ -32,8 +35,8 @@ class BookingCommentWorkflow extends BaseWorkflow
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		$this->bookingCommentManager = $this->container->get('warehouse.manager.booking_comment_manager');
-		$this->bookingManager = $this->container->get('warehouse.manager.booking_manager');
+		$this->bookingCommentManager = $this->container->get(BookingCommentManager::class);
+		$this->bookingManager = $this->container->get(BookingManager::class);
 		$this->formBuilder = $container->get('form.factory');
 		$this->router = $container->get('router');
 		$this->user = $this->container->get('security.token_storage')->getToken()->getUser();
@@ -46,7 +49,7 @@ class BookingCommentWorkflow extends BaseWorkflow
 			throw new WorkflowException("Failed! Can not identify user. Please refresh page and try again.");
 		}
 
-		if (!$this->user){
+		if (!$this->user) {
 			throw new WorkflowException("Failed! Can not identify user. Please refresh page and try again.");
 		}
 
@@ -58,8 +61,8 @@ class BookingCommentWorkflow extends BaseWorkflow
 			throw new WorkflowException("Failed! Comment form not valid.");
 		}
 
-		if ($commentForm->get('notifyCustomerCare')->getData()==1){
-			$this->sendCommentToRove($bookingComment->getComment(),$booking->getOrderNumber());
+		if ($commentForm->get('notifyCustomerCare')->getData() == 1) {
+			$this->sendCommentToRove($bookingComment->getComment(), $booking->getOrderNumber());
 		}
 
 		$bookingComment->setCreated(new \DateTime());
@@ -72,7 +75,7 @@ class BookingCommentWorkflow extends BaseWorkflow
 		$this->entityManager->flush();
 
 		$messages['success'][] = "Comment created.";
-		$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+		$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		$ajaxCommands[] = new AjaxCommandDTO('.booking-comment-message-bag-container',
 			AjaxCommandDTO::OP_HTML, $this->getMessageBagView());
 
@@ -89,7 +92,8 @@ class BookingCommentWorkflow extends BaseWorkflow
 	 * @param $comment
 	 * @param $orderNumber
 	 */
-	private function sendCommentToRove($comment, $orderNumber){
+	private function sendCommentToRove($comment, $orderNumber)
+	{
 		$orderCommentCreateDto = new OrderCommentCreateDto();
 		$orderCommentCreateDto->setOrderNumber($orderNumber);
 		$orderCommentCreateDto->setNotifyCustomerCare(true);

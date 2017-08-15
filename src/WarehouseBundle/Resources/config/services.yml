@@ -21,70 +21,23 @@ services:
     ProductManager:
       class: WarehouseBundle\Doctrine\ProductManager
       arguments: [ "@doctrine.orm.entity_manager" , "@service_container" ]
-    warehouse.manager.booking_manager:
-        class: WarehouseBundle\Manager\BookingManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.product_manager:
-        class: WarehouseBundle\Manager\ProductManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.user_manager:
-        class: WarehouseBundle\Manager\UserManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.user_group_manager:
-        class: WarehouseBundle\Manager\UserGroupManager
+
+
+    WarehouseBundle\Manager\:
+        resource: '../../Manager/*'
+        exclude: '../../Manager/{BaseWorkflow}'
         arguments: ['@doctrine.orm.entity_manager']
     warehouse.manager.incoming_manager:
-        class: WarehouseBundle\Manager\IncomingManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.location_product_manager:
-        class: WarehouseBundle\Manager\LocationProductManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.incoming_status_manager:
-        class: WarehouseBundle\Manager\IncomingStatusManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.incoming_product_scan_manager:
-        class: WarehouseBundle\Manager\IncomingProductScanManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.incoming_product_manager:
-        class: WarehouseBundle\Manager\IncomingProductManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.location_manager:
-        class: WarehouseBundle\Manager\LocationManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.booking_comment_manager:
-        class: WarehouseBundle\Manager\BookingCommentManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.incoming_comment_manager:
-        class: WarehouseBundle\Manager\IncomingCommentManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.carrier_manager:
-        class: WarehouseBundle\Manager\CarrierManager
-        arguments: ['@doctrine.orm.entity_manager']
-    warehouse.manager.booking_contact_manager:
-        class: WarehouseBundle\Manager\BookingContactManager
-        arguments: ['@doctrine.orm.entity_manager']
+            class: WarehouseBundle\Manager\IncomingManager
+            arguments: ['@doctrine.orm.entity_manager']
 
-    warehouse.work_flow.booking_work_flow:
-        class: WarehouseBundle\Workflow\BookingWorkflow
-        arguments: ['@service_container']
-    warehouse.workflow.user_workflow:
-        class: WarehouseBundle\Workflow\UserWorkflow
-        arguments: ['@service_container']
-    warehouse.workflow.incoming_workflow:
-        class: WarehouseBundle\Workflow\IncomingWorkflow
-        arguments: ['@service_container']
-    warehouse.workflow.incoming_product_scan_workflow:
-        class: WarehouseBundle\Workflow\IncomingProductScanWorkflow
-        arguments: ['@service_container']
-    warehouse.workflow.staging_queue_workflow:
-        class: WarehouseBundle\Workflow\StagingQueueWorkflow
-        arguments: ['@service_container']
-    warehouse.workflow.booking_comment_workflow:
-        class: WarehouseBundle\Workflow\BookingCommentWorkflow
+    WarehouseBundle\Workflow\:
+        resource: '../../Workflow/*'
+        exclude: '../../Workflow/{BaseWorkflow}'
         arguments: ['@service_container']
 
-    warehouse.utils.message_printer:
-        class: WarehouseBundle\Utils\MessagePrinter
+    WarehouseBundle\Utils\:
+        resource: '../../Utils/*'
         arguments: ['@service_container']
 
     warehouse.hidden_datetime.form.type:

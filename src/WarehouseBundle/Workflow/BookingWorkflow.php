@@ -10,6 +10,7 @@ use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Manager\ProductManager;
 use WarehouseBundle\Utils\FileUtility;
 
 class BookingWorkflow
@@ -31,7 +32,7 @@ class BookingWorkflow
 	 */
 	public function __construct(ContainerInterface $container)
 	{
-		$this->bookingManager = $container->get('warehouse.manager.booking_manager');
+		$this->bookingManager = $container->get(BookingManager::class);
 		$this->em = $container->get('doctrine')->getManager();
 		$this->templating = $container->get('templating');
 		$this->container = $container;
@@ -145,7 +146,7 @@ class BookingWorkflow
 		foreach ($bookings as $booking) {
 			foreach ($booking->getProducts() as $bookingProduct) {
 				$sku = $bookingProduct->getProduct()->getModel();
-				$availableQuantity = $this->container->get('warehouse.manager.product_manager')
+				$availableQuantity = $this->container->get(ProductManager::class)
 					->getProductAvailableQuantity($sku);
 				if ($availableQuantity < $bookingProduct->getQty()) {
 					$unavailableBooking[$booking->getOrderNumber()][] = ['sku' => $sku, '

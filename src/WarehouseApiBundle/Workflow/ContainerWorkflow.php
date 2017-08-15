@@ -14,6 +14,10 @@ use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingComment;
 use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Manager\IncomingCommentManager;
+use WarehouseBundle\Manager\IncomingManager;
+use WarehouseBundle\Manager\IncomingProductManager;
+use WarehouseBundle\Manager\ProductManager;
 
 class ContainerWorkflow extends BaseWorkflow
 {
@@ -30,10 +34,10 @@ class ContainerWorkflow extends BaseWorkflow
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		$this->productManager = $container->get('warehouse.manager.product_manager');
-		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
-		$this->incomingCommentManager = $container->get('warehouse.manager.incoming_comment_manager');
-		$this->incomingProductManager = $container->get('warehouse.manager.incoming_product_manager');
+		$this->productManager = $container->get(ProductManager::class);
+		$this->incomingManager = $container->get(IncomingManager::class);
+		$this->incomingCommentManager = $container->get(IncomingCommentManager::class);
+		$this->incomingProductManager = $container->get(IncomingProductManager::class);
 	}
 
 	/**

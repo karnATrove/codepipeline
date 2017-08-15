@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use WarehouseBundle\Form\BookingRestType;
 use WarehouseBundle\Entity\Booking;
+use WarehouseBundle\Manager\CarrierManager;
 
 /**
  * Rest controller for booking
@@ -256,7 +257,7 @@ class BookingRestController extends FOSRestController
         if($paramFetcher->get('orderreference')){$booking->setOrderReference($paramFetcher->get('orderreference'));}
         if($paramFetcher->get('ordertype')){$booking->setOrderType($paramFetcher->get('ordertype'));}
         if($paramFetcher->get('carrierid')){
-            $carrierManager = $this->get('warehouse.manager.carrier_manager');
+            $carrierManager = $this->get(CarrierManager::class);
             $booking->setCarrier($carrierManager->find($paramFetcher->get('carrierid')));
         }
         $booking->setModified(new \DateTime('now'));

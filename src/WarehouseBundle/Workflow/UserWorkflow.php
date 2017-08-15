@@ -1,21 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-06-07
- * Time: 9:28 AM
- */
 
 namespace WarehouseBundle\Workflow;
 
-
-use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
 use WarehouseBundle\Entity\User;
 use WarehouseBundle\Manager\UserGroupManager;
 
@@ -37,19 +30,19 @@ class UserWorkflow
 	{
 		$this->container = $container;
 		$this->fosUserManager = $container->get('fos_user.user_manager');
-		$this->userManager = $container->get('warehouse.manager.user_manager');
-		$this->userGroupManager = $container->get('warehouse.manager.user_group_manager');
+		$this->userManager = $container->get(\WarehouseBundle\Manager\UserManager::class);
+		$this->userGroupManager = $container->get(UserGroupManager::class);
 		$this->entityManager = $container->get('doctrine.orm.entity_manager');
 	}
 
 	/**
 	 * @param User $user
 	 *
-	 * @return \Symfony\Component\Form\FormInterface
+	 * @return FormInterface
 	 */
 	public function makeUserCreateEditForm(User $user)
 	{
-		$userGroups = $this->container->get('warehouse.manager.user_group_manager')->getAllUserGroups();
+		$userGroups = $this->container->get(UserGroupManager::class)->getAllUserGroups();
 		$selection = UserGroupManager::makeUserGroupListForForm($userGroups);
 		$selected = UserGroupManager::makeSelectedUserGroupListForForm($user);
 		$formBuilder = $this->container->get('form.factory')->createBuilder(FormType::class, $user);

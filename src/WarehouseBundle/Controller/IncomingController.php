@@ -16,6 +16,7 @@ use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingType;
+use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Model\Incoming\IncomingSearchModel;
 
 /**
@@ -42,7 +43,7 @@ class IncomingController extends Controller
 		$searchModel->setSearchString($keyword);
 		$searchModel->setIsComplete($isComplete);
 		$searchModel->setOrderBy(['eta' => 'desc']);
-		$query = $this->get('warehouse.manager.incoming_manager')
+		$query = $this->get(IncomingManager::class)
 			->searchContainers($searchModel, true);
 
 		$paginator = $this->get('knp_paginator');
@@ -99,7 +100,7 @@ class IncomingController extends Controller
 		$searchModel->setEtaEndDate($end);
 		$searchModel->setScheduledStartDate($start);
 		$searchModel->setScheduledEndDate($end);
-		$incomingList = $this->get('warehouse.manager.incoming_manager')
+		$incomingList = $this->get(IncomingManager::class)
 			->searchContainers($searchModel, false);
 		$data = [];
 		foreach ($incomingList as $incoming) {

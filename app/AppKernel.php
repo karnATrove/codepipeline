@@ -43,6 +43,9 @@ class AppKernel extends Kernel
             new RoveSiteRestApiBundle\RoveSiteRestApiBundle(),
 	        new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
             new WarehouseApiBundle\WarehouseApiBundle(),
+
+	        //rove
+	        new Rove\RoveSiteRestApiBundle\RoveRoveSiteRestApiBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
