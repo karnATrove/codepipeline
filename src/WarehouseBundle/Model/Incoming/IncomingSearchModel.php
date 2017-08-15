@@ -57,7 +57,7 @@ class IncomingSearchModel
 	/**
 	 * @return bool|null
 	 */
-	public function getisComplete()
+	public function getIsComplete()
 	{
 		return $this->isComplete;
 	}

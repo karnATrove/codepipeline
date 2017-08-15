@@ -10,7 +10,7 @@
               <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div class="tile-stats">
                   <div class="icon"><i class="fa fa-cart-plus"></i></div>
-                  <div class="count">179</div>
+                  <div class="count">{{ countBookingsCreatedToday }}</div>
                   <h3>New Orders</h3>
                   <p>Number of new orders created today.</p>
                 </div>
@@ -19,7 +19,7 @@
                 <div class="tile-stats">
                   <div class="icon"><i class="fa fa-cubes"></i></div>
                   <div class="count">179</div>
-                  <h3>Stocked Items</h3>
+                  <h3>Stocked SKUs</h3>
                   <p>Total count of different inventory items.</p>
                 </div>
               </div>
@@ -34,7 +34,7 @@
               <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div class="tile-stats">
                   <div class="icon"><i class="fa fa-check-square-o"></i></div>
-                  <div class="count">179</div>
+                  <div class="count">{{ countBookingsShippedToday }}</div>
                   <h3>Orders closed today</h3>
                   <p>How many orders were closed today.</p>
                 </div>

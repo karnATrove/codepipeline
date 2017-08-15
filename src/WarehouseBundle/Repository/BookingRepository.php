@@ -8,6 +8,7 @@ use Doctrine\ORM\NoResultException;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Model\Booking\BookingSearchModel;
 
 class BookingRepository extends EntityRepository
 {
@@ -154,17 +155,33 @@ class BookingRepository extends EntityRepository
 	}
 
 	/**
-	 * @param $criteria
+	 * @param BookingSearchModel $bookingSearchModel
 	 *
 	 * @return int|mixed
 	 */
-	public function count($criteria)
+	public function count($bookingSearchModel)
 	{
 		$queryBuilder = $this->createQueryBuilder('b');
 		$queryBuilder->select($queryBuilder->expr()->count('b'));
-		foreach ($criteria as $param => $value) {
-			$queryBuilder->andWhere("b.{$param} = '{$value}'");
-		}
+		$criteria = $bookingSearchModel->getCriteria();
+		$criteriaStartDate = $bookingSearchModel->getCriteriaStartDate();
+		$criteriaEndDate = $bookingSearchModel->getCriteriaEndDate();
+		if(!empty($criteria)){
+            foreach ($criteria as $param => $value) {
+                $queryBuilder->andWhere("b.{$param} = '{$value}'");
+            }
+        }
+        if(!empty($criteriaStartDate)){
+            foreach ($criteriaStartDate as $param => $value) {
+                $queryBuilder->andWhere("b.{$param} >= '{$value}'");
+            }
+        }
+        if(!empty($criteriaEndDate)){
+            foreach ($criteriaEndDate as $param => $value) {
+                $queryBuilder->andWhere("b.{$param} <= '{$value}'");
+            }
+        }
+
 		$query = $queryBuilder->getQuery();
 		try{
 			return $query->getSingleScalarResult();

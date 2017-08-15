@@ -17,8 +17,9 @@ use WarehouseApiBundle\Mapper\Booking\BookingItemMapper;
 use WarehouseApiBundle\Mapper\Booking\BookingMapper;
 use WarehouseBundle\Entity\BookingContact;
 use WarehouseBundle\Manager\BookingContactManager;
-use WarehouseBundle\Manager\BookingManager;
+use WarehouseBundle\Model\Booking\BookingSearchModel;
 use WarehouseBundle\Manager\ProductManager;
+use WarehouseBundle\Manager\BookingManager;
 
 class BookingWorkflow extends BaseWorkflow
 {
@@ -48,11 +49,13 @@ class BookingWorkflow extends BaseWorkflow
 	public function getBookingsView(Request $request)
 	{
 		$criteria = $this->buildBookingSearchCriteria($request);
+        $bookingSearchModel = new BookingSearchModel();
+        $bookingSearchModel->setCriteria($criteria);
 		$orderBy = $this->buildBookingSearchOrder($request);
 		$limit = empty($request->get('limit')) ? 50 : $request->get('limit');;
 		$page = empty($request->get('page')) ? 1 : $request->get('page');
 
-		$total = $this->bookingManager->count($criteria);
+		$total = $this->bookingManager->count($bookingSearchModel);
 		$offset = $limit * (($page - 1) > 0 ? ($page - 1) : 0);
 		$bookings = $this->bookingManager->findBy($criteria, $orderBy, $limit, $offset);
 		$bookingDtos = BookingMapper::mapToDtoList($bookings);
