@@ -8,3 +8,7 @@ services:
     warehouse_api.workflow.container_workflow:
         class: WarehouseApiBundle\Workflow\ContainerWorkflow
         arguments: ['@service_container']
+#    WarehouseApiBundle\Workflow\:
+#            resource: '../../Workflow/*'
+#            exclude: '../../Workflow/{BaseWorkflow}'
+#            arguments: ['@service_container']

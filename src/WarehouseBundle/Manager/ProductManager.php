@@ -16,6 +16,7 @@ use Rove\CanonicalDto\Product\ProductItemDimensionDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Exception\Manager\ManagerException;
+use WarehouseBundle\Model\Product\ProductSearchModel;
 
 class ProductManager extends BaseManager
 {
@@ -113,4 +114,13 @@ class ProductManager extends BaseManager
 			$entityManager->flush();
 		}
 	}
+
+    /**
+     * Count products
+     * @param ProductSearchModel $productSearchModel
+     * @return int
+     */
+    public function countStockProduct(ProductSearchModel $productSearchModel){
+        return $this->productRepository->countStockProduct($productSearchModel);
+    }
 }

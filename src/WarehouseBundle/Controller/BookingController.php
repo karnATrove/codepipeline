@@ -18,6 +18,7 @@ use WarehouseBundle\DTO\Booking\BulkAction;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingLog;
 use WarehouseBundle\Entity\BookingStatusLog;
+use WarehouseBundle\Entity\Carrier;
 use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Shipment;
 use WarehouseBundle\Enum\SessionEnum;
@@ -29,6 +30,7 @@ use WarehouseBundle\Manager\BookingManager;
 use WarehouseBundle\Utils\Booking as BookingUtility;
 use WarehouseBundle\Utils\StringHelper;
 use WarehouseBundle\Workflow\BookingWorkflow;
+use WarehouseBundle\Workflow\StagingQueueWorkflow;
 
 /**
  * Booking controller.
@@ -47,30 +49,29 @@ class BookingController extends Controller
 	public function indexAction(Request $request)
 	{
 
-        $criteria = array();
+		$criteria = [];
 		// Remove deleted status
 		if (empty($request->get('status')) || !(is_numeric($request->get('status'))
 				|| intval($request->get('status')) == 0)
 		) {
-		    $criteria['status'] = array('op'=>'<>','value'=>Booking::STATUS_DELETED);
+			$criteria['status'] = ['op' => '<>', 'value' => Booking::STATUS_DELETED];
 		}
-		$sorting = array('id'=>'desc');// default sorting by id
+		$sorting = ['id' => 'desc'];// default sorting by id
 
-        $numberPerPage = empty($request->get('numberPerPage')) ? 50 : $request->get('numberPerPage');
+		$numberPerPage = empty($request->get('numberPerPage')) ? 50 : $request->get('numberPerPage');
 
-        // set filter & filter form
-        list($filterForm, $criteria) = $this->filter($criteria, $request);
-        $queryBuilder = $this->get('warehouse.manager.booking_manager')->searchBookings($criteria,$sorting,TRUE);
-        $paginator  = $this->get('knp_paginator');
-        $pagination = $paginator->paginate(
-            $queryBuilder, /* query NOT result */
-            $request->query->getInt('page', 1),/*page number*/
-            $numberPerPage
-        );
-
+		// set filter & filter form
+		list($filterForm, $criteria) = $this->filter($criteria, $request);
+		$queryBuilder = $this->get(BookingManager::class)->searchBookings($criteria, $sorting, TRUE);
+		$paginator = $this->get('knp_paginator');
+		$pagination = $paginator->paginate(
+			$queryBuilder, /* query NOT result */
+			$request->query->getInt('page', 1),/*page number*/
+			$numberPerPage
+		);
 		return $this->render('WarehouseBundle::Booking/index.html.twig', [
-            'numberPerPage' => $numberPerPage,
-            'pagination' => $pagination,
+			'numberPerPage' => $numberPerPage,
+			'pagination' => $pagination,
 			'filterForm' => $filterForm->createView(),
 		]);
 	}
@@ -91,7 +92,7 @@ class BookingController extends Controller
 		}
 
 		// Filter action
-        $filterData = array();
+		$filterData = [];
 		if ($request->get('filter_action') == 'filter') {
 			// Bind values from the request
 			$filterForm->handleRequest($request);
@@ -120,18 +121,18 @@ class BookingController extends Controller
 	 */
 	protected function paginator(QueryBuilder $queryBuilder, Request $request)
 	{
-	    echo 111;
+		echo 111;
 		//sorting
 		$sortCol = $queryBuilder->getRootAliases()[0] . '.' . $request->get('pcg_sort_col', 'id');
 		echo $sortCol;
 		$queryBuilder->orderBy($sortCol, $request->get('pcg_sort_order', 'desc'));
 
-        $paginator  = $this->get('knp_paginator');
-        $pagination = $paginator->paginate(
-            $queryBuilder, /* query NOT result */
-            $request->get('pcg_page', 1)/*page number*/,
-            $request->get('pcg_show', 50)/*limit per page*/
-        );
+		$paginator = $this->get('knp_paginator');
+		$pagination = $paginator->paginate(
+			$queryBuilder, /* query NOT result */
+			$request->get('pcg_page', 1)/*page number*/,
+			$request->get('pcg_show', 50)/*limit per page*/
+		);
 
 		// Paginator - route generator
 		$me = $this;
@@ -140,8 +141,8 @@ class BookingController extends Controller
 			$requestParams['pcg_page'] = $page;
 			return $me->generateUrl('booking', $requestParams);
 		};
-        
-        return $pagination;
+
+		return $pagination;
 	}
 
 
@@ -159,7 +160,7 @@ class BookingController extends Controller
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
-            $bookingManager->updateBooking($booking, TRUE); # Persists/flush
+			$bookingManager->updateBooking($booking, TRUE); # Persists/flush
 
 			$editLink = $this->generateUrl('booking_edit', ['id' => $booking->getId()]);
 			$this->get('session')->getFlashBag()->add('success', "<a href='$editLink'>New booking was created successfully.</a>");
@@ -241,9 +242,9 @@ class BookingController extends Controller
 						continue;
 						break;
 					case "carrier":
-                        /** @var \WarehouseBundle\Entity\Carrier[] $change */
-                        $changedFrom = $change[0]->getName();
-						$changedTo = $change[1]->getName();
+						/** @var Carrier[] $change */
+						$changedFrom = $change[0] == null ? null : $change[0]->getName();
+						$changedTo = $change[1] == null ? null : $change[1]->getName();
 						$note .= "Booking Carrier changed from {$changedFrom} to {$changedTo}. ";
 						continue;
 						break;
@@ -329,7 +330,7 @@ class BookingController extends Controller
 	public function deleteByIdAction(Booking $booking)
 	{
 		try {
-			$bookingManager = $this->get('warehouse.manager.booking_manager');
+			$bookingManager = $this->get(BookingManager::class);
 			$bookingManager->deleteBookingById($booking->getId());
 			$this->get('session')->getFlashBag()->add('success', 'The Booking was deleted successfully');
 		} catch (\Exception $ex) {
@@ -363,7 +364,7 @@ class BookingController extends Controller
 				return $this->redirect($this->generateUrl('booking'));
 			}
 			$responseData = null;
-			$response = $this->get('warehouse.work_flow.booking_work_flow')->bulkAction($bulkAction, $responseData);
+			$response = $this->get(BookingWorkflow::class)->bulkAction($bulkAction, $responseData);
 			switch ($response) {
 				case BookingWorkflow::BULK_ACTION_TYPE_RENDER_PDF:
 					return new Response($responseData, Response::HTTP_OK);
@@ -489,9 +490,9 @@ class BookingController extends Controller
 			throw $this->createNotFoundException("booking not found");
 		}
 		$bookingIdList = explode(',', $ids);
-		$pickSummaryModel = $this->get('warehouse.manager.booking_manager')->getPickSummaryModel($bookingIdList);
-		$pickSummaryDTO = $this->get('warehouse.manager.booking_manager')->getPickSummaryDTO($pickSummaryModel);
-		$bookings = $this->get('warehouse.manager.booking_manager')->getBookingByIdList($bookingIdList);
+		$pickSummaryModel = $this->get(BookingManager::class)->getPickSummaryModel($bookingIdList);
+		$pickSummaryDTO = $this->get(BookingManager::class)->getPickSummaryDTO($pickSummaryModel);
+		$bookings = $this->get(BookingManager::class)->getBookingByIdList($bookingIdList);
 		$viewData = BookingManager::formatPickSummaryForView($pickSummaryDTO);
 		$html = $this->renderView('WarehouseBundle::Booking/pdf/pick_summary.html.twig', [
 			'bookings' => $bookings,
@@ -510,7 +511,7 @@ class BookingController extends Controller
 			throw $this->createNotFoundException("booking not found");
 		}
 		$bookingIdList = explode(',', $ids);
-		$response = $this->get('warehouse.work_flow.booking_work_flow')->downloadDocuments($bookingIdList);
+		$response = $this->get(BookingWorkflow::class)->downloadDocuments($bookingIdList);
 		return $response;
 	}
 
@@ -563,7 +564,7 @@ class BookingController extends Controller
 									$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
 									$locationDTO->setModified(new \DateTime()); # Keep modified synced
 									# Use the workflow managers for update.
-									$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct, $locationDTO->getQuantityStaged());
+									$this->get(StagingQueueWorkflow::class)->update($locationProduct, $locationDTO->getQuantityStaged());
 
 									$message = "Staged location updated at: " .
 										$locationTitle . " Quantity: {$locationProduct->getStaged()}";
@@ -627,8 +628,8 @@ class BookingController extends Controller
 
 	public function createPickQueueForm()
 	{
-		$pickQueueModel = $this->get('warehouse.manager.booking_manager')->getPickQueueModel();
-		$pickQueueDTO = $this->get('warehouse.manager.booking_manager')->getPickQueueDTO($pickQueueModel);
+		$pickQueueModel = $this->get(BookingManager::class)->getPickQueueModel();
+		$pickQueueDTO = $this->get(BookingManager::class)->getPickQueueDTO($pickQueueModel);
 
 		return $this->createFormBuilder($pickQueueDTO)
 			->setAction($this->generateUrl('booking_pick_queue'))
@@ -672,7 +673,7 @@ class BookingController extends Controller
 				$errors[] = 'That will be over the threshold of "asked quantity" of ' . $quantity_asked;
 			} elseif ($qty !== null && $qty <= $available && $qty >= 0) {
 				# Use the workflow managers for update.
-				$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct, $qty);
+				$this->get(StagingQueueWorkflow::class)->update($locationProduct, $qty);
 
 				$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
 				$message = "Staged location updated at: " .
@@ -782,7 +783,7 @@ class BookingController extends Controller
 			# Update if quantity is valid
 			if ($newEntity !== null) {
 				# Use the workflow managers for update.
-				$this->get('warehouse.workflow.staging_queue_workflow')->update($locationProduct, $newEntity->getQuantityStaged());
+				$this->get(StagingQueueWorkflow::class)->update($locationProduct, $newEntity->getQuantityStaged());
 			}
 			$locationTitle = $locationProduct->getLocation() ? $locationProduct->getLocation()->printLocation() : "NULL";
 			$message = "Staged location updated at: " .

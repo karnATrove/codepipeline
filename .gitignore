@@ -46,3 +46,5 @@ gen
 /bower_components/
 /web/js/
 /composer.lock
+/src/Rove/
+/src/WarehouseBundle/Controller/TestController.php

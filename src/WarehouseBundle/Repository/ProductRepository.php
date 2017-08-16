@@ -3,7 +3,9 @@
 namespace WarehouseBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Model\Product\ProductSearchModel;
 
 /**
  * ProductRepository
@@ -101,5 +103,56 @@ class ProductRepository extends EntityRepository
 		$results = $query->getResult();
 		return isset($results[0]) ? TRUE : FALSE;
 	}
+
+    /**
+     * Count products
+     * @param ProductSearchModel $productSearchModel
+     */
+    public function countStockProduct(ProductSearchModel $productSearchModel)
+    {
+        $products = $this->getStockProduct($productSearchModel);
+        return is_array($products) ? count($products) : 0;
+    }
+
+    /**
+     * @param ProductSearchModel $productSearchModel
+     * @return array
+     */
+    public function getStockProduct(ProductSearchModel $productSearchModel){
+        $criteria = $productSearchModel->getCriteria();
+        $orderBy = $productSearchModel->getOrderBy();
+        $offset = $productSearchModel->getOffset();
+        $limit = $productSearchModel->getLimit();
+
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p.model AS model')
+            ->select('SUM(lp.onHand) AS on_hand')
+            ->leftJoin('WarehouseBundle:LocationProduct', 'lp', 'WITH', 'p = lp.product')
+            ->groupBy('p.model')
+            ->andHaving('on_hand > 0');
+
+        if(!empty($criteria)){
+            foreach ($criteria as $param => $value) {
+                $queryBuilder->andWhere("p.{$param} = '{$value}'");
+            }
+        }
+        if(!empty($orderBy)){
+            foreach ($orderBy as $param => $value) {
+                $queryBuilder->orderBy("p.{$value}");
+            }
+        }
+        if(!empty($limit)){
+            $queryBuilder->setMaxResults($limit);
+            if(!empty($offset)) $queryBuilder->setFirstResult($offset);
+        }
+
+        $query = $queryBuilder->getQuery();
+        try{
+            return $query->getResult();
+        }catch (NoResultException $noResultException){
+            return [];
+        }
+
+    }
 
 }

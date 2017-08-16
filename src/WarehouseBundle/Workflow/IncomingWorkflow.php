@@ -15,6 +15,9 @@ use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Manager\IncomingManager;
+use WarehouseBundle\Manager\IncomingProductScanManager;
+use WarehouseBundle\Manager\IncomingStatusManager;
+use WarehouseBundle\Manager\LocationProductManager;
 
 class IncomingWorkflow extends BaseWorkflow
 {
@@ -32,10 +35,10 @@ class IncomingWorkflow extends BaseWorkflow
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		$this->locationProductManager = $container->get('warehouse.manager.location_product_manager');
-		$this->incomingStatusManager = $container->get('warehouse.manager.incoming_status_manager');
-		$this->incomingManager = $container->get('warehouse.manager.incoming_manager');
-		$this->incomingProductScanManager = $container->get('warehouse.manager.incoming_product_scan_manager');
+		$this->locationProductManager = $container->get(LocationProductManager::class);
+		$this->incomingStatusManager = $container->get(IncomingStatusManager::class);
+		$this->incomingManager = $container->get(IncomingManager::class);
+		$this->incomingProductScanManager = $container->get(IncomingProductScanManager::class);
 		$this->templating = $container->get('templating');
 	}
 

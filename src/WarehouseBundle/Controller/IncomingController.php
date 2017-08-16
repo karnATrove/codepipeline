@@ -16,6 +16,7 @@ use WarehouseBundle\Entity\IncomingProduct;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Form\IncomingType;
+use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Model\Incoming\IncomingSearchModel;
 
 /**
@@ -42,7 +43,7 @@ class IncomingController extends Controller
 		$searchModel->setSearchString($keyword);
 		$searchModel->setIsComplete($isComplete);
 		$searchModel->setOrderBy(['eta' => 'desc']);
-		$query = $this->get('warehouse.manager.incoming_manager')
+		$query = $this->get(IncomingManager::class)
 			->searchContainers($searchModel, true);
 
 		$paginator = $this->get('knp_paginator');
@@ -99,7 +100,7 @@ class IncomingController extends Controller
 		$searchModel->setEtaEndDate($end);
 		$searchModel->setScheduledStartDate($start);
 		$searchModel->setScheduledEndDate($end);
-		$incomingList = $this->get('warehouse.manager.incoming_manager')
+		$incomingList = $this->get(IncomingManager::class)
 			->searchContainers($searchModel, false);
 		$data = [];
 		foreach ($incomingList as $incoming) {
@@ -348,8 +349,8 @@ class IncomingController extends Controller
 				$containerUpdateDto->setName($incoming->getName());
 				$containerUpdateDto->setScheduledArrivalTime($incoming->getScheduled());
 				if ($incoming->getType()->getCode() == \WarehouseBundle\Entity\IncomingType::OCEAN_FREIGHT_CODE) {
-					$this->container->get('rove_site_rest_api.manager.container_manager')
-						->update($containerUpdateDto, $incoming->getName());
+					$this->container->get('rove_rove_site_rest_api.service.container_service')
+						->update($containerUpdateDto);
 				}
 
 				$em->flush();

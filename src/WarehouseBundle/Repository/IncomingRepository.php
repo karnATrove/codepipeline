@@ -24,10 +24,10 @@ class IncomingRepository extends EntityRepository
 	public function searchContainers(IncomingSearchModel $incomingSearchModel, $returnQuery = false)
 	{
 		$queryBuilder = $this->createQueryBuilder('i');
-		if ($incomingSearchModel->getisComplete() === true) {
+		if ($incomingSearchModel->getIsComplete() === true) {
 			$queryBuilder->andWhere('i.status = :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
-		} elseif ($incomingSearchModel->getisComplete() === false) {
+		} elseif ($incomingSearchModel->getIsComplete() === false) {
 			$queryBuilder->andWhere('i.status != :complete')
 				->setParameter('complete', IncomingStatus::COMPLETED);
 		}

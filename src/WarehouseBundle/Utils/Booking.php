@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use WarehouseBundle\Entity\Booking as BookingEntity;
 use WarehouseBundle\Entity\BookingContact;
 use WarehouseBundle\Entity\BookingProduct as BookingProductEntity;
-use WarehouseBundle\Entity\Carrier;
+use WarehouseBundle\Manager\CarrierManager;
 use WarehouseBundle\Model\BookingInterface;
 use WarehouseBundle\Model\BookingManagerInterface;
 
@@ -34,13 +34,13 @@ class Booking
 	 */
 	private $requestStack;
 
-    /**
-     * Make the utility container-aware. (giving access to doctrine for example)
-     *
-     * @param \Symfony\Component\DependencyInjection\Container  $container The container
-     * @param \WarehouseBundle\Model\BookingManagerInterface    $bookingManager
-     * @param \Symfony\Component\HttpFoundation\RequestStack    $requestStack
-     */
+	/**
+	 * Make the utility container-aware. (giving access to doctrine for example)
+	 *
+	 * @param \Symfony\Component\DependencyInjection\Container $container The container
+	 * @param \WarehouseBundle\Model\BookingManagerInterface   $bookingManager
+	 * @param \Symfony\Component\HttpFoundation\RequestStack   $requestStack
+	 */
 	public function __construct(Container $container, BookingManagerInterface $bookingManager, RequestStack $requestStack)
 	{
 		$this->container = $container;
@@ -125,7 +125,7 @@ class Booking
 	 */
 	public function bookingCarrierName($carrierId)
 	{
-	    $list = $this->bookingCarrierList();
+		$list = $this->bookingCarrierList();
 		return isset($list[$carrierId]) ? $list[$carrierId] : 'Unknown';
 	}
 
@@ -135,7 +135,7 @@ class Booking
 	 */
 	public function bookingCarrierList()
 	{
-        return $this->container->get('warehouse.manager.carrier_manager')->getCarrierList('name');
+		return $this->container->get(CarrierManager::class)->getCarrierList('name');
 	}
 
 	/**
@@ -184,7 +184,7 @@ class Booking
 		$booking->setOrderNumber($orderNumber);
 		$booking->setOrderReference($orderReference);
 		$booking->setOrderType($orderType);
-		$booking->setCarrier($this->container->get('warehouse.manager.carrier_manager')->find($carrierId));
+		$booking->setCarrier($this->container->get(CarrierManager::class)->find($carrierId));
 		$booking->setSkidCount(NULL);
 		$booking->setStatus(BookingEntity::STATUS_ACCEPTED);
 		$booking->setFutureShip($futureShip);

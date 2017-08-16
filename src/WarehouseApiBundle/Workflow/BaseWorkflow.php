@@ -22,7 +22,7 @@ class BaseWorkflow
 	protected $container;
 	/** @var EntityManagerInterface $entityManager  */
 	protected $entityManager;
-	protected $roveApiProductManager;
+	protected $roveApiProductItemService;
 
 	/**
 	 * BaseWorkflow constructor.
@@ -33,7 +33,7 @@ class BaseWorkflow
 	{
 		$this->container = $container;
 		$this->entityManager = $container->get('doctrine.orm.entity_manager');
-		$this->roveApiProductManager = $container->get('rove_site_rest_api.manager.product_manager');
+		$this->roveApiProductItemService = $container->get('rove_rove_site_rest_api.service.product_item_service');
 	}
 
     /**
@@ -45,7 +45,7 @@ class BaseWorkflow
     {
         //create product
         try{
-            $productItemDto = $this->roveApiProductManager->getItemBySku($sku);
+            $productItemDto = $this->roveApiProductItemService->getProductItemBySku($sku);
         }catch (RoveSiteApiException $exception) {
             throw new ApiException("Can not create missing sku $sku Detail: ".$exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }

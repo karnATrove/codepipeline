@@ -22,8 +22,11 @@ use WarehouseBundle\Exception\WorkflowException\WorkflowAPIException;
 use WarehouseBundle\Exception\WorkflowException\WorkflowException;
 use WarehouseBundle\Manager\IncomingManager;
 use WarehouseBundle\Manager\IncomingProductManager;
+use WarehouseBundle\Manager\IncomingProductScanManager;
 use WarehouseBundle\Manager\IncomingStatusManager;
 use WarehouseBundle\Manager\LocationManager;
+use WarehouseBundle\Manager\ProductManager;
+use WarehouseBundle\Utils\MessagePrinter;
 
 class IncomingProductScanWorkflow extends BaseWorkflow
 {
@@ -42,11 +45,11 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 	public function __construct(ContainerInterface $container)
 	{
 		parent::__construct($container);
-		$this->incomingProductScanManager = $container->get('warehouse.manager.incoming_product_scan_manager');
-		$this->incomingProductManager = $container->get('warehouse.manager.incoming_product_manager');
-		$this->productManager = $container->get('warehouse.manager.product_manager');
+		$this->incomingProductScanManager = $container->get(IncomingProductScanManager::class);
+		$this->incomingProductManager = $container->get(IncomingProductManager::class);
+		$this->productManager = $container->get(ProductManager::class);
 		$this->templating = $container->get('templating');
-		$this->locationManager = $container->get('warehouse.manager.location_manager');
+		$this->locationManager = $container->get(LocationManager::class);
 		$this->user = $this->container->get('security.token_storage')->getToken()->getUser();
 	}
 
@@ -103,7 +106,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$this->incomingProductScanManager->delete($incomingProductScan);
 		$messages['success'][] = "Incoming {$incomingProductScan->getProduct()->getModel()} successfully deleted";
 		if (!empty($messages)) {
-			$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		}
 		$ajaxCommands[] = new AjaxCommandDTO('.loading', AjaxCommandDTO::OP_HIDE);
 		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
@@ -187,7 +190,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$this->incomingProductScanManager->update($incomingProductScan, $this->entityManager);
 		$this->entityManager->flush();
 		if (!empty($messages)) {
-			$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		}
 		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
 			AjaxCommandDTO::OP_HTML, $this->getScannedProductTableView($incoming));
@@ -227,7 +230,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		}
 		$messages['success'][] = "Packing list pre-loaded";
 		if (!empty($messages)) {
-			$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		}
 		$this->entityManager->flush();
 		$this->entityManager->refresh($incoming);
@@ -275,8 +278,8 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			$containerUpdateDto->setStatusCode($incoming->getStatus()->getCode());
 			$containerUpdateDto->setName($incoming->getName());
 			try {
-				$this->container->get('rove_site_rest_api.manager.container_manager')
-					->update($containerUpdateDto, $incoming->getName());
+				$this->container->get('rove_rove_site_rest_api.service.container_service')
+					->update($containerUpdateDto);
 
 			} catch (RoveSiteApiException $roveSiteApiException) {
 				throw new WorkflowAPIException("Error from roveconcepts.com:<br>"
@@ -288,7 +291,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 		$this->entityManager->flush();
 
 		$messages['success'][] = "Incoming container scanned list was saved and Incoming container is now complete.";
-		$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+		$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
 			AjaxCommandDTO::OP_HTML, $this->getScannedProductTableView($incoming));
 		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
@@ -321,7 +324,7 @@ class IncomingProductScanWorkflow extends BaseWorkflow
 			->setProduct($incomingProductScan->getProduct());
 		$this->incomingProductScanManager->update($newIncomingProductScan);
 		$messages['success'][] = "Incoming scanned product {$incomingProductScan->getProduct()->getModel()} split";
-		$this->container->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+		$this->container->get(MessagePrinter::class)->printToFlashBag($messages);
 		$ajaxCommands[] = new AjaxCommandDTO('.incomingScannedProductsPage',
 			AjaxCommandDTO::OP_HTML, $this->getScannedProductTableView($incoming));
 		$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',

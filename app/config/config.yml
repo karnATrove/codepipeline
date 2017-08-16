@@ -7,7 +7,6 @@ imports:
     # Others
     - { resource: jms/jms.yml }
     - { resource: "@ReportBundle/Resources/config/services.yml" }
-    - { resource: "@RoveSiteRestApiBundle/Resources/config/services.yml" }
     - { resource: "@WarehouseApiBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
@@ -193,3 +192,15 @@ fos_http_cache:
                     cache_control: { public: true, max_age: 15, s_maxage: 30 }
                     last_modified: "-1 hour"
                     vary: [Accept-Encoding, Accept-Language]
+
+rove_rove_site_rest_api:
+    api_key: "%rove_site.api.key%"
+    url:
+      base: "%rove_site.api.url.base%"
+#      base: 'https://www.roveconcepts.com/api'
+      comment: "%rove_site.api.url.comment%"
+      container: "%rove_site.api.url.container%"
+      product: "%rove_site.api.url.product%"
+      product_item: "%rove_site.api.url.productItem%"
+      order: /order
+      inventory: /inventory

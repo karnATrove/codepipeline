@@ -2,10 +2,12 @@
 
 namespace WarehouseBundle\Repository;
 
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\Product;
+use WarehouseBundle\Model\Booking\BookingProductSearchModel;
 
 /**
  * BookingProductRepository
@@ -182,5 +184,56 @@ class BookingProductRepository extends \Doctrine\ORM\EntityRepository
 			$query->setMaxResults(10);
 		return $query->getQuery()->getResult();
 	}
+
+    /**
+     * @param BookingProductSearchModel $bookingProductSearchModel
+     * @return int|mixed
+     */
+    public function count(BookingProductSearchModel $bookingProductSearchModel)
+    {
+        $queryBuilder = $this->createQueryBuilder('bp');
+        $queryBuilder->select('SUM(bp.qty) AS total_qty');
+        $criteria = $bookingProductSearchModel->getCriteria();
+        $criteriaStartDate = $bookingProductSearchModel->getCriteriaStartDate();
+        $criteriaEndDate = $bookingProductSearchModel->getCriteriaEndDate();
+        $orderBy = $bookingProductSearchModel->getOrderBy();
+        $offset = $bookingProductSearchModel->getOffset();
+        $limit = $bookingProductSearchModel->getLimit();
+        if(!empty($criteria)){
+            foreach ($criteria as $param => $value) {
+                $queryBuilder->andWhere("bp.{$param} = '{$value}'");
+            }
+        }
+        if(!empty($criteriaStartDate)){
+            foreach ($criteriaStartDate as $param => $value) {
+                $queryBuilder->andWhere("bp.{$param} >= '{$value}'");
+            }
+        }
+        if(!empty($criteriaEndDate)){
+            foreach ($criteriaEndDate as $param => $value) {
+                $queryBuilder->andWhere("bp.{$param} <= '{$value}'");
+            }
+        }
+        if(!empty($orderBy)){
+            foreach ($orderBy as $param => $value) {
+                $queryBuilder->orderBy("bp.{$value}");
+            }
+        }
+        if(!empty($limit)){
+            $queryBuilder->setMaxResults($limit);
+            if(!empty($offset)) $queryBuilder->setFirstResult($offset);
+        }
+
+        $query = $queryBuilder->getQuery();
+        $aa = $query->getSQL();
+        try{
+            $result = $query->getSingleScalarResult();
+            return $result ? $result : 0;
+        }catch (NoResultException $noResultException){
+            return 0;
+        }
+
+
+    }
 
 }

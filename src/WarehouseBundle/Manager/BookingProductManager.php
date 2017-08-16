@@ -9,8 +9,10 @@
 namespace WarehouseBundle\Manager;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Exception\Manager\ManagerException;
+use WarehouseBundle\Model\Booking\BookingProductSearchModel;
 
 class BookingProductManager
 {
@@ -19,6 +21,14 @@ class BookingProductManager
 	const STATUS_CODE_IN_PROGRESS = "PROG";
 	const STATUS_CODE_PICKED = "PICK";
 	const STATUS_CODE_CLOSED = "CLOS";
+
+    private $bookingProductRepository;
+    private $em;
+
+	public function  __construct(EntityManagerInterface $entityManager){
+        $this->em = $entityManager;
+        $this->bookingProductRepository = $this->em->getRepository('WarehouseBundle:BookingProduct');
+	}
 
 	/**
 	 * @param $statusId
@@ -78,5 +88,14 @@ class BookingProductManager
                 throw new ManagerException("Can't find match booking product status list");
                 break;
         }
+    }
+
+    /**
+     * @param BookingProductSearchModel $bookingProductSearchModel
+     * @return mixed
+     */
+    public function count(BookingProductSearchModel $bookingProductSearchModel)
+    {
+        return $this->bookingProductRepository->count($bookingProductSearchModel);
     }
 }

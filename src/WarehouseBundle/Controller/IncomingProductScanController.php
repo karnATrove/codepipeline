@@ -12,8 +12,11 @@ use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingProductScan;
 use WarehouseBundle\Exception\WorkflowException\WorkflowAPIException;
+use WarehouseBundle\Manager\IncomingProductScanManager;
 use WarehouseBundle\Manager\LocationManager;
 use WarehouseBundle\Utils\AjaxCommandParser;
+use WarehouseBundle\Utils\MessagePrinter;
+use WarehouseBundle\Workflow\IncomingProductScanWorkflow;
 
 /**
  * Booking controller.
@@ -30,9 +33,9 @@ class IncomingProductScanController extends Controller
 	 */
 	public function incomingProductsScannedAction(Incoming $incoming)
 	{
-		$scannedProducts = $this->get('warehouse.manager.incoming_product_scan_manager')
+		$scannedProducts = $this->get(IncomingProductScanManager::class)
 			->getByIncoming($incoming);
-		$locations = $this->get('warehouse.manager.location_manager')->getLocations();
+		$locations = $this->get(LocationManager::class)->getLocations();
 		$locationDropdownList = LocationManager::toArray($locations);
 		return $this->render('WarehouseBundle::Incoming/products_scanned.html.twig', [
 			'incoming' => $incoming,
@@ -57,14 +60,14 @@ class IncomingProductScanController extends Controller
 		try {
 			$qty = $request->get('quantity');
 			$locationId = $request->get('location');
-			$ajaxCommands = $this->container->get('warehouse.workflow.incoming_product_scan_workflow')
+			$ajaxCommands = $this->container->get(IncomingProductScanWorkflow::class)
 				->edit($incomingProductScan, $qty, $locationId);
 		} catch (\Exception $exception) {
 			$messages['error'][] = "Update failed. Please refresh page and try again. 
 			Error detail: {$exception->getMessage()}";
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 		}
 
@@ -79,7 +82,7 @@ class IncomingProductScanController extends Controller
 	 */
 	public function incomingProductsScannedDeleteAjaxAction(IncomingProductScan $incomingProductScan)
 	{
-		$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')->delete($incomingProductScan);
+		$ajaxCommands = $this->get(IncomingProductScanWorkflow::class)->delete($incomingProductScan);
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
 		return new JsonResponse($response, JsonResponse::HTTP_OK);
 	}
@@ -90,7 +93,7 @@ class IncomingProductScanController extends Controller
 	 */
 	public function renderProductScannedRowsAction(Incoming $incoming)
 	{
-		return new Response($this->get('warehouse.workflow.incoming_product_scan_workflow')
+		return new Response($this->get(IncomingProductScanWorkflow::class)
 			->getScannedProductTableView($incoming));
 	}
 
@@ -108,12 +111,12 @@ class IncomingProductScanController extends Controller
 		}
 		try {
 			$sku = $request->get('sku');
-			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')->newScan($sku, $incoming);
+			$ajaxCommands = $this->get(IncomingProductScanWorkflow::class)->newScan($sku, $incoming);
 		} catch (\Exception $exception) {
 			$messages['error'][] = "Error: {$exception->getMessage()}";
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 		}
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
@@ -131,13 +134,13 @@ class IncomingProductScanController extends Controller
 				['id' => $incoming->getId()]));
 		}
 		try {
-			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
+			$ajaxCommands = $this->get(IncomingProductScanWorkflow::class)
 				->loadScannedProductsFromPackingList($incoming);
 		} catch (\Exception $exception) {
 			$messages['error'][] = "Error: {$exception->getMessage()}";
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 		}
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
@@ -163,25 +166,25 @@ class IncomingProductScanController extends Controller
 			//if receive force submit, we don't want update roveconcepts
 			$updateRove = $request->get('forceSubmit') ? false : true;
 
-			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
+			$ajaxCommands = $this->get(IncomingProductScanWorkflow::class)
 				->completeProductScan($incoming, $form, $updateRove);
 		} catch (WorkflowAPIException $workflowAPIException) {
 			$messages['error'][] = "Complete Container Scan Failed! You can try to complete scan without notify" .
-				" Roveconcepts by using [FORCE COMPLETE BUTTON].".
+				" Roveconcepts by using [FORCE COMPLETE BUTTON]." .
 				" Please notify them that this container is complete if you do this.<br>" .
 				$workflowAPIException->getMessage();
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 			$ajaxCommands[] = new AjaxCommandDTO('#product_scan_form_force_submit',
 				AjaxCommandDTO::OP_SHOW);
 		} catch (\Exception $exception) {
 			$messages['error'][] = "Complete Container Scan Failed! Please contact Rove dev team with detailed error message.<br>"
 				. $exception->getMessage();
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 		}
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);
@@ -202,13 +205,13 @@ class IncomingProductScanController extends Controller
 				['id' => $incomingProductScan->getIncoming()->getId()]));
 		}
 		try {
-			$ajaxCommands = $this->get('warehouse.workflow.incoming_product_scan_workflow')
+			$ajaxCommands = $this->get(IncomingProductScanWorkflow::class)
 				->splitProductScan($incomingProductScan);
 		} catch (\Exception $exception) {
 			$messages['error'][] = "Error: {$exception->getMessage()}";
-			$this->get('warehouse.utils.message_printer')->printToFlashBag($messages);
+			$this->get(MessagePrinter::class)->printToFlashBag($messages);
 			$ajaxCommands[] = new AjaxCommandDTO('#products_scanned_form_message_bag',
-				AjaxCommandDTO::OP_HTML, $this->get('warehouse.workflow.incoming_product_scan_workflow')
+				AjaxCommandDTO::OP_HTML, $this->get(IncomingProductScanWorkflow::class)
 					->getMessageBagView());
 		}
 		$response = AjaxCommandParser::parseAjaxCommands($ajaxCommands);

@@ -2,14 +2,14 @@
 
 namespace WarehouseBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Acl\Exception\Exception;
 use WarehouseBundle\Entity\User;
+use WarehouseBundle\Manager\UserManager;
+use WarehouseBundle\Workflow\UserWorkflow;
 
 /**
  * User controller.
@@ -24,7 +24,7 @@ class UserController extends Controller
 	 */
 	public function indexAction(Request $request)
 	{
-		$users = $this->container->get('warehouse.manager.user_manager')->getAllUsers();
+		$users = $this->container->get(UserManager::class)->getAllUsers();
 		return $this->render('WarehouseBundle::User/user_list.html.twig', [
 			'users' => $users
 		]);
@@ -51,12 +51,12 @@ class UserController extends Controller
 		$userManager = $this->get('fos_user.user_manager');
 		$user = $userManager->createUser();
 		$user->setEnabled(true);
-		$form = $this->get('warehouse.workflow.user_workflow')->makeUserCreateEditForm($user);
+		$form = $this->get(UserWorkflow::class)->makeUserCreateEditForm($user);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
 			$userGroupIds = $form->get('userGroup')->getData();
-			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
+			$this->get(UserWorkflow::class)->updateUser($user, $userGroupIds);
 			return $this->redirectToRoute('user_view', ['id' => $user->getId()]);
 		}
 		return $this->render('WarehouseBundle::User/user_create.html.twig', [
@@ -71,11 +71,11 @@ class UserController extends Controller
 	{
 		$userManager = $this->get('fos_user.user_manager');
 		$user = $userManager->findUserBy(['id' => $id]);
-		$form = $this->get('warehouse.workflow.user_workflow')->makeUserCreateEditForm($user);
+		$form = $this->get(UserWorkflow::class)->makeUserCreateEditForm($user);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$userGroupIds = $form->get('userGroup')->getData();
-			$this->get('warehouse.workflow.user_workflow')->updateUser($user,$userGroupIds);
+			$this->get(UserWorkflow::class)->updateUser($user, $userGroupIds);
 		}
 		return $this->render('WarehouseBundle::User/user_edit.html.twig', [
 			'form' => $form->createView()

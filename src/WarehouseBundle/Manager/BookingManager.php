@@ -17,6 +17,7 @@ use WarehouseBundle\DTO\Booking\PickSummary\PickSummaryItemOrder;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\BookingManagerException;
 use WarehouseBundle\Exception\Utils\UrlFileNotFoundException;
+use WarehouseBundle\Model\Booking\BookingSearchModel;
 use WarehouseBundle\Model\Booking\PickQueue\PickQueueItemModel;
 use WarehouseBundle\Model\Booking\PickQueue\PickQueueModel;
 use WarehouseBundle\Model\Booking\PickSummary\PickSummaryItemModel;
@@ -124,13 +125,13 @@ class BookingManager
 	}
 
 	/**
-	 * @param array $criteria
+	 * @param BookingSearchModel $bookingSearchModel
 	 *
 	 * @return int|mixed
 	 */
-	public function count(array $criteria)
+	public function count(BookingSearchModel $bookingSearchModel)
 	{
-		return $this->bookingRepository->count($criteria);
+		return $this->bookingRepository->count($bookingSearchModel);
 	}
 
     /**
