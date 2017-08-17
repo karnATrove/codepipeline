@@ -17,6 +17,7 @@ class BookingSearchModel
     private $orderBy;
     private $limit;
     private $offset;
+    private $groupBy;
 
     /**
      * @return mixed
@@ -113,6 +114,22 @@ class BookingSearchModel
     public function setOffset($offset)
     {
         $this->offset = $offset;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroupBy()
+    {
+        return $this->groupBy;
+    }
+
+    /**
+     * @param mixed $groupBy
+     */
+    public function setGroupBy($groupBy)
+    {
+        $this->groupBy = $groupBy;
     }
 
 }
