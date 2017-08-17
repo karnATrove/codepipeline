@@ -5,6 +5,7 @@ namespace WarehouseBundle\Repository;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\ResultSetMapping;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Entity\BookingProduct;
 use WarehouseBundle\Entity\Product;
@@ -201,6 +202,60 @@ class BookingRepository extends EntityRepository
 			return 0;
 		}
 	}
+
+    /**
+     * @param BookingSearchModel $bookingSearchModel
+     *
+     * @return int|mixed
+     */
+    public function countGroupBy($bookingSearchModel)
+    {
+        $criteriaStartDate = $bookingSearchModel->getCriteriaStartDate();
+        $criteriaEndDate = $bookingSearchModel->getCriteriaEndDate();
+        $orderBy = $bookingSearchModel->getOrderBy();
+        $groupBy = $bookingSearchModel->getGroupBy();
+
+        $created_start = $created_end = $group_by = $order_by = '';
+
+        if(!empty($criteriaStartDate)){
+            foreach ($criteriaStartDate as $param => $value) {
+                if($param == 'created') $created_start = $value;
+            }
+        }
+        if(!empty($criteriaEndDate)){
+            foreach ($criteriaEndDate as $param => $value) {
+                if($param == 'created') $created_end = $value;
+            }
+        }
+        if(!empty($groupBy)){
+            foreach ($groupBy as $param => $value){
+                if($param <> 0) $group_by .= ',';
+                $group_by .= $value;
+            }
+
+        }
+        if(!empty($orderBy)){
+            foreach ($orderBy as $param => $value){
+                if($param <> 0) $orderBy .= ',';
+                $order_by .= $value;
+            }
+        }
+
+
+        $query = $this->_em->getConnection()->prepare('SELECT count(*) as count, DATE(created) as created_date
+ FROM warehouse_booking 
+ WHERE created BETWEEN :created_start AND :created_end 
+ GROUP BY '.$group_by.' ORDER BY '.$order_by);
+        $query->bindValue('created_start', $created_start);
+        $query->bindValue('created_end', $created_end);
+        $query->execute();
+        try{
+            return $query->fetchAll();
+        }catch (NoResultException $noResultException){
+            return 0;
+        }
+
+    }
 
     /**
      * Search bookings

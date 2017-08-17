@@ -135,6 +135,16 @@ class BookingManager
 	}
 
     /**
+     * @param BookingSearchModel $bookingSearchModel
+     *
+     * @return int|mixed
+     */
+    public function countGroupBy(BookingSearchModel $bookingSearchModel)
+    {
+        return $this->bookingRepository->countGroupBy($bookingSearchModel);
+    }
+
+    /**
      * @param $criteria
      * @param $sorting
      * @param bool $query  true return query builder otherwise return result.
