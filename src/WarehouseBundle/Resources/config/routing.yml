@@ -1,4 +1,0 @@
-warehouse_homepage:
-    path:     /
-    host: warehouse.roveconcepts.com
-    defaults: { _controller: WarehouseBundle:Default:dashboard }
