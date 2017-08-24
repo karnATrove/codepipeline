@@ -62,7 +62,8 @@ class ContainerWorkflow extends BaseWorkflow
 				$product = $this->productManager->getOneBySku($sku);
 				if (!$product) {
 					$product = $this->createMissingProduct($sku);
-					$this->productManager->updateProduct($product, $this->entityManager);
+                    // shall create missing product right away, as it is possible having multiple record for same missing sku in container
+                    $this->productManager->updateProduct($product, NULL);
 				}
 
 				if (array_key_exists($sku, $existProductList)) {
