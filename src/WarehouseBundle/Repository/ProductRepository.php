@@ -4,6 +4,8 @@ namespace WarehouseBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
+use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Model\Product\ProductSearchModel;
 
@@ -86,11 +88,12 @@ class ProductRepository extends EntityRepository
 	 * Identify if there is an 'onHand' amount greater then 'Staged'.
 	 * This is bad and can be caused by transferring stock from one location to another.
 	 */
-	public function isDefunct(Product $product) {
+	public function isDefunct(Product $product)
+	{
 		$query = $this->getEntityManager()->createQuery(
 			'SELECT
 			  SUM(lp.onHand) AS hand,
-			  (SELECT SUM(lpp.staged) FROM WarehouseBundle:LocationProduct lpp WHERE lpp.product = lp.product) as x
+			  (SELECT SUM(lpp.staged) FROM WarehouseBundle:LocationProduct lpp WHERE lpp.product = lp.product) AS x
 			 FROM WarehouseBundle:LocationProduct lp 
 			 INNER JOIN WarehouseBundle:Location l WITH l = lp.location
 			 INNER JOIN WarehouseBundle:Product p WITH p = lp.product
@@ -98,61 +101,113 @@ class ProductRepository extends EntityRepository
 			 WHERE p.id = :product
 			 GROUP BY lp.product
 			 HAVING x < hand'
-		)->setParameter('product',$product);
+		)->setParameter('product', $product);
 
 		$results = $query->getResult();
 		return isset($results[0]) ? TRUE : FALSE;
 	}
 
-    /**
-     * Count products
-     * @param ProductSearchModel $productSearchModel
-     */
-    public function countStockProduct(ProductSearchModel $productSearchModel)
-    {
-        $products = $this->getStockProduct($productSearchModel);
-        return is_array($products) ? count($products) : 0;
-    }
+	/**
+	 * Count products
+	 *
+	 * @param ProductSearchModel $productSearchModel
+	 */
+	public function countStockProduct(ProductSearchModel $productSearchModel)
+	{
+		$products = $this->getStockProduct($productSearchModel);
+		return is_array($products) ? count($products) : 0;
+	}
 
-    /**
-     * @param ProductSearchModel $productSearchModel
-     * @return array
-     */
-    public function getStockProduct(ProductSearchModel $productSearchModel){
-        $criteria = $productSearchModel->getCriteria();
-        $orderBy = $productSearchModel->getOrderBy();
-        $offset = $productSearchModel->getOffset();
-        $limit = $productSearchModel->getLimit();
+	/**
+	 * @param ProductSearchModel $productSearchModel
+	 *
+	 * @return array
+	 */
+	public function getStockProduct(ProductSearchModel $productSearchModel)
+	{
+		$criteria = $productSearchModel->getCriteria();
+		$orderBy = $productSearchModel->getOrderBy();
+		$offset = $productSearchModel->getOffset();
+		$limit = $productSearchModel->getLimit();
 
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p.model AS model')
-            ->select('SUM(lp.onHand) AS on_hand')
-            ->leftJoin('WarehouseBundle:LocationProduct', 'lp', 'WITH', 'p = lp.product')
-            ->groupBy('p.model')
-            ->andHaving('on_hand > 0');
+		$queryBuilder = $this->createQueryBuilder('p')
+			->select('p.model AS model')
+			->select('SUM(lp.onHand) AS on_hand')
+			->leftJoin('WarehouseBundle:LocationProduct', 'lp', 'WITH', 'p = lp.product')
+			->groupBy('p.model')
+			->andHaving('on_hand > 0');
 
-        if(!empty($criteria)){
-            foreach ($criteria as $param => $value) {
-                $queryBuilder->andWhere("p.{$param} = '{$value}'");
-            }
-        }
-        if(!empty($orderBy)){
-            foreach ($orderBy as $param => $value) {
-                $queryBuilder->orderBy("p.{$value}");
-            }
-        }
-        if(!empty($limit)){
-            $queryBuilder->setMaxResults($limit);
-            if(!empty($offset)) $queryBuilder->setFirstResult($offset);
-        }
+		if (!empty($criteria)) {
+			foreach ($criteria as $param => $value) {
+				$queryBuilder->andWhere("p.{$param} = '{$value}'");
+			}
+		}
+		if (!empty($orderBy)) {
+			foreach ($orderBy as $param => $value) {
+				$queryBuilder->orderBy("p.{$value}");
+			}
+		}
+		if (!empty($limit)) {
+			$queryBuilder->setMaxResults($limit);
+			if (!empty($offset)) $queryBuilder->setFirstResult($offset);
+		}
 
-        $query = $queryBuilder->getQuery();
-        try{
-            return $query->getResult();
-        }catch (NoResultException $noResultException){
-            return [];
-        }
+		$query = $queryBuilder->getQuery();
+		try {
+			return $query->getResult();
+		} catch (NoResultException $noResultException) {
+			return [];
+		}
+	}
 
-    }
+	/**
+	 * @param ProductSearchModel $searchModel
+	 * @param bool               $queryOnly
+	 *
+	 * @return array|Query
+	 */
+	public function searchProducts(ProductSearchModel $searchModel, $queryOnly = false)
+	{
+		if ($queryOnly) {
+			return $this->getProductsBySearchModelQuery($searchModel);
+		}
+		return $this->getProductsBySearchModelQuery($searchModel)->getResult();
+	}
 
+	/**
+	 * @param ProductSearchModel $searchModel
+	 *
+	 * @return Query
+	 */
+	public function getProductsBySearchModelQuery(ProductSearchModel $searchModel)
+	{
+		$queryBuilder = $this->createQueryBuilder('product');
+
+		if ($searchModel->getSearchString()) {
+			$queryBuilder->andWhere($queryBuilder->expr()->like('product.model', ':searchString'))
+				->setParameter('searchString', '%' . $searchModel->getSearchString() . '%');
+		}
+
+		if ($searchModel->getStatus()) {
+			$queryBuilder->andWhere("product.status = :status")->setParameter('status', $searchModel->getStatus());
+		}
+
+		if ($searchModel->isProductHaveQuantityOnly()) {
+			$queryBuilder->join(LocationProduct::class, 'locationProduct', 'with',
+				'locationProduct.product = product AND locationProduct.onHand>0');
+		}
+
+		if (!$searchModel->getLimit()) {
+			$queryBuilder->setMaxResults('25');
+		} else {
+			$queryBuilder->setMaxResults($searchModel->getLimit());
+		}
+
+		if ($searchModel->getOffset()) {
+			$queryBuilder->setFirstResult($searchModel->getOffset());
+		}
+
+		$query = $queryBuilder->getQuery();
+		return $query;
+	}
 }

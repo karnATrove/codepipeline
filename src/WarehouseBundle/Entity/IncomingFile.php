@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_incoming_file")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingFileRepository")
  */
-class IncomingFile
+class IncomingFile implements IEntity
 {
     /**
      * @var int

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_incoming_status")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingStatusRepository")
  */
-class IncomingStatus
+class IncomingStatus implements IEntity
 {
 	//Status
 	const DELETED = 0;

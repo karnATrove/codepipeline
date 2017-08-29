@@ -1,23 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-06-07
- * Time: 3:22 PM
- */
 
 namespace WarehouseBundle\Manager;
 
-
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use WarehouseBundle\Entity\Incoming;
 use WarehouseBundle\Entity\IncomingStatus;
 use WarehouseBundle\Model\Incoming\IncomingSearchModel;
+use WarehouseBundle\Repository\IncomingRepository;
 
 class IncomingManager extends BaseManager
 {
-
-	private $incomingRepository;
 
 	/**
 	 * IncomingProductScanManager constructor.
@@ -26,8 +19,7 @@ class IncomingManager extends BaseManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		parent::__construct($entityManager);
-		$this->incomingRepository = $entityManager->getRepository('WarehouseBundle:Incoming');
+		parent::__construct($entityManager, Incoming::class);
 	}
 
 	/**
@@ -83,53 +75,15 @@ class IncomingManager extends BaseManager
 	}
 
 	/**
-	 * @param Incoming $incoming
-	 */
-	public function refresh(Incoming $incoming)
-	{
-		$this->entityManager->refresh($incoming);
-	}
-
-	/**
-	 * Finds entities by a set of criteria.
-	 *
-	 * @param array      $criteria
-	 * @param array|null $orderBy
-	 * @param int|null   $limit
-	 * @param int|null   $offset
-	 *
-	 * @return Incoming[]
-	 */
-	public function findBy($criteria, $orderBy = null, $limit = null, $offset = null)
-	{
-		return $this->incomingRepository->findBy($criteria, $orderBy, $limit, $offset);
-	}
-
-	/**
-	 * @return array|Incoming[]
-	 */
-	public function findAll()
-	{
-		return $this->incomingRepository->findAll();
-	}
-
-	/**
 	 * @param IncomingSearchModel $incomingSearchModel
 	 * @param bool                $returnQuery
 	 *
-	 * @return \Doctrine\ORM\Query|Incoming[]
+	 * @return Query|Incoming[]
 	 */
 	public function searchContainers(IncomingSearchModel $incomingSearchModel, $returnQuery = false)
 	{
-		return $this->incomingRepository->searchContainers($incomingSearchModel, $returnQuery);
-	}
-
-	/**
-	 * @param $criteria
-	 *
-	 * @return null|object|Incoming
-	 */
-	public function findOneBy($criteria){
-		return $this->incomingRepository->findOneBy($criteria);
+		/** @var IncomingRepository $repo */
+		$repo = $this->entityRepository;
+		return $repo->searchContainers($incomingSearchModel, $returnQuery);
 	}
 }

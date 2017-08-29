@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_booking_status_log")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\BookingStatusLogRepository")
  */
-class BookingStatusLog
+class BookingStatusLog implements IEntity
 {
 	/**
 	 * @var int
@@ -23,7 +23,7 @@ class BookingStatusLog
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Booking", inversedBy="bookingStatusLogs")
-     * @ORM\JoinColumn(onDelete="cascade")
+	 * @ORM\JoinColumn(onDelete="cascade")
 	 */
 	private $booking;
 

@@ -1,21 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-06-07
- * Time: 3:22 PM
- */
 
 namespace WarehouseBundle\Manager;
-
 
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\IncomingType;
 
 class IncomingTypeManager extends BaseManager
 {
-
-	private $incomingTypeRepository;
 
 	/**
 	 * IncomingProductScanManager constructor.
@@ -24,8 +15,7 @@ class IncomingTypeManager extends BaseManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		parent::__construct($entityManager);
-		$this->incomingTypeRepository = $entityManager->getRepository('WarehouseBundle:IncomingType');
+		parent::__construct($entityManager, IncomingType::class);
 	}
 
 	/**
@@ -39,15 +29,5 @@ class IncomingTypeManager extends BaseManager
 			IncomingType::OCEAN_FREIGHT => 'Ocean Freight',
 			IncomingType::FORWARD => 'Forward',
 		];
-	}
-
-	/**
-	 * @param array $criteria
-	 *
-	 * @return null|object|IncomingType
-	 */
-	public function findOneBy(array $criteria)
-	{
-		return $this->incomingTypeRepository->findOneBy($criteria);
 	}
 }

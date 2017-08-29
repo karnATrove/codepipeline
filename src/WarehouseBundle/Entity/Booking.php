@@ -19,7 +19,7 @@ use WarehouseBundle\Model\BookingInterface;
  * @Gedmo\Loggable
  * @ExclusionPolicy("all")
  */
-class Booking implements BookingInterface
+class Booking implements BookingInterface, IEntity
 {
 	//region Constants
 

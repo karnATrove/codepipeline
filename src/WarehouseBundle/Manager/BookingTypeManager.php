@@ -7,7 +7,7 @@ use Rove\CanonicalDto\Booking\BookingDto;
 use WarehouseBundle\Entity\Booking;
 use WarehouseBundle\Exception\Manager\ManagerException;
 
-class BookingTypeManager extends BaseManager
+class BookingTypeManager
 {
 	/**
 	 * get type code by type id

@@ -12,7 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="warehouse_incoming")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingRepository")
  */
-class Incoming
+class Incoming implements IEntity
 {
 	//region Constants
 

@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-06-08
- * Time: 4:30 PM
- */
 
 namespace WarehouseBundle\Manager;
-
 
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\IncomingProductScan;
@@ -15,10 +8,10 @@ use WarehouseBundle\Entity\Location;
 use WarehouseBundle\Entity\LocationProduct;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Entity\User;
+use WarehouseBundle\Repository\LocationProductRepository;
 
 class LocationProductManager extends BaseManager
 {
-	private $locationProductRepository;
 
 	/**
 	 * LocationProductManager constructor.
@@ -27,8 +20,7 @@ class LocationProductManager extends BaseManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		parent::__construct($entityManager);
-		$this->locationProductRepository = $entityManager->getRepository('WarehouseBundle:LocationProduct');
+		parent::__construct($entityManager, LocationProduct::class);
 	}
 
 	/**
@@ -39,7 +31,9 @@ class LocationProductManager extends BaseManager
 	 */
 	public function findOneByProductAndLocation(Product $product, Location $location)
 	{
-		return $this->locationProductRepository->findOneByProductAndLocation($product, $location);
+		/** @var LocationProductRepository $repo */
+		$repo = $this->entityRepository;
+		return $repo->findOneByProductAndLocation($product, $location);
 	}
 
 	/**
@@ -68,19 +62,18 @@ class LocationProductManager extends BaseManager
 	}
 
 	/**
-	 * Create a LocationProduct
-	 * @param  Location $location      [description]
-	 * @param  Product  $product       [description]
-	 * @param  integer  $onHand        [description]
-	 * @param  integer  $staged        [description]
-	 * @param  [type]   $entityManager [description]
-	 * @param  [type]   $user          [description]
-	 * @return [type]                  [description]
+	 * @param Location                    $location
+	 * @param Product                     $product
+	 * @param int                         $onHand
+	 * @param int                         $staged
+	 * @param EntityManagerInterface|null $entityManager
+	 * @param null                        $user
 	 */
-	public function create(Location $location, Product $product, $onHand = 0, $staged = 0, $entityManager = null, $user = null) {
+	public function create(Location $location, Product $product, $onHand = 0, $staged = 0, EntityManagerInterface $entityManager = null, $user = null)
+	{
 		$flush = $entityManager ? false : true;
-		$locationProduct = (new LocationProduct())
-			->setLocation($location)
+		$locationProduct = new LocationProduct();
+		$locationProduct->setLocation($location)
 			->setProduct($product)
 			->setOnHand($onHand)
 			->setStaged($staged)

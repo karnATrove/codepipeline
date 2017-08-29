@@ -1,0 +1,34 @@
+{% for product in pagination %}
+    <tr>
+        <td><input type="checkbox" name="ids[]" onclick='bulkSubmitBtnManage();'
+                   class="check-all" value="{{ product.id }}" title="ids"/></td>
+        <td>
+            <a href="{{ path('product_edit',{'id':product.id}) }}">{{ product.model }}</a>
+        </td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.qtyPerCarton }}</td>
+        <td>{{ product.quantityOnHand }}</td>
+        <td>{{ productUtil.getAllocated(product) }}</td>
+        <td>{{ productUtil.getPicked(product) }}</td>
+        <td>{{ productUtil.getAvailable(product) }}</td>
+        {% set locationMap = productUtil.getLocationMap(product) %}
+        <td class="hidden-xs">{{ product.locations|length }} {% if locationMap|length %}
+                <ul>{% for location in locationMap %}
+                    <li>{{ location }}</li>{% endfor %}</ul>{% endif %}</td>
+
+        <td class="hidden-xs">{% if product.created %}{{ product.created|date('Y-m-d H:i:s') }}{% endif %}</td>
+
+        <td class="actions hidden-xs">
+            <div class="btn-group" role="group" aria-label="...">
+            <a onclick="return confirm('Are you sure!');" title="Delete" class="btn btn-danger btn-sm"
+               href="{{ path('product_by_id_delete',  app.request.query.all|merge({'id':product.id})) }}">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
+            <a title='Edit' class="btn btn-primary btn-sm"
+               href="{{ path('product_edit', app.request.query.all|merge({'id':product.id})) }}">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </a>
+            </div>
+        </td>
+    </tr>
+{% endfor %}

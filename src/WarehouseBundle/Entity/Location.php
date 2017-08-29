@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="warehouse_location")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\LocationRepository")
  */
-class Location
+class Location implements IEntity
 {
     /**
      * @var int

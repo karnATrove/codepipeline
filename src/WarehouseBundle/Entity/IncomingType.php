@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_incoming_type")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingTypeRepository")
  */
-class IncomingType
+class IncomingType implements IEntity
 {
 	const OCEAN_FREIGHT = 1;
 	const FORWARD = 2;

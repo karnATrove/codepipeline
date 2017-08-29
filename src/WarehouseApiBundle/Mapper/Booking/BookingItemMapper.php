@@ -42,7 +42,7 @@ class BookingItemMapper
 
     /**
      * @param \Rove\CanonicalDto\Booking\BookingItemDto $bookingItemDto
-     * @param \WarehouseBundle\Manager\ProductManager $productManager
+     * @param \WarehouseBundle\Manager\ProductManager   $productManager
      *
      * @throws \WarehouseApiBundle\Exception\MapperException
      */

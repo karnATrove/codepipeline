@@ -1,27 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-05-25
- * Time: 3:08 PM
- */
 
 namespace WarehouseBundle\Manager;
 
-
 use Doctrine\ORM\EntityManagerInterface;
-use Rove\CanonicalDto\Product\ProductDto;
-use Rove\CanonicalDto\Product\ProductItemDimensionDot;
+use Doctrine\ORM\Query;
 use Rove\CanonicalDto\Product\ProductItemDimensionDto;
 use Rove\CanonicalDto\Product\ProductItemDto;
 use WarehouseBundle\Entity\Product;
 use WarehouseBundle\Exception\Manager\ManagerException;
 use WarehouseBundle\Model\Product\ProductSearchModel;
+use WarehouseBundle\Repository\ProductRepository;
 
 class ProductManager extends BaseManager
 {
-	private $productRepository;
-
 	/**
 	 * ProductManager constructor.
 	 *
@@ -29,12 +20,12 @@ class ProductManager extends BaseManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		parent::__construct($entityManager);
-		$this->productRepository = $entityManager->getRepository('WarehouseBundle:Product');
+		parent::__construct($entityManager, Product::class);
 	}
 
 	/**
-     * Get product item dimension
+	 * Get product item dimension
+	 *
 	 * @param ProductItemDto $productItemDto
 	 *
 	 * @return null|ProductItemDimensionDto
@@ -64,7 +55,9 @@ class ProductManager extends BaseManager
 		if (empty($sku)) {
 			throw new ManagerException('Empty SKU', "Sku you provided is empty");
 		}
-		return $this->productRepository->findProductAvailableQuantity($sku);
+		/** @var ProductRepository $repo */
+		$repo = $this->entityRepository;
+		return $repo->findProductAvailableQuantity($sku);
 	}
 
 	/**
@@ -74,7 +67,7 @@ class ProductManager extends BaseManager
 	 */
 	public function getOneBySku(string $sku)
 	{
-		return $this->productRepository->findOneBy(['model' => $sku]);
+		return $this->entityRepository->findOneBy(['model' => $sku]);
 	}
 
 	/**
@@ -115,12 +108,44 @@ class ProductManager extends BaseManager
 		}
 	}
 
-    /**
-     * Count products
-     * @param ProductSearchModel $productSearchModel
-     * @return int
-     */
-    public function countStockProduct(ProductSearchModel $productSearchModel){
-        return $this->productRepository->countStockProduct($productSearchModel);
-    }
+	/**
+	 * Count products
+	 *
+	 * @param ProductSearchModel $productSearchModel
+	 *
+	 * @return int
+	 */
+	public function countStockProduct(ProductSearchModel $productSearchModel)
+	{
+		/** @var ProductRepository $repo */
+		$repo = $this->entityRepository;
+		return $repo->countStockProduct($productSearchModel);
+	}
+
+	/**
+	 * @param ProductSearchModel $searchModel
+	 * @param bool               $returnQuery
+	 *
+	 * @return array|Query
+	 */
+	public function searchProducts(ProductSearchModel $searchModel, $returnQuery = false)
+	{
+		/** @var ProductRepository $repo */
+		$repo = $this->entityRepository;
+		return $repo->searchProducts($searchModel, $returnQuery);
+	}
+
+	/**
+	 * @param Product $product
+	 *
+	 * @return int
+	 */
+	public static function quantityOnHand(Product $product)
+	{
+		$onHand = 0;
+		foreach ($product->getLocations() as $location) {
+			$onHand += $location->getOnHand();
+		}
+		return $onHand;
+	}
 }

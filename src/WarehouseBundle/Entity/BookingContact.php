@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\BookingContactRepository")
  * @Gedmo\Loggable
  */
-class BookingContact
+class BookingContact implements IEntity
 {
     /**
      * @var int

@@ -6,7 +6,7 @@ namespace WarehouseBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /** @ORM\Entity */
-class Invitation
+class Invitation implements IEntity
 {
     /** @ORM\Id @ORM\Column(type="string", length=6) */
     protected $code;

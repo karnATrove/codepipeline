@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_carrier")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\CarrierRepository")
  */
-class Carrier
+class Carrier implements IEntity
 {
 
 	//region Constant

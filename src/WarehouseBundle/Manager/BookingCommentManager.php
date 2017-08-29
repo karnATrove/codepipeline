@@ -11,6 +11,7 @@ namespace WarehouseBundle\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\BookingComment;
+use WarehouseBundle\Entity\IEntity;
 
 class BookingCommentManager extends BaseManager
 {
@@ -18,15 +19,15 @@ class BookingCommentManager extends BaseManager
 
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		parent::__construct($entityManager);
+		parent::__construct($entityManager, BookingComment::class);
 		$this->bookingCommentRepository = $entityManager->getRepository('WarehouseBundle:BookingComment');
 	}
 
 	/**
-	 * @param BookingComment $bookingComment
-	 * @param null           $entityManager
+	 * @param BookingComment|IEntity      $bookingComment
+	 * @param EntityManagerInterface|null $entityManager
 	 */
-	public function update(BookingComment $bookingComment, $entityManager = null)
+	public function update(IEntity $bookingComment, EntityManagerInterface $entityManager = null)
 	{
 		$flush = $entityManager ? false : true;
 		$entityManager = $entityManager ? $entityManager : $this->entityManager;

@@ -25,7 +25,7 @@ use WarehouseBundle\Model\Booking\PickSummary\PickSummaryModel;
 use WarehouseBundle\Utils\DownloadUtility;
 use WarehouseBundle\Utils\FileUtility;
 
-class BookingManager
+class BookingManager extends BaseManager
 {
 	const BASE_WEBSITE_ADDRESS = "https://www.roveconcepts.com/remote/c9c078d09dbfa23992cb150ccadc238f/carrier/downloads/";
 
@@ -39,6 +39,7 @@ class BookingManager
 	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
+		parent::__construct($entityManager, Booking::class);
 		$this->em = $entityManager;
 		$this->bookingRepository = $this->em->getRepository('WarehouseBundle:Booking');
 	}
@@ -112,19 +113,6 @@ class BookingManager
 	}
 
 	/**
-	 * @param array      $criteria
-	 * @param array|null $orderBy
-	 * @param null       $limit
-	 * @param null       $offset
-	 *
-	 * @return array|Booking[]
-	 */
-	public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
-	{
-		return $this->bookingRepository->findBy($criteria, $orderBy, $limit, $offset);
-	}
-
-	/**
 	 * @param BookingSearchModel $bookingSearchModel
 	 *
 	 * @return int|mixed
@@ -134,24 +122,25 @@ class BookingManager
 		return $this->bookingRepository->count($bookingSearchModel);
 	}
 
-    /**
-     * @param BookingSearchModel $bookingSearchModel
-     *
-     * @return int|mixed
-     */
-    public function countGroupBy(BookingSearchModel $bookingSearchModel)
-    {
-        return $this->bookingRepository->countGroupBy($bookingSearchModel);
-    }
+	/**
+	 * @param BookingSearchModel $bookingSearchModel
+	 *
+	 * @return int|mixed
+	 */
+	public function countGroupBy(BookingSearchModel $bookingSearchModel)
+	{
+		return $this->bookingRepository->countGroupBy($bookingSearchModel);
+	}
 
-    /**
-     * @param $criteria
-     * @param $sorting
-     * @param bool $query  true return query builder otherwise return result.
-     */
-    public function searchBookings($criteria, $sorting, $query = FALSE) {
-        return $this->bookingRepository->searchBookings($criteria,$sorting,$query);
-    }
+	/**
+	 * @param      $criteria
+	 * @param      $sorting
+	 * @param bool $query true return query builder otherwise return result.
+	 */
+	public function searchBookings($criteria, $sorting, $query = FALSE)
+	{
+		return $this->bookingRepository->searchBookings($criteria, $sorting, $query);
+	}
 
 	/**
 	 * @param $status
@@ -499,9 +488,9 @@ class BookingManager
 	 */
 	public static function getDefaultBookingLabel(Booking $booking)
 	{
-        if (!$booking->getCarrier()) {
-            return null;
-        }
+		if (!$booking->getCarrier()) {
+			return null;
+		}
 		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/label";
 		return DownloadUtility::isLinkExist($url) ? $url : null;
 	}
@@ -515,9 +504,9 @@ class BookingManager
 	 */
 	public static function getDefaultBookingBol(Booking $booking)
 	{
-	    if (!$booking->getCarrier()) {
-	        return null;
-        }
+		if (!$booking->getCarrier()) {
+			return null;
+		}
 		$url = self::BASE_WEBSITE_ADDRESS . $booking->getCarrier()->getId() . "/{$booking->getOrderReference()}/bol";
 		return DownloadUtility::isLinkExist($url) ? $url : null;
 	}

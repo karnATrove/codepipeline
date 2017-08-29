@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="warehouse_booking_file")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\BookingFileRepository")
  */
-class BookingFile
+class BookingFile implements IEntity
 {
     /**
      * @var int

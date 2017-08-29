@@ -10,7 +10,7 @@ namespace WarehouseBundle\Workflow;
 
 
 use Rove\CanonicalDto\Container\ContainerUpdateDto;
-use RoveSiteRestApiBundle\Exception\RoveSiteApiException;
+use Rove\RoveSiteRestApiBundle\Exception\RoveSiteApiException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WarehouseBundle\DTO\AjaxResponse\AjaxCommandDTO;
 use WarehouseBundle\Entity\Incoming;

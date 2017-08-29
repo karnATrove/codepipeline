@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use WarehouseBundle\Manager\ProductManager;
 use WarehouseBundle\Model\ProductInterface;
 
 /**
@@ -14,7 +15,7 @@ use WarehouseBundle\Model\ProductInterface;
  * @ORM\Table(name="warehouse_product")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\ProductRepository")
  */
-class Product implements ProductInterface
+class Product implements ProductInterface, IEntity
 {
 	/**
 	 * @var int
@@ -403,11 +404,11 @@ class Product implements ProductInterface
 	/**
 	 * Add location
 	 *
-	 * @param \WarehouseBundle\Entity\Location $location
+	 * @param Location $location
 	 *
 	 * @return Product
 	 */
-	public function addLocation(\WarehouseBundle\Entity\Location $location)
+	public function addLocation(Location $location)
 	{
 		$this->locations[] = $location;
 
@@ -417,9 +418,9 @@ class Product implements ProductInterface
 	/**
 	 * Remove location
 	 *
-	 * @param \WarehouseBundle\Entity\Location $location
+	 * @param Location $location
 	 */
-	public function removeLocation(\WarehouseBundle\Entity\Location $location)
+	public function removeLocation(Location $location)
 	{
 		$this->locations->removeElement($location);
 	}
@@ -437,11 +438,11 @@ class Product implements ProductInterface
 	/**
 	 * Add incoming
 	 *
-	 * @param \WarehouseBundle\Entity\IncomingProduct $incoming
+	 * @param IncomingProduct $incoming
 	 *
 	 * @return Product
 	 */
-	public function addIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
+	public function addIncoming(IncomingProduct $incoming)
 	{
 		$this->incoming[] = $incoming;
 
@@ -451,9 +452,9 @@ class Product implements ProductInterface
 	/**
 	 * Remove incoming
 	 *
-	 * @param \WarehouseBundle\Entity\IncomingProduct $incoming
+	 * @param IncomingProduct $incoming
 	 */
-	public function removeIncoming(\WarehouseBundle\Entity\IncomingProduct $incoming)
+	public function removeIncoming(IncomingProduct $incoming)
 	{
 		$this->incoming->removeElement($incoming);
 	}
@@ -471,7 +472,7 @@ class Product implements ProductInterface
 	/**
 	 * Get user
 	 *
-	 * @return \WarehouseBundle\Entity\User
+	 * @return User
 	 */
 	public function getUser()
 	{
@@ -481,11 +482,11 @@ class Product implements ProductInterface
 	/**
 	 * Set user
 	 *
-	 * @param \WarehouseBundle\Entity\User $user
+	 * @param User $user
 	 *
 	 * @return Product
 	 */
-	public function setUser(\WarehouseBundle\Entity\User $user = null)
+	public function setUser(User $user = null)
 	{
 		$this->user = $user;
 
@@ -495,5 +496,13 @@ class Product implements ProductInterface
 	public function __toString()
 	{
 		return 'Product';
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getQuantityOnHand()
+	{
+		return ProductManager::quantityOnHand($this);
 	}
 }

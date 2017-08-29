@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_incoming_product")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingProductRepository")
  */
-class IncomingProduct
+class IncomingProduct implements IEntity
 {
     /**
      * @var int

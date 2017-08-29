@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_incoming_comment")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\IncomingCommentRepository")
  */
-class IncomingComment
+class IncomingComment implements IEntity
 {
     /**
      * @var int

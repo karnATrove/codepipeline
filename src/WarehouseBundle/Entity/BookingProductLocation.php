@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="warehouse_booking_product_location")
  * @ORM\Entity(repositoryClass="WarehouseBundle\Repository\BookingProductLocationRepository")
  */
-class BookingProductLocation
+class BookingProductLocation implements IEntity
 {
     /**
      * @var int

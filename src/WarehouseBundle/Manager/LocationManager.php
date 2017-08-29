@@ -1,30 +1,27 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rove
- * Date: 2017-06-08
- * Time: 11:58 AM
- */
 
 namespace WarehouseBundle\Manager;
-
 
 use Doctrine\ORM\EntityManagerInterface;
 use WarehouseBundle\Entity\Location;
 
-class LocationManager
+class LocationManager extends BaseManager
 {
-	private $entityManager;
-	private $locationRepository;
 
+	/**
+	 * LocationManager constructor.
+	 *
+	 * @param EntityManagerInterface $entityManager
+	 */
 	public function __construct(EntityManagerInterface $entityManager)
 	{
-		$this->entityManager = $entityManager;
-		$this->locationRepository = $entityManager->getRepository('WarehouseBundle:Location');
+		parent::__construct($entityManager, Location::class);
 	}
 
 	/**
 	 * @param Location[] $locations
+	 *
+	 * @return array
 	 */
 	public static function toArray($locations)
 	{
@@ -36,11 +33,11 @@ class LocationManager
 	}
 
 	/**
-	 * @return array|\WarehouseBundle\Entity\Location[]
+	 * @return Location[]
 	 */
 	public function getLocations()
 	{
-		return $this->locationRepository->findAll();
+		return $this->entityRepository->findAll();
 	}
 
 	/**
@@ -50,7 +47,7 @@ class LocationManager
 	 */
 	public function findById($id)
 	{
-		return $this->locationRepository->find($id);
+		return $this->entityRepository->find($id);
 	}
 
 }
