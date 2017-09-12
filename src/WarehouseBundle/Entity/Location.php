@@ -168,7 +168,7 @@ class Location implements IEntity
      *
      * @param boolean $staging
      *
-     * @return boolean
+     * @return self
      */
     public function setStaging($staging)
     {
