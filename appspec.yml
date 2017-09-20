@@ -8,5 +8,3 @@ files:
 hooks:
   BeforeInstall:
     - location: /conf/stopserver.sh
-  AfterInstall:
-    - location: /conf/startserver.sh
