@@ -5,7 +5,7 @@ files:
     destination: /var/www/rlogistic/
   - source: /
     destination: /var/www/dx3pl/
-  - source: /conf/httpd.conf
+  - source: /conf/
     destination: /etc/httpd/conf/
 hooks:
   BeforeInstall:
