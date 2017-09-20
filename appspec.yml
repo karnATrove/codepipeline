@@ -1,9 +1,9 @@
 version: 0.0
 os: linux
 files:
-  - source: /conf/
-    destination: /etc/httpd/sites-available/
   - source: /
     destination: /var/www/rlogistic/
   - source: /
     destination: /var/www/dx3pl/
+  - source: /conf/httpd.conf
+    destination: /etc/httpd/conf/
