@@ -5,3 +5,6 @@ files:
     destination: /var/www/rlogistic
   - source: /conf/
     destination: /etc/httpd/conf
+hooks:
+  BeforeInstall:
+    - location: /conf/stopserver.sh
