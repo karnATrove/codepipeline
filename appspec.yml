@@ -3,6 +3,8 @@ os: linux
 files:
   - source: /
     destination: /var/www/rlogistic
+  - source: /
+    destination: /var/www/dx3pl
   - source: /conf/
     destination: /etc/httpd/conf
 hooks:
