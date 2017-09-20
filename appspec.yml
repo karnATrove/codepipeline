@@ -3,5 +3,3 @@ os: linux
 files:
   - source: /
     destination: /var/www/rlogistic
-  - source: /conf/
-    destination: /etc/httpd/conf
