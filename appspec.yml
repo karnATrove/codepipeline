@@ -7,9 +7,8 @@ files:
     destination: /var/www/dx3pl/
   - source: /conf/httpd.conf
     destination: /etc/httpd/conf/
-    hooks:
+hooks:
   BeforeInstall:
     - location: /conf/stopserver.sh
   AfterInstall:
     - location: /conf/startserver.sh
-      timeout: 180
