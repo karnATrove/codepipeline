@@ -5,8 +5,3 @@ files:
     destination: /var/www/rlogistic/
   - source: /
     destination: /var/www/dx3pl/
-hooks:
-  BeforeInstall:
-    - location: /conf/stopserver.sh
-  AfterInstall:
-    - location: /conf/startserver.sh
