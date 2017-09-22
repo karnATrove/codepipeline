@@ -5,3 +5,5 @@ files:
     destination: /var/www/rlogistic
   - source: /
     destination: /var/www/dx3pl
+  - source: /conf.d
+    destination: /etc/httpd/conf.d
