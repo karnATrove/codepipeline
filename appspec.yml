@@ -7,3 +7,15 @@ files:
     destination: /var/www/vhosts/dx3pl.roveconcepts.com/public_html
   - source: /conf.d
     destination: /etc/httpd/conf.d
+permissions:
+  - object: /var/www
+    pattern: "**"
+    owner: ec2-user
+    group: apache
+    mode: 755
+    type:
+      - file
+hooks:
+  AfterInstall:
+   - location: scripts/restart_apache.sh
+     runas: root
