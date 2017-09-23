@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/vhosts/rlogistic.roveconcepts.com/public_html
+    destination: /var/www/vhosts/rlogistic.roveconcepts.me/public_html
   - source: /
-    destination: /var/www/vhosts/dx3pl.roveconcepts.com/public_html
+    destination: /var/www/vhosts/dx3pl.roveconcepts.me/public_html
   - source: /conf.d
     destination: /etc/httpd/conf.d
 permissions:
