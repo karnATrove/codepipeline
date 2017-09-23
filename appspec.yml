@@ -18,4 +18,4 @@ permissions:
 hooks:
   AfterInstall:
    - location: scripts/restart_apache.sh
-     runas: root
+     runas: ec2-user
