@@ -13,7 +13,7 @@ chown -R ec2-user:apache /etc/httpd/conf.d
 cd ~
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
-#ln -s /usr/local/bin/composer /usr/bin/composer
+ln -s /usr/local/bin/composer /usr/bin/composer
 #composer upadte
 #php bin/console cache:clear --env=prod
 #php bin/console assetic:dump
