@@ -14,7 +14,17 @@ cd ~
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
-#composer upadte
+#composer update
 #php bin/console cache:clear --env=prod
 #php bin/console assetic:dump
+#yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
+#mkdir /CloudWatch
+#cd /CloudWatch
+#curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
+#unzip CloudWatchMonitoringScripts-1.2.1.zip
+#rm -f CloudWatchMonitoringScripts-1.2.1.zip
+#cd aws-scripts-mon
+#./mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail
+#./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --auto-scaling=only
+#./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --aggregated=only
 service httpd restart > /var/www/vhosts/logs/restartapache.out 2>&1
