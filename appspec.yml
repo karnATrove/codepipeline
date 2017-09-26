@@ -17,5 +17,5 @@ files:
 #      - file
 hooks:
   AfterInstall:
-   - location: scripts/restart_apache.sh
+   - location: scripts/after-install.sh
      runas: root
