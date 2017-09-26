@@ -5,6 +5,11 @@
 # exec 1>/var/www/vhosts/logs/out.log 2>&1
 chmod -R 777 /var/www/vhosts/rlogistic.roveconcepts.me/public_html/var/cache
 chmod -R 777 /var/www/vhosts/rlogistic.roveconcepts.me/public_html/var/logs
+chmod -R 777 /var/www/vhosts/dx3pl.roveconcepts.me/public_html/var/cache
+chmod -R 777 /var/www/vhosts/dx3pl.roveconcepts.me/public_html/var/logs
+chown -R ec2-user:apache /var/www
+chown -R ec2-user:apache /etc/httpd/conf
+chown -R ec2-user:apache /etc/httpd/conf.d
 #cd ~
 #curl -sS https://getcomposer.org/installer | php
 #mv composer.phar /usr/local/bin/composer
