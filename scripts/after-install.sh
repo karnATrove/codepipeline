@@ -35,6 +35,7 @@ fi
 #php -d memory_limit=2048M bin/console assetic:dump
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
 yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
+yum install zip unzip -y
 mkdir /CloudWatch
 cd /CloudWatch
 curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
