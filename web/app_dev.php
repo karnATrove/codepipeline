@@ -28,13 +28,14 @@ function ip_in_range( $ip, $range ) {
 }
 
 $ip = $_SERVER['REMOTE_ADDR'];
+print_r($ip,TRUE);
 $in_range = false;
 $cidr_list = array("10.1.42.0/24","10.1.44.0/24","20.1.42.0/24","20.1.44.0/24","30.1.42.0/24","30.1.44.0/24","10.0.42.0/24","10.0.44.0/24","20.0.42.0/24","20.0.44.0/24","30.0.42.0/24","30.0.44.0/24");
 foreach($cidr_list as $cidr) {
   $in_range = $in_range || (ip_in_range($ip,$cidr));
   if($in_range) { break; }
 }
-
+print_r($in_range,TRUE);
 
 // This check prevents access to debug front controllers that are deployed by accident to production servers.
 // Feel free to remove this, extend it, or make something more sophisticated.
