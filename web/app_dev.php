@@ -28,14 +28,14 @@ function ip_in_range( $ip, $range ) {
 }
 
 $ip = $_SERVER['REMOTE_ADDR'];
-print_r($ip,TRUE);
+echo ($ip.'<br>');
 $in_range = false;
 $cidr_list = array("10.1.42.0/24","10.1.44.0/24","20.1.42.0/24","20.1.44.0/24","30.1.42.0/24","30.1.44.0/24","10.0.42.0/24","10.0.44.0/24","20.0.42.0/24","20.0.44.0/24","30.0.42.0/24","30.0.44.0/24");
 foreach($cidr_list as $cidr) {
   $in_range = $in_range || (ip_in_range($ip,$cidr));
   if($in_range) { break; }
 }
-print_r($in_range,TRUE);
+echo ($in_range.'<br>');
 
 // This check prevents access to debug front controllers that are deployed by accident to production servers.
 // Feel free to remove this, extend it, or make something more sophisticated.
@@ -47,7 +47,7 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
     header('HTTP/1.0 403 Forbidden');
     exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information. IP: '.$_SERVER['REMOTE_ADDR']);
 } else {
-  print_r(($_SERVER['REMOTE_ADDR'].' is eligible'),TRUE);
+  echo (($_SERVER['REMOTE_ADDR'].' is eligible'));
 }
 
 /** @var \Composer\Autoload\ClassLoader $loader */
