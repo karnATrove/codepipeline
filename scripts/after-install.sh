@@ -15,8 +15,8 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
 #composer update
-#php bin/console cache:clear --env=prod
-#php bin/console assetic:dump
+#php -d memory_limit=2048M bin/console cache:clear --env=prod
+#php -d memory_limit=2048M bin/console assetic:dump
 #yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
 mkdir /CloudWatch
 cd /CloudWatch
