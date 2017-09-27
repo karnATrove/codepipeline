@@ -41,6 +41,7 @@ curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScript
 unzip CloudWatchMonitoringScripts-1.2.1.zip
 rm -f CloudWatchMonitoringScripts-1.2.1.zip
 #cd aws-scripts-mon
+(crontab -l ; echo "*/5 * * * * ~/aws-scripts-mon/mon-put-instance-data.pl --mem-used-incl-cache-buff --mem-util --disk-space-util --disk-path=/ --from-cron") | crontab
 #./mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail
 #./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --auto-scaling=only
 #./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --aggregated=only
