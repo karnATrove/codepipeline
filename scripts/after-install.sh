@@ -29,7 +29,7 @@ then
     echo "ok parameters.yml or rlogistic exist"
 else
     cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/web
-    #composer install
+    #composer install --no-interaction
 fi
 cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/app/config
 if [ -e parameters.yml ]
@@ -37,7 +37,7 @@ then
     echo "ok parameters.yml or dx3pl exist"
 else
     cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/web
-    #composer install
+    #composer install --no-interaction
 fi
 #composer update
 cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
