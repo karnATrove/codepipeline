@@ -14,10 +14,27 @@ cd ~
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
+cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config
+if [ -e parameters.yml ]
+then
+    echo "ok parameters.yml or rlogistic exist"
+else
+    cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/web
+    #composer install
+fi
+cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/app/config
+if [ -e parameters.yml ]
+then
+    echo "ok parameters.yml or dx3pl exist"
+else
+    cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/web
+    #composer install
+fi
 #composer update
 #php -d memory_limit=2048M bin/console cache:clear --env=prod
 #php -d memory_limit=2048M bin/console assetic:dump
-#yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
+#cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
+yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
 mkdir /CloudWatch
 cd /CloudWatch
 curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
