@@ -19,7 +19,7 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     firewall_host: "%firewall_host%"
-    api_host: "%api_host%"
+    api_host: api.roveconcepts.com
     business.name: "%business_name%"
 
     rove_site.api.key : "%rove_site_api_key%"
