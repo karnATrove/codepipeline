@@ -84,7 +84,7 @@
     "symfony-bin-dir": "bin",
     "symfony-assets-install": "relative",
     "incenteev-parameters": {
-      "file": "app/config/parameters.yml"
+      "file": "app/config/parameters.yml",
       "env-map": {
             "database_host": "database_host",
             "database_port": "database_port",
