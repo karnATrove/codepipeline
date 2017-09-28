@@ -13,7 +13,7 @@
   },
   "require": {
     "php": ">=7.0.0",
-    "symfony/symfony": "~3.3",
+    "symfony/symfony": "~3.0",
     "doctrine/orm": "^2.4.8",
     "doctrine/doctrine-bundle": "~1.4",
     "symfony/swiftmailer-bundle": "~2.3",
@@ -85,6 +85,26 @@
     "symfony-assets-install": "relative",
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
+      "env-map": {
+            "database_host": "database_host",
+            "database_port": "database_port",
+            "database_name": "database_name",
+            "database_user": "database_user",
+            "database_pass": "database_pass",
+            "mailer_transport": "mailer_transport"
+            "mailer_host": "mailer_host"
+            "mailer_user": "mailer_user"
+            "mailer_password": "mailer_password"
+            "firewall_host": "firewall_host",
+            "api_host": "api_host",
+            "business.name": "business_name",
+            "rove_site.api.key": "rove_site_api_key",
+            "rove_site.api.url.base": "rove_site_api_url_base",
+            "rove_site.api.url.comment": "rove_site_api_url_comment",
+            "rove_site.api.url.container": "rove_site_api_url_container",
+            "rove_site.api.url.product": "rove_site_api_url_product",
+            "rove_site.api.url.productItem": "rove_site_api_url_productItem"
+        }
     },
     "branch-alias": null
   },
