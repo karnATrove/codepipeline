@@ -17,7 +17,6 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
-
     firewall_host: localhost
     api_host: api.roveconcepts.com
     business.name: "%business_name%"
