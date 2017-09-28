@@ -90,7 +90,7 @@
             "database_port": "database_port",
             "database_name": "database_name",
             "database_user": "database_user",
-            "database_pass": "database_pass",
+            "database_password": "database_password",
             "mailer_transport": "mailer_transport",
             "mailer_host": "mailer_host",
             "mailer_user": "mailer_user",
