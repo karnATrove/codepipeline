@@ -47,6 +47,7 @@ cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
 php -d memory_limit=2048M bin/console cache:clear --env=prod
 php -d memory_limit=2048M bin/console assetic:dump
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
+#echo 'export database_host=rlogistic-cluster.cluster-cepwew4s61wr.us-west-2.rds.amazonaws.com' > /var/www/vhosts/config/configuration.sh
 
 
 #################################################################################
