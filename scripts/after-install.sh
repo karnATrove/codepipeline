@@ -19,6 +19,9 @@ chown -R ec2-user:apache /etc/httpd/conf.d
 # Install composer
 # Execute composer install if parameters.yml file is not yet created
 #######################################################################
+cd /etc/profile.d/
+chmod +x /etc/profile.d/configuration.sh
+./configuration.sh
 cd ~
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
@@ -40,12 +43,12 @@ else
     #composer install --no-interaction
 fi
 #composer update
-cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
-php -d memory_limit=2048M bin/console cache:clear --env=prod
-php -d memory_limit=2048M bin/console assetic:dump
-cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
-php -d memory_limit=2048M bin/console cache:clear --env=prod
-php -d memory_limit=2048M bin/console assetic:dump
+#cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
+#php -d memory_limit=2048M bin/console cache:clear --env=prod
+#php -d memory_limit=2048M bin/console assetic:dump
+#cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
+#php -d memory_limit=2048M bin/console cache:clear --env=prod
+#php -d memory_limit=2048M bin/console assetic:dump
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
 #echo 'export database_host=rlogistic-cluster.cluster-cepwew4s61wr.us-west-2.rds.amazonaws.com' > /var/www/vhosts/config/configuration.sh
 
