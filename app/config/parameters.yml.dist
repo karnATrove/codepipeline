@@ -2,29 +2,29 @@
 # Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
 # http://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
-    database_host:     127.0.0.1
-    database_port:     ~
-    database_name:     symfony
-    database_user:     root
-    database_password: ~
+    database_host:     "%env(database_host)%"
+    database_port:     "%env(database_port)%"
+    database_name:     "%env(database_name)%"
+    database_user:     "%env(database_user)%"
+    database_password: "%env(database_password)%"
     # You should uncomment this if you want use pdo_sqlite
     # database_path: "%kernel.root_dir%/data.db3"
 
-    mailer_transport:  smtp
-    mailer_host:       127.0.0.1
-    mailer_user:       ~
-    mailer_password:   ~
+    mailer_transport:  "%env(mailer_transport)%"
+    mailer_host:       "%env(mailer_host)%"
+    mailer_user:       "%env(mailer_user)%"
+    mailer_password:   "%env(mailer_password)%"
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    firewall_host: localhost
-    api_host: api.roveconcepts.com
-    business.name: rlogistic
+    firewall_host: "%env(firewall_host)%"
+    api_host: "%env(api_host)%"
+    business.name: "%env(business_name)%"
 
-    rove_site.api.key : d21zIGxpbmsgdG8gcm92ZSBhd2Vzb21l
-    rove_site.api.url.base: https://roveconcepts.com/api
-    rove_site.api.url.comment: /order-comment
-    rove_site.api.url.container: /container
-    rove_site.api.url.product: /product
-    rove_site.api.url.productItem: /product-item
+    rove_site.api.key : "%env(rove_site_api_key)%"
+    rove_site.api.url.base: "%env(rove_site_api_url_base)%"
+    rove_site.api.url.comment: "%env(rove_site_api_url_comment)%"
+    rove_site.api.url.container: "%env(rove_site_api_url_container)%"
+    rove_site.api.url.product: "%env(rove_site_api_url_product)%"
+    rove_site.api.url.productItem: "%env(rove_site_api_url_productItem)%"
