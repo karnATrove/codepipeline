@@ -44,7 +44,7 @@ then
     echo "parameters.yml of rlogistic already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
 else
     echo "no parameters.yml of rlogistic exist" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/web
+    cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
     export database_name=rlogistic
     export business_name=rlogistic
     composer install --no-interaction
@@ -61,7 +61,7 @@ then
     echo "parameters.yml of dx3pl already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
 else
     echo "no parameters.yml of dx3pl exist" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/web
+    cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
     export database_name=dx3pl
     export business_name=dx3pl
     composer install --no-interaction
@@ -72,7 +72,6 @@ else
 fi
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
 #echo 'export database_host=rlogistic-cluster.cluster-cepwew4s61wr.us-west-2.rds.amazonaws.com' > /var/www/vhosts/config/configuration.sh
-
 
 #################################################################################
 # Install perl script
