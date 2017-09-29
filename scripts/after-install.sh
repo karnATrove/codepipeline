@@ -47,7 +47,7 @@ else
     cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
     export database_name=rlogistic
     export business_name=rlogistic
-    composer install --no-interaction
+    composer install --no-interaction >> /var/www/vhosts/logs/after_install_script.out 2>&1
     #cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
     #echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
     #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
@@ -64,7 +64,7 @@ else
     cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
     export database_name=dx3pl
     export business_name=dx3pl
-    composer install --no-interaction
+    composer install --no-interaction >> /var/www/vhosts/logs/after_install_script.out 2>&1
     #cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
     #echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
     #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
