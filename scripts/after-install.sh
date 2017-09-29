@@ -38,7 +38,7 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
 cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config
-#rm -f parameters.yml
+rm -f parameters.yml
 if [ -e parameters.yml ]
 then
     echo "parameters.yml of rlogistic already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
@@ -49,13 +49,13 @@ else
     export business_name=rlogistic
     composer install --no-interaction
     #cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
-    #echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    #php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
 fi
 
 cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/app/config
-#rm -f parameters.yml
+rm -f parameters.yml
 if [ -e parameters.yml ]
 then
     echo "parameters.yml of dx3pl already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
@@ -66,9 +66,9 @@ else
     export business_name=dx3pl
     composer install --no-interaction
     #cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
-    #echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    #php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
 fi
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
 #echo 'export database_host=rlogistic-cluster.cluster-cepwew4s61wr.us-west-2.rds.amazonaws.com' > /var/www/vhosts/config/configuration.sh
@@ -96,6 +96,7 @@ crontab -l | grep -q 'aws-script'  && echo 'entry exists' || (crontab -l ; echo 
 # Ensure to change user and group as well as grant accessing to directories 
 # to prevent file permissions problem
 #################################################################################
+echo "Change owner and permission" >> /var/www/vhosts/logs/after_install_script.out 2>&1
 chown -R ec2-user:apache /var/www
 chmod -R 777 /var/www/
 chmod -R 777 /var/www/vhosts/dx3pl.roveconcepts.me/public_html/var/cache
