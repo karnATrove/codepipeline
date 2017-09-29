@@ -11,6 +11,9 @@
 #######################################################################
 # Change user and group of some directories
 #######################################################################
+echo "------------------------------------------------------------------------" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+echo TZ=":PST8PDT" date >> /var/www/vhosts/logs/after_install_script.out 2>&1
+echo "------------------------------------------------------------------------" >> /var/www/vhosts/logs/after_install_script.out 2>&1
 chown -R ec2-user:apache /var/www
 chown -R ec2-user:apache /etc/httpd/conf
 chown -R ec2-user:apache /etc/httpd/conf.d
