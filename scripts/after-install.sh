@@ -35,6 +35,7 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
 cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config
+rm -f parameters.yml
 if [ -e parameters.yml ]
 then
     echo "parameters.yml of rlogistic already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
@@ -51,6 +52,7 @@ else
 fi
 
 cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/app/config
+rm -f parameters.yml
 if [ -e parameters.yml ]
 then
     echo "parameters.yml of dx3pl already existed" >> /var/www/vhosts/logs/after_install_script.out 2>&1
