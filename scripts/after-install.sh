@@ -41,6 +41,8 @@ then
 else
     echo "no parameters.yml of rlogistic exist" >> /var/www/vhosts/logs/after_install_script.out 2>&1
     cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/web
+    export database_name=rlogistic
+    export business_name=rlogistic
     composer install --no-interaction
     cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
     echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
@@ -55,6 +57,8 @@ then
 else
     echo "no parameters.yml of dx3pl exist" >> /var/www/vhosts/logs/after_install_script.out 2>&1
     cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/web
+    export database_name=dx3pl
+    export business_name=dx3pl
     composer install --no-interaction
     cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
     echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
