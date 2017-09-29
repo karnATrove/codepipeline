@@ -99,4 +99,5 @@ chmod -R 777 /var/www/vhosts/rlogistic.roveconcepts.me/public_html/var/logs
 #################################################################################
 # Restart httpd
 #################################################################################
-service httpd restart > /var/www/vhosts/logs/restartapache.out 2>&1
+echo "Finally restart Apache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+service httpd restart >> /var/www/vhosts/logs/after_install_script.out 2>&1
