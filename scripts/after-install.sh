@@ -49,9 +49,9 @@ else
     export business_name=rlogistic
     composer install --no-interaction
     #cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html
-    echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #echo "Clear rlogistic cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
 fi
 
 cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html/app/config
@@ -66,9 +66,9 @@ else
     export business_name=dx3pl
     composer install --no-interaction
     #cd /var/www/vhosts/dx3pl.roveconcepts.me/public_html
-    echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
-    php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #echo "Clear dx3pl cache" >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #php -d memory_limit=2048M bin/console cache:clear --env=prod >> /var/www/vhosts/logs/after_install_script.out 2>&1
+    #php -d memory_limit=2048M bin/console assetic:dump >> /var/www/vhosts/logs/after_install_script.out 2>&1
 fi
 #cat /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config/parameters.yml | grep database_host
 #echo 'export database_host=rlogistic-cluster.cluster-cepwew4s61wr.us-west-2.rds.amazonaws.com' > /var/www/vhosts/config/configuration.sh
