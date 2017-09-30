@@ -35,10 +35,10 @@ chmod +x /etc/profile.d/configuration.sh
 ./configuration.sh
 cd ~
 curl -sS https://getcomposer.org/installer | php
-#curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -
-#yum install nodejs
-#npm install bower -g
-#npm install gulp -g
+curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -
+yum install nodejs
+npm install bower -g
+npm install gulp -g
 mv composer.phar /usr/local/bin/composer
 ln -s /usr/local/bin/composer /usr/bin/composer
 cd /var/www/vhosts/rlogistic.roveconcepts.me/public_html/app/config
